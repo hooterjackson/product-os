@@ -50,6 +50,10 @@ FORBIDDEN_PATHS = re.compile(
 
 ALLOWLIST_FILE = "state/secret-allowlist.txt"
 
+# A four-digit proposal citation, anywhere in authored prose. Four digits
+# exactly: the trailing \b keeps a longer number from half-matching.
+PROPOSAL_REF = re.compile(r"\bPROP-(\d{4})\b")
+
 # Thread shards are metadata only. Duplicated from index.py ON PURPOSE: a
 # shared constant would let one edit relax both gates at once, and the whole
 # point of this check is that it is independent of the tool that writes.
@@ -250,6 +254,54 @@ class Validator(object):
             if derived in node.fm:
                 self.error("E-DERIVED-PRESENT", path,
                            "%r is computed and must not be stored" % derived)
+
+    def check_proposal_refs(self):
+        """A cited proposal must exist.
+
+        `check_model` resolves `unblocks`, `answers` and `gates` against the
+        node table, and repo names against `repos.json`. Proposal citations
+        were the one reference class nothing resolved: `state/repos.json`
+        shipped a `See PROP-NNNN` for a file that did not exist and this tool
+        exited 0 on it. A citation to a proposal that is not there is the same
+        defect as an `unblocks` pointing at no item -- the register asserting a
+        provenance it cannot produce.
+
+        `state/inbox/` is exempt deliberately. A capture is raw words; turning
+        a half-remembered number into a real citation is what triage is for,
+        and a gate on the inbox would make `/capture` ask a question.
+
+        `public/` and `build/` are exempt because they are derived -- a dangling
+        citation there is a symptom of one in `state/`, and reporting it twice
+        points at the generated copy instead of the file to edit.
+        """
+        prop_dir = os.path.join(self.root, "state", "proposals")
+        known = set()
+        if os.path.isdir(prop_dir):
+            for name in os.listdir(prop_dir):
+                found = PROPOSAL_REF.search(name)
+                if found:
+                    known.add(found.group(1))
+        for path in self.tracked_files():
+            rel = os.path.relpath(path, self.root)
+            parts = rel.split(os.sep)
+            if parts[0] in ("build", "public"):
+                continue
+            if parts[:2] == ["state", "inbox"]:
+                continue
+            if not os.path.exists(path) or not self.is_text(path):
+                continue
+            try:
+                with open(path, "r", encoding="utf-8", errors="replace") as fh:
+                    lines = fh.readlines()
+            except OSError:
+                continue
+            for number, line in enumerate(lines, 1):
+                for ref in PROPOSAL_REF.finditer(line):
+                    if ref.group(1) not in known:
+                        self.error("E-REF-PROPOSAL", rel,
+                                   "cites %s, which does not exist in "
+                                   "state/proposals/" % ref.group(0),
+                                   line=number)
 
     def check_secrets(self):
         for path in self.tracked_files():
@@ -515,6 +567,7 @@ class Validator(object):
         self.check_contract_docs()
         model = _model.Model.load(self.root)
         self.check_model(model)
+        self.check_proposal_refs()
         self.check_secrets()
         self.check_thread_shards()
         self.check_public_surface()

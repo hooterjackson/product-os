@@ -160,6 +160,21 @@ answer already in mind. That is what makes the class dangerous rather than merel
 possible. `wiki/ruled-out.md` `R-054` has the third instance in full, but it is
 keyword-scoped to code search — **the rule applies to every verification act.**
 
+**A correction is only real where it is read.** A superseded marker below the
+excerpt cut, a stamp in a log nobody opens, a banner on a page the generator
+skips — each is a fix that changed nothing for the reader.
+
+This is a *separate* class from the table above, with four instances of its own,
+and it is deliberately not a fourth row: the remedies point in opposite
+directions. For a cheap signal, go and look at the primary source. For a
+misplaced correction, **put it where the reader already is** — which means
+knowing what your reader actually reads. `brief.py` and `kickoff.py` take an
+entry's *first paragraph*; the `SessionStart` hook takes the whole body but only
+the top six entries by keyword overlap. A correction outside either window did
+not happen. `wiki/ruled-out.md` `R-063` has the measured instance: 121 committed
+files served a claim `DEC-201` had already reversed, while `publish.py --check`
+correctly reported the surface in sync.
+
 **Local git lies** is the same lesson wearing work clothes. `git rev-list --count
 HEAD..origin/main` returned `0` in `engineered-lighting` while the remote was 54
 commits ahead, because the tracking ref had not been fetched since July. Always `git

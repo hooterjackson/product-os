@@ -1,0 +1,47 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-08-10",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 153
+  },
+  "item": {
+    "authored_status": "doing",
+    "blocked_by": [],
+    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-012.md",
+    "closed_origin": null,
+    "cognitive_load": "medium",
+    "completed": null,
+    "effort_minutes": 60,
+    "evidence_found": [],
+    "gate": "none",
+    "id": "POS-012",
+    "keywords": [
+      "banner",
+      "closed-origin",
+      "concurrency",
+      "correction",
+      "drift",
+      "excerpt",
+      "one-tree",
+      "proposal",
+      "referential-integrity",
+      "register",
+      "ruled-out",
+      "two-agents",
+      "validate",
+      "visibility"
+    ],
+    "lane": "infra",
+    "leverage": 0,
+    "machine_affinity": null,
+    "project": "product-os",
+    "reach": [],
+    "repos": [],
+    "score": 4.5,
+    "status": "doing",
+    "title": "A correction is only real where it is read",
+    "unblocks": []
+  }
+}

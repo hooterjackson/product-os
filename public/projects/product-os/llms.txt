@@ -29,6 +29,7 @@ portfolio into context.
 - `POS-011` The remaining action artifacts: reconcile, attach, connect-repo, capture — score 5.0
 - `POS-007` Re-centre on software: kill lead-time, park hardware, briefs and resume verdicts — score 5.0
 - `POS-009` llms.txt and the JSON API: the agent-facing surface — score 5.0
+- `POS-012` A correction is only real where it is read — score 4.5
 - `POS-006` Group D coverage: cluster 301 unattributed commits into items — score 4.0
 - `POS-001` Build product-os slice 1a-minus — score 4.0
 

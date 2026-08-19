@@ -1098,3 +1098,75 @@ describing the repair as *"the read pan/tilt buttons actually read the position
 instead of sending a system info command."* That is the right outcome and the
 wrong mechanism, four days after it landed. The register exists so the third
 person to hear it does not go looking for a `0x9A` in the read path.
+
+## R-063 · Placing a correction where the consumer does not read it
+**keywords:** correction · superseded · excerpt · first-paragraph · banner · stamp · visibility · consumed · register · brief · kickoff · group-d · truncation · reader · drift
+**source:** product-os `tools/brief.py:66` · 2026-08-19 · grade: measured
+
+**A correction is only real where it is read.** Writing the fix is not the same
+act as delivering it, and this portfolio has now got that wrong four times:
+
+| the correction | where it sat | who was supposed to read it |
+|---|---|---|
+| the `(inferred)` closure stamp | audit logs | nobody opens an audit log |
+| the CLOSED ON MY JUDGEMENT banner | could not render — closed items were filtered out of brief generation | anyone reading the brief |
+| group D, the unattributed commits | recorded in the run | never surfaced |
+| `R-050`'s superseded marker | below the excerpt cut | every cold agent |
+
+The fourth is the measured one. `brief.py` and `kickoff.py` collect **the first
+whole paragraph** of a register entry. A `SUPERSEDED` block appended at the foot
+of `R-050` — the correct place by this file's own leave-it-standing rule — was
+invisible to both. **121 committed files under `public/` went on telling every
+cold-start agent that this repository starts private**, four hours after
+`DEC-201` made it public, while `publish.py --check` reported `public/` in sync.
+It was in sync. The staleness was inside the excerpt, below the cut.
+
+**This is not the "trusted a cheap signal" class**, and folding it in loses the
+more actionable half. That class is fixed by going and looking at the primary
+source. This one is fixed by **putting the correction where the reader already
+is** — for `R-050`, hoisting it into the lead paragraph so the excerpt carries
+it.
+
+**The next instance, checked 2026-08-19 rather than assumed.** All four
+`parse_register` consumers — `build.py`, `brief.py`, `publish.py`, `kickoff.py` —
+share the first-paragraph cut, so the hoist covers all four. The `SessionStart`
+hook does **not**: it injects the whole entry body, so a foot-of-entry marker
+does reach it. But it truncates on a different axis — `MAX_ENTRIES = 6`, ranked
+by keyword-overlap size. **Measured: 7 of 41 items match more than six entries.**
+`EL-003` matches 13; six are injected and **seven are reduced to a bare count
+line**. So an entry's visibility there depends on how many keywords it shares,
+not on whether it carries a correction. A superseded marker on a low-overlap
+entry is never injected at all. Position is one cut; rank is another.
+
+## R-064 · Two agents writing one working tree
+**keywords:** concurrency · two-agents · one-tree · worktree · torn-read · false-alarm · multi-machine · sharding · race · uncommitted · git-add-all · diagnosis
+**source:** product-os, this session on work-laptop · 2026-08-19 · grade: measured
+
+The multi-machine design makes **cross-machine** conflict structurally
+impossible: `state/threads/by-machine/<id>.json` is written by exactly one
+machine's indexer, so two machines syncing the same day touch different files.
+**Nothing was designed for two agents on one machine, in one working tree.** That
+gap produced a false-alarm cascade in a single afternoon:
+
+- a **torn read** — `brief.py:226` raised `AttributeError: 'str' object has no
+  attribute 'get'` because a state file was scanned mid-write. It cleared on its
+  own. A later scan of all 49 frontmatter blocks found zero malformed evidence.
+- **seven `validate.py` errors** — `E-PUBLIC-STALE` across the derived surface
+  plus one `E-REGRESSION`, every one of them downstream of *another* session's
+  uncommitted `POS-002`, `GB-004` and `manual.yaml` edits.
+- **a failing test** — `test_an_unconfirmed_close_is_flagged_on_the_face_of_its_brief`,
+  which was the guard working correctly: `POS-002` had just become an inferred
+  closure whose brief still said `doing`. See `R-063`.
+
+None of it was a defect in the committed tree. **The safe move is to diagnose and
+not regenerate:** running `publish.py` would have baked another session's
+half-finished closure into committed `public/` files — publishing their work by
+proxy, on a public surface, mid-audit. Let the owning session finish, then
+regenerate once.
+
+Two aggravating details worth keeping. The other session commits with `git add
+-A`, which swept an unrelated edit into a commit whose message did not mention
+it. And a mechanical signal lied again in a new way: the 49 `PARSE FAIL` lines
+that first looked like repo damage were a **wrong function name in the scanning
+script** — the tool was broken, not the data. Suspect the instrument before the
+subject.
