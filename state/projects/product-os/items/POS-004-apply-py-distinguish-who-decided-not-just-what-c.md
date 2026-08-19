@@ -52,7 +52,8 @@
   ],
   "created": "2026-08-19",
   "updated": "2026-08-19",
-  "completed": "2026-08-19"
+  "completed": "2026-08-19",
+  "closed_origin": "inferred"
 }
 ---
 

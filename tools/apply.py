@@ -173,6 +173,11 @@ class Applier(object):
             return
         if status == "done":
             fm["completed"] = today()
+            # Derived here, never accepted from the caller. `closed_origin` is
+            # the answer to "did a machine decide this was finished, or did
+            # he?" -- and an agent that could set it would be able to launder
+            # its own judgement into his word.
+            fm["closed_origin"] = "his-word" if origin == HUMAN else "inferred"
         fm["status"] = status
         fm["updated"] = today()
         self.write(node.path, fm, body, self.kind_of(item_id))
@@ -184,6 +189,13 @@ class Applier(object):
             return
         if field == "status":
             return self.set_status(item_id, value, origin=origin)
+        if field == "closed_origin":
+            self.refused.append(
+                (item_id,
+                 "REFUSED closed_origin: it is DERIVED from who closed the "
+                 "item, never set. To confirm a closure, re-affirm it: "
+                 "--decided %s=status:done --said \"...\"" % item_id))
+            return
         # AUTHORITY guard. The agent inferring a decided value proposes; the
         # owner stating one applies. Same field, different speaker.
         if _fm.AUTHORITY.get(field) == _fm.HUMAN and origin != HUMAN:

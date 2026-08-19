@@ -111,6 +111,8 @@ def main(argv=None):
     parser.add_argument("--explain", action="store_true",
                         help="the top item, with reasoning")
     parser.add_argument("--show", metavar="ID", help="the arithmetic for one item")
+    parser.add_argument("--unconfirmed", action="store_true",
+                        help="items a machine closed that he never confirmed")
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
 
@@ -118,6 +120,29 @@ def main(argv=None):
     if model.errors:
         for err in model.errors:
             sys.stderr.write("warning: %s\n" % err)
+
+    if args.unconfirmed:
+        rows = [n for n in model.nodes.values()
+                if n.status == "done" and n.get("closed_origin") != "his-word"]
+        rows.sort(key=lambda n: _fm.sort_key(n.id))
+        if not rows:
+            print("Nothing is closed on my judgement alone.")
+            return 0
+        print("%d item(s) a machine closed. You have confirmed none of these.\n"
+              % len(rows))
+        for node in rows:
+            found = node.get("evidence_found") or []
+            print("  %-9s %s" % (node.id, node.title))
+            print("            closed %s on %s · evidence: %s"
+                  % (node.get("completed") or "?",
+                     node.get("closed_origin") or "(unrecorded)",
+                     ", ".join(str(e.get("sha") or e.get("path"))
+                               for e in found[:3]) or "NONE"))
+        print("\nConfirm one in a sentence:")
+        print("  python3 tools/apply.py --decided %s=status:done \\"
+              % rows[0].id)
+        print("      --said \"yes, %s is finished\"" % rows[0].id)
+        return 0
 
     if args.show:
         node = model.nodes.get(args.show)

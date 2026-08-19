@@ -61,7 +61,8 @@
   "parent_ruling": null,
   "created": "2026-08-19",
   "updated": "2026-08-19",
-  "completed": "2026-08-15"
+  "completed": "2026-08-15",
+  "closed_origin": "inferred"
 }
 ---
 

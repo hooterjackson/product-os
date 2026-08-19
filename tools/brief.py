@@ -174,6 +174,16 @@ def render(node, model, entries, stamp, repos_spec, root):
         node.get("gate") or "none",
         " · machine %s" % node.get("machine_affinity")
         if node.get("machine_affinity") else ""))
+    if node.status == "done" and node.get("closed_origin") != "his-word":
+        lines += ["",
+                  "> ## ⚠ CLOSED ON MY JUDGEMENT, NOT CONFIRMED",
+                  ">",
+                  "> A machine decided this was finished. Marcelo has not said so.",
+                  "> The evidence below is what I found; nobody has agreed it is "
+                  "enough.",
+                  ">",
+                  "> Confirm in a sentence: "
+                  "`apply.py --decided %s=status:done --said \"...\"`" % node.id]
     lines += ["", "**Freshness:** %s" % freshness(root, node, stamp, repos_spec), ""]
 
     lines += ["## Where this stands", ""]

@@ -45,7 +45,7 @@ FIELD_ORDER = {
         "lead_time_days", "cost_usd",
         "unblocks", "unblocks_inferred", "answers", "pin",
         "keywords", "evidence", "evidence_found", "repos", "parent_ruling",
-        "created", "updated", "completed",
+        "created", "updated", "completed", "closed_origin",
     ],
     "question": [
         "id", "title", "project", "status", "gates",

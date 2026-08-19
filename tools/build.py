@@ -53,6 +53,17 @@ def render_now(model):
     for index, node in enumerate(ranked[1:8], 2):
         lines.append("%d. **%s** %s — score %.1f" % (
             index, node.id, node.title, node.score))
+    unconfirmed = [n for n in model.nodes.values()
+                   if n.status == "done" and n.get("closed_origin") != "his-word"]
+    if unconfirmed:
+        lines += ["", "## Closed on my judgement, not yours", "",
+                  "%d item(s) are marked done because a machine decided so. "
+                  "You have confirmed none of them." % len(unconfirmed), ""]
+        for node in sorted(unconfirmed, key=lambda n: _fm.sort_key(n.id)):
+            lines.append("- **%s** %s — closed %s"
+                         % (node.id, node.title, node.get("completed") or "?"))
+        lines += ["", "`python3 tools/rank.py --unconfirmed` lists them with "
+                  "their evidence.", ""]
     lines.append("")
     return "\n".join(lines)
 
@@ -162,6 +173,17 @@ def build(root, out_dir):
     # Briefs are not a deferred phase. They are the per-item answer to "where
     # does this stand", and they are regenerated wholesale so they can never
     # drift from state/ the way a hand-maintained file does.
+    # Wholesale means wholesale. Without this, a brief for an item that leaves
+    # the active set is never rewritten and never removed -- POS-003's brief sat
+    # at `doing` after it was closed, and the "closed on my judgement" banner
+    # could not appear on it, because the items that most need that banner are
+    # precisely the ones a `is_active` filter skips.
+    briefs_dir = os.path.join(out_dir, "briefs")
+    if os.path.isdir(briefs_dir):
+        for stale_name in os.listdir(briefs_dir):
+            if stale_name.endswith(".md"):
+                os.unlink(os.path.join(briefs_dir, stale_name))
+
     entries = brief_mod.parse_register(model.root)
     stamp = brief_mod.read_stamp(model.root)
     with open(os.path.join(model.root, "state", "repos.json"), "r",
@@ -169,8 +191,6 @@ def build(root, out_dir):
         repos_spec = {k: v for k, v in json.load(fh).items()
                       if not k.startswith("_")}
     for node in model.nodes.values():
-        if not node.is_active:
-            continue
         write(out_dir, os.path.join("briefs", "%s.md" % node.id),
               brief_mod.render(node, model, entries, stamp, repos_spec,
                                model.root))

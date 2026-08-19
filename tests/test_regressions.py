@@ -517,6 +517,85 @@ class TheDoneGuardIsASpeedBumpNotAWall(unittest.TestCase):
         self.assertIn("_(inferred)_", text)
 
 
+class InferredClosuresAreVisibleWhereHumansLook(unittest.TestCase):
+    """R-059 concluded the durable guarantee was the (inferred) stamp. It was
+    recorded in state/audits/ and appeared in ZERO places anyone reads --
+    including the brief for the very item it described. A guarantee nobody can
+    see is not a guarantee; that is the same shape as four earlier findings
+    here, where the rule existed and nothing executed it."""
+
+    def test_closed_origin_is_derived_not_settable(self):
+        applier = apply_mod.Applier(ROOT, dry_run=True)
+        applier.set_field("POS-003", "closed_origin", "his-word",
+                          origin=apply_mod.HUMAN)
+        self.assertEqual(applier.applied, [],
+                         "an agent laundered its judgement into his word")
+        self.assertTrue(any("REFUSED closed_origin" in why
+                            for _, why in applier.refused))
+
+    def test_closing_records_who_closed_it(self):
+        for origin, expected in ((apply_mod.HUMAN, "his-word"),
+                                 (apply_mod.AGENT, "inferred")):
+            applier = apply_mod.Applier(ROOT, dry_run=True)
+            target = next((n.id for n in applier.model.items.values()
+                           if n.get("evidence_found") and n.status != "done"),
+                          None)
+            if target is None:
+                self.skipTest("no open item with prior evidence")
+            applier.set_status(target, "done", origin=origin)
+            self.assertTrue(applier.applied)
+
+    def test_every_done_item_records_how_it_was_closed(self):
+        import _model as model_mod
+        model = model_mod.Model.load(ROOT)
+        for node in model.items.values():
+            if node.status == "done":
+                self.assertIn(node.get("closed_origin"), ("inferred", "his-word"),
+                              "%s is done and does not say who closed it" % node.id)
+
+    def test_an_unconfirmed_close_is_flagged_on_the_face_of_its_brief(self):
+        import _model as model_mod
+        model = model_mod.Model.load(ROOT)
+        for node in model.items.values():
+            if node.status != "done" or node.get("closed_origin") == "his-word":
+                continue
+            path = os.path.join(ROOT, "build", "briefs", "%s.md" % node.id)
+            if not os.path.exists(path):
+                continue
+            with open(path, encoding="utf-8") as fh:
+                head = "".join(fh.readlines()[:12])
+            self.assertIn("CLOSED ON MY JUDGEMENT", head,
+                          "%s's brief buries or omits the stamp" % node.id)
+
+    def test_now_md_surfaces_them(self):
+        path = os.path.join(ROOT, "build", "now.md")
+        if not os.path.exists(path):
+            self.skipTest("not built")
+        with open(path, encoding="utf-8") as fh:
+            text = fh.read()
+        import _model as model_mod
+        model = model_mod.Model.load(ROOT)
+        if any(n.status == "done" and n.get("closed_origin") != "his-word"
+               for n in model.items.values()):
+            self.assertIn("Closed on my judgement", text)
+
+
+class SettledDecisionsAreWrittenDown(unittest.TestCase):
+    """The public-visibility question was re-derived in three consecutive
+    recaps because `grep -ril public state/decisions/` returned nothing. A
+    decision that lives only in a chat gets re-derived by every session that
+    follows -- this repo's founding failure, happening to this repo."""
+
+    def test_the_visibility_decision_exists_as_a_record(self):
+        import _model as model_mod
+        model = model_mod.Model.load(ROOT)
+        hits = [d for d in model.decisions.values()
+                if "public" in (d.title or "").lower()]
+        self.assertTrue(hits, "the visibility decision is not a decision record")
+        self.assertTrue(hits[0].get("revisit_if"),
+                        "a decision with no revisit trigger is a gag order")
+
+
 class ApplyRefusals(unittest.TestCase):
     """Three refusals that must not bend. Each is checked against a real seed
     item in a scratch copy of state/, not against a mock."""
