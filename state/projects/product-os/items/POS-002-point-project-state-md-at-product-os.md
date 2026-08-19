@@ -58,9 +58,16 @@ nine** in a portfolio that already has eight, each confidently disagreeing with
 the others.
 
 `PROJECT-STATE.md` is the incumbent. It opens by telling every agent on every
-machine to read it first, and it is already demonstrably wrong in both
-directions: its header says 2026-07-31, and it lists as "pending" two prompts
-that had shipped ten days earlier (see EL-004).
+machine to read it first, and its header says 2026-07-31 against a remote that moved on until
+2026-08-17 — nineteen days and a whole Doc 4a series later.
+
+**Correction, 2026-08-19.** This item was written claiming the file *still*
+lists two shipped prompts as pending. It does not: it self-corrected in
+`acd0611` on 2026-07-29, before this item existed. I drafted the premise from a
+local clone that was 54 commits behind — `R-044`, reproduced inside an item's
+content rather than inside a report, which is sharper than any instance in the
+`CLAUDE.md` table. The underlying lesson stands (`R-051`, and `EL-004` records
+what happened); the present tense did not.
 
 A pointer is not a merge. It should say which file is authoritative for what —
 `PROJECT-STATE.md` for narrative and the site's own build state, product-os for

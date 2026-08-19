@@ -35,11 +35,11 @@
     "note": "No repository exists. Auditable only via manual/file evidence; the work lives on the GPU box."
   },
   "product-os": {
-    "owner": null,
+    "owner": "hooterjackson",
     "local": "~/Claude/product-os",
     "default_branch": "main",
     "authority": false,
-    "public": false,
-    "note": "This repo. No remote yet, by decision -- see wiki/ruled-out.md R-050. audit.py reads it in local-only mode: with no remote configured there is nothing to be stale FROM, so local HEAD is the record rather than a mirror of one."
+    "public": true,
+    "note": "This repo. PUBLIC by DEC-201 (2026-08-19), which supersedes R-050. public/ is the agent-facing surface and is fetchable over raw.githubusercontent.com with no clone."
   }
 }
