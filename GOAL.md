@@ -5,9 +5,10 @@ cold, with no chat history.
 
 ## STAND — updated 2026-08-19, after the first real `/audit`
 
-**10 local commits, nothing pushed, no remote.** `validate.py` exits 0 · 29 items
-(5 done) · 5 questions · 8 rulings · 58 register entries · **5-hop** confirmed chain ·
-**40 gated tests** · byte-deterministic build · one thread shard, 3 threads bound.
+**9 local commits at the time of writing, nothing pushed, no remote.** `validate.py`
+exits 0 · 30 items (5 done) · 5 questions · 8 rulings · 58 register entries · **5-hop**
+confirmed chain · **40 gated tests** · byte-deterministic build · one thread shard,
+3 threads bound.
 
 **Built and verified before this session (slice 1a-minus):** the item model, scoring,
 `validate.py` / `rank.py` / `build.py` / `new.py` / `stale.py`, the evidence-backed
@@ -122,6 +123,29 @@ reports the collision. `R-057`.
 was the default window — and *both were silently truncated* at the API's 100-row page.
 `gimbal-bench` alone had 245. Paginated, the default window is **301**. Coverage lines
 now carry their window and flag truncation as a floor. `R-058`.
+
+**POS-006 — group-D coverage. PROPOSED, not created.** The system models 29 items
+against **301** unattributed commits: ~10% of the portfolio, with the missing 90%
+concentrated in `gimbal-bench`. Clustered into **20 items covering 288 — 96%**, as
+`PROP-0003`, answerable in one sentence. The glob set and the measurement are in
+`state/proposals/PROP-0003-clusters.py` so the 96% reproduces rather than being
+asserted.
+
+- **13 commits deliberately left uncovered and named** — a `.gitignore` change, a
+  one-off capture, a mobile fix, and a tail of reverts. A coverage figure gamed by
+  fake items is worse than a low one.
+- **Part of the 301 was never a modelling gap.** 13 *existing* items are suppressed by
+  the too-broad check and contribute their commits to D; `GB-001` alone would claim 57.
+  The number mixes "nobody modelled this" with "the rule is too coarse". Separate jobs,
+  not merged.
+- **The too-broad check does not apply to `done` items, and that is correct** — it
+  guards against a *forward* claim absorbing a directory's future. Verified in
+  `audit_item()`, not assumed. Two genuine grab-bags narrowed anyway.
+
+**Reporting discipline, corrected.** My recaps reported one commit more than `git log`
+showed, five sessions running — I was counting the commit I was about to make. In a
+repo whose pitch is numbers that can be checked, a count habitually one high is the
+exact shape of the thing it exists to catch. Verified counts only from here.
 
 ## How to talk about state — I kept getting this wrong
 
