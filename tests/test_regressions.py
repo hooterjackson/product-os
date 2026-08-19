@@ -655,13 +655,22 @@ class PublishedStampsMustSurviveBeingPublished(unittest.TestCase):
         self.assertNotIn("since the last audit", durable)
         self.assertIn("last audit", durable)
 
-    def test_no_committed_brief_carries_a_commit_delta(self):
+    def test_no_committed_freshness_line_carries_a_commit_delta(self):
+        """Scan the FRESHNESS LINE, not the whole file.
+
+        The first version of this test grepped the file and failed on
+        `R-061`'s own register excerpt, which correctly quotes the bad stamp as
+        an example. A check aimed at the wrong surface -- the same class it was
+        written to catch, inside itself."""
         for name in glob.glob(os.path.join(ROOT, "public", "briefs", "*.md")) + \
                 glob.glob(os.path.join(ROOT, "public", "kickoff", "*.md")):
             with open(name, encoding="utf-8") as fh:
-                text = fh.read()
-            self.assertNotIn("since the last audit", text,
-                             "%s embeds a counter its own commit changes" % name)
+                for line in fh:
+                    if not line.startswith(("**Freshness:**", "Freshness:")):
+                        continue
+                    self.assertNotIn("since the last audit", line,
+                                     "%s embeds a counter its own commit "
+                                     "changes" % os.path.basename(name))
 
 
 class ApplyRefusals(unittest.TestCase):
