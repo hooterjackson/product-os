@@ -19,9 +19,9 @@ Evidence on file: `796559c`
 Read these before proposing an approach:
 
 - **R-043 · `fixture-bench.yaml`** — _matched on doc4, gpio_
-  Doc 4's prompts say to grow `fixture-bench.yaml`. **That file does not exist.** The
+  Doc 4's prompts say to grow `fixture-bench.yaml`. **That file does not exist.** The real one is `esphome/spot-bench.yaml`, and it already carries the as-built stages 5 and 6.
 - **R-041 · Reading a word count as a decision** — _matched on propagation_
-  "Doc 6 has 11 ESPHome lines and 1 Zigbee line" was read as "retire Doc 6's ESPHome
+  "Doc 6 has 11 ESPHome lines and 1 Zigbee line" was read as "retire Doc 6's ESPHome lane". The cited source said the opposite — R-040's STILL LIVE block covers exactly Doc 6 §1.
 
 ## Decisions in force
 

@@ -317,5 +317,158 @@
     "last_audit_window_since": "2026-07-05",
     "source": "state/ in hooterjackson/product-os",
     "unattributed_commits_at_last_audit": 301
+  },
+  "manual_urls": {},
+  "note": "A RESUME verdict with no way back is a dead end. Web chats have no CLI, so their URLs live in state/threads/manual.yaml -- paste one in once.",
+  "return_paths": {
+    "POS-001": [
+      {
+        "command": "cd ~/Claude/product-os && claude -r c064d4d7-2187-41fd-9971-e5cc0ae0efca",
+        "id": "c064d4d7-2187-41fd-9971-e5cc0ae0efca",
+        "machine": "work-laptop",
+        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
+        "title": "Product-OS slice 1a-minus seed",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": "cd ~/Claude/product-os && claude -r 24ecfcb2-3fec-41bb-bc6e-898eb808df63",
+        "id": "24ecfcb2-3fec-41bb-bc6e-898eb808df63",
+        "machine": "work-laptop",
+        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
+        "title": "BOOTSTRAP.md setup plan",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": "cd ~/Claude/product-os && claude -r c6d2193d-5995-438b-864e-c1afff01ba78",
+        "id": "c6d2193d-5995-438b-864e-c1afff01ba78",
+        "machine": "work-laptop",
+        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
+        "title": "Product-OS slice 1a-minus build",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "POS-002": [
+      {
+        "command": "cd ~/Claude/product-os && claude -r c064d4d7-2187-41fd-9971-e5cc0ae0efca",
+        "id": "c064d4d7-2187-41fd-9971-e5cc0ae0efca",
+        "machine": "work-laptop",
+        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
+        "title": "Product-OS slice 1a-minus seed",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": "cd ~/Claude/product-os && claude -r 24ecfcb2-3fec-41bb-bc6e-898eb808df63",
+        "id": "24ecfcb2-3fec-41bb-bc6e-898eb808df63",
+        "machine": "work-laptop",
+        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
+        "title": "BOOTSTRAP.md setup plan",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "POS-003": [
+      {
+        "command": "cd ~/Claude/product-os && claude -r c064d4d7-2187-41fd-9971-e5cc0ae0efca",
+        "id": "c064d4d7-2187-41fd-9971-e5cc0ae0efca",
+        "machine": "work-laptop",
+        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
+        "title": "Product-OS slice 1a-minus seed",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": "cd ~/Claude/product-os && claude -r 24ecfcb2-3fec-41bb-bc6e-898eb808df63",
+        "id": "24ecfcb2-3fec-41bb-bc6e-898eb808df63",
+        "machine": "work-laptop",
+        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
+        "title": "BOOTSTRAP.md setup plan",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "POS-004": [
+      {
+        "command": "cd ~/Claude/product-os && claude -r c064d4d7-2187-41fd-9971-e5cc0ae0efca",
+        "id": "c064d4d7-2187-41fd-9971-e5cc0ae0efca",
+        "machine": "work-laptop",
+        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
+        "title": "Product-OS slice 1a-minus seed",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": "cd ~/Claude/product-os && claude -r 24ecfcb2-3fec-41bb-bc6e-898eb808df63",
+        "id": "24ecfcb2-3fec-41bb-bc6e-898eb808df63",
+        "machine": "work-laptop",
+        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
+        "title": "BOOTSTRAP.md setup plan",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "POS-005": [
+      {
+        "command": "cd ~/Claude/product-os && claude -r c064d4d7-2187-41fd-9971-e5cc0ae0efca",
+        "id": "c064d4d7-2187-41fd-9971-e5cc0ae0efca",
+        "machine": "work-laptop",
+        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
+        "title": "Product-OS slice 1a-minus seed",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": "cd ~/Claude/product-os && claude -r 24ecfcb2-3fec-41bb-bc6e-898eb808df63",
+        "id": "24ecfcb2-3fec-41bb-bc6e-898eb808df63",
+        "machine": "work-laptop",
+        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
+        "title": "BOOTSTRAP.md setup plan",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "POS-006": [
+      {
+        "command": "cd ~/Claude/product-os && claude -r c064d4d7-2187-41fd-9971-e5cc0ae0efca",
+        "id": "c064d4d7-2187-41fd-9971-e5cc0ae0efca",
+        "machine": "work-laptop",
+        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
+        "title": "Product-OS slice 1a-minus seed",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": "cd ~/Claude/product-os && claude -r 24ecfcb2-3fec-41bb-bc6e-898eb808df63",
+        "id": "24ecfcb2-3fec-41bb-bc6e-898eb808df63",
+        "machine": "work-laptop",
+        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
+        "title": "BOOTSTRAP.md setup plan",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "POS-007": [
+      {
+        "command": "cd ~/Claude/product-os && claude -r c064d4d7-2187-41fd-9971-e5cc0ae0efca",
+        "id": "c064d4d7-2187-41fd-9971-e5cc0ae0efca",
+        "machine": "work-laptop",
+        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
+        "title": "Product-OS slice 1a-minus seed",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": "cd ~/Claude/product-os && claude -r 24ecfcb2-3fec-41bb-bc6e-898eb808df63",
+        "id": "24ecfcb2-3fec-41bb-bc6e-898eb808df63",
+        "machine": "work-laptop",
+        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
+        "title": "BOOTSTRAP.md setup plan",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ]
   }
 }

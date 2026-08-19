@@ -61,13 +61,23 @@ def parse_register(root):
         body = chunk[:cut.start()] if cut else chunk
         words = {w.strip().lower() for w in re.split(r"[·,]", match.group(1))
                  if w.strip()}
-        first = ""
-        # skip the title line itself -- splitlines()[0] IS the heading
+        # Collect the first whole PARAGRAPH, not the first line. A single line
+        # from the middle of a wrapped paragraph ends mid-clause and reads as a
+        # transcription error rather than an excerpt.
+        first, buf = "", []
         for line in body.splitlines()[1:]:
             line = line.strip()
-            if line and not line.startswith(("**keywords", "**source", ">", "|")):
-                first = line
-                break
+            if line.startswith(("**keywords", "**source")):
+                continue
+            if not line:
+                if buf:
+                    break
+                continue
+            if line.startswith(("|", "#")):
+                continue
+            buf.append(line.lstrip("> "))
+        if buf:
+            first = " ".join(buf)
         entries.append((title, words, first))
     return entries
 

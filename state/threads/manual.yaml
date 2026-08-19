@@ -1,0 +1,13 @@
+# Chat URLs, pasted once, reachable forever after.
+#
+# A web or cloud chat has no CLI and no session file, so the indexer cannot
+# find a way back to it. Without this file a RESUME verdict on one is a dead
+# end wearing a green label.
+#
+# Format: <ITEM-ID or thread name>: <url>   -- one per line, # comments fine.
+# Add a line from anywhere, including a phone. Nothing parses it but eight
+# lines of Python; there is no YAML dependency.
+#
+# Example:
+#   GB-001: https://claude.ai/chat/....
+#   POS-002: https://chatgpt.com/c/....

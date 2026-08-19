@@ -864,6 +864,43 @@ Do not strengthen the snapshot rule into something that looks unbreakable. Make
 the origin stamp legible instead, and read the `(inferred)` lines when deciding
 what to trust.
 
+## R-060 · Believing `git commit --amend` removes an address from a public repo
+**keywords:** commit · metadata · email · author · committer · amend · orphan · disclosure · screen · public · identity
+**source:** measured against the GitHub API, 2026-08-19 · grade: measured
+
+`validate.py`'s disclosure screen scans **file contents**. On a public repo,
+**author and committer emails are public too** — served by the API for every
+commit — and the screen never looked at them.
+
+A work address reached one public commit before being amended out. Amending did
+not remove it:
+
+    $ gh api repos/hooterjackson/product-os/commits/e30c955
+      -> 200, author and committer both carry the work address
+
+That commit is unreachable from any branch and **still served by SHA**.
+`--amend` writes a new object and orphans the old one; GitHub keeps orphans and
+keeps answering for them. `git gc` on the clone changes nothing about a remote.
+
+**Only GitHub support can purge it.** There is no local command that
+substitutes, and believing otherwise is the entry.
+
+`check_commit_identities()` now scans `git log --all` and the reflog against the
+same allowlist, splitting the two cases deliberately:
+
+- **Reachable history → error.** Fixable here, so it fails the gate.
+- **Orphaned objects → warning.** Not fixable with git, and a permanently red
+  gate on something the tooling cannot repair trains people to ignore the gate.
+  Never silent, because the address is genuinely public.
+
+`state/secret-allowlist.txt` carries the two intended identities. A third
+appearing is a finding.
+
+**The reusable shape:** a screen that scans one surface implies coverage of
+everything. Metadata is a surface. This repo had a rule about disclosure and a
+tool that executed it against files only — which is the same class as R-054 and
+R-056, one level further out.
+
 ## R-050 · `product-os` starting public
 **keywords:** product-os · public · private · disclosure · ruled-out · seed · publication
 **source:** product-os `wiki/ruled-out.md` (this file) · 2026-08-19 · grade: inferred

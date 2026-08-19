@@ -280,6 +280,13 @@
       "title": "llms.txt and the JSON API: the agent-facing surface"
     },
     {
+      "id": "POS-010",
+      "leverage": 0,
+      "project": "product-os",
+      "status": "next",
+      "title": "Kickoff prompts and thread return paths"
+    },
+    {
       "id": "Q-001",
       "leverage": 1,
       "project": "gimbal-bench",

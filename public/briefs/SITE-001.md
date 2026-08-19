@@ -19,13 +19,13 @@ Score 5.3 · leverage 0 · 180 min.
 Read these before proposing an approach:
 
 - **R-041 · Reading a word count as a decision** — _matched on doc6, doc7, esphome, propagation_
-  "Doc 6 has 11 ESPHome lines and 1 Zigbee line" was read as "retire Doc 6's ESPHome
+  "Doc 6 has 11 ESPHome lines and 1 Zigbee line" was read as "retire Doc 6's ESPHome lane". The cited source said the opposite — R-040's STILL LIVE block covers exactly Doc 6 §1.
 - **R-040 · Tombstoning `spot-bench.yaml` wholesale** — _matched on d3, esphome_
   The file names exactly what survives D3:
 - **R-015 · Working from a Downloads folder** — _matched on stale_
-  The most dangerous failure in this toolchain, because every symptom points
+  The most dangerous failure in this toolchain, because every symptom points somewhere else:
 - **R-029 · Replacing the dead-man with a hub-sourced liveness timer** — _matched on zigbee_
-  The winning answer was not a better timer, it was position-only commands (D12):
+  Over Zigbee a brief dropout takes **seconds** to recover, not milliseconds, so a 400 ms timer would trip constantly on a healthy system. Loosening it to seconds means seconds of uncommanded motion before anything reacts — a weaker net wearing the same name.
 
 ## Decisions in force
 

@@ -396,6 +396,60 @@ class Validator(object):
                                    "thread %d carries %r, which is not on the "
                                    "allowlist" % (index, key))
 
+    def check_commit_identities(self):
+        """The screen scans FILE CONTENTS. Commit metadata is public too.
+
+        On a public repo every author and committer email is served by the API,
+        and `git commit --amend` does not remove the old object -- it orphans
+        it, and GitHub keeps serving orphans by SHA. Measured 2026-08-19:
+        `e30c955` was amended out of the branch and remained fetchable, still
+        carrying a work address in both fields.
+
+        So this checks identities, not files, and it checks ALL refs plus the
+        reflog -- because the reachable branch is exactly where an amended
+        address is NOT.
+        """
+        def identities(args):
+            found = {}
+            out = _run(["git", "-C", self.root] + args)
+            for line in (out or "").splitlines():
+                parts = line.split("\x1f")
+                if len(parts) != 3:
+                    continue
+                for address in parts[1:]:
+                    if (address and address not in found
+                            and re.match(r"^[^@]+@[^@]+\.[^@]+$", address)):
+                        found[address] = parts[0][:7]
+            return found
+
+        reachable = identities(["log", "--all", "--format=%H%x1f%ae%x1f%ce"])
+        orphaned = identities(["reflog", "--format=%H%x1f%ae%x1f%ce"])
+
+        # Reachable history is fixable here, so a stray address is an ERROR.
+        for address, sha in sorted(reachable.items()):
+            if address in self.allowlist:
+                continue
+            self.error(
+                "E-DISCLOSURE-COMMIT-IDENTITY", "git history",
+                "commit %s carries %r as an author/committer address, and it "
+                "is REACHABLE. On a public repo the API serves it. If "
+                "intended, add the exact string to %s"
+                % (sha, address, ALLOWLIST_FILE))
+
+        # Orphans are NOT fixable with git: --amend leaves the old object, and
+        # GitHub keeps serving it by SHA. Warning, because a permanently red
+        # gate on something the tooling cannot fix trains people to ignore it --
+        # but never silence, because the address is genuinely public.
+        for address, sha in sorted(orphaned.items()):
+            if address in self.allowlist or address in reachable:
+                continue
+            self.warn(
+                "W-DISCLOSURE-ORPHANED-IDENTITY", "git history",
+                "orphaned commit %s carries %r. It is unreachable from any "
+                "branch and STILL served by GitHub by SHA -- `--amend` did not "
+                "remove it. Only GitHub support can purge it. See "
+                "wiki/ruled-out.md R-060." % (sha, address))
+
     def check_public_surface(self):
         """Every path llms.txt advertises must exist, and public/ must match a
         fresh generation.
@@ -461,6 +515,7 @@ class Validator(object):
         self.check_secrets()
         self.check_thread_shards()
         self.check_public_surface()
+        self.check_commit_identities()
         self.check_authority(base_ref)
         if with_tests:
             self.check_regressions()

@@ -13,8 +13,10 @@ All paths below are relative to it.
 2. `BASE/api/now.json` — the ranked list, and how fresh it is.
 3. Pick the top item, or the one he names.
    Fetch `BASE/api/items/<ID>.json`.
-4. Fetch `BASE/briefs/<ID>.md` — where it stands, what's next,
-   what is ALREADY RULED OUT, and which decisions bind it.
+4. Fetch `BASE/kickoff/<ID>.md` — a paste-ready prompt with what is
+   known, what is ALREADY RULED OUT, which repo to work in, and the
+   rules. `BASE/briefs/<ID>.md` is the same content without the
+   framing, if you only want the state.
 
 Then work. If a step 404s, say so; do not guess the shape.
 
@@ -61,6 +63,7 @@ _5 item(s) are marked done on a machine's judgement, unconfirmed by him: EL-004,
 - `BASE/api/graph.json` — the dependency graph
 - `BASE/api/threads.json` — indexed chats, with resume-or-restart
 - `BASE/api/unconfirmed.json` — closed by a machine, not confirmed
+- `BASE/kickoff/<ID>.md` — PASTE THIS to start work on an item
 - `BASE/briefs/<ID>.md` — the paste-able brief
 - `BASE/projects/<slug>/llms.txt` — this file, scoped to one project
 

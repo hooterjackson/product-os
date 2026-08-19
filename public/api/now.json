@@ -1,10 +1,10 @@
 {
   "counts": {
-    "active": 21,
+    "active": 22,
     "blocked": 9,
     "decisions": 9,
     "done": 5,
-    "items": 33,
+    "items": 34,
     "parked": 7,
     "questions": 5
   },
@@ -327,6 +327,40 @@
       "score": 5.333,
       "status": "next",
       "title": "Does a mid-move retarget re-plan smoothly, or stop and restart?",
+      "unblocks": []
+    },
+    {
+      "authored_status": "next",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-010.md",
+      "closed_origin": null,
+      "cognitive_load": "medium",
+      "completed": null,
+      "effort_minutes": 300,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "POS-010",
+      "keywords": [
+        "bootstrap",
+        "kickoff",
+        "manual",
+        "paste",
+        "prompt",
+        "resume",
+        "return-path",
+        "ruled-out",
+        "threads",
+        "url"
+      ],
+      "lane": "infra",
+      "leverage": 0,
+      "machine_affinity": null,
+      "project": "product-os",
+      "reach": [],
+      "repos": [],
+      "score": 5.0,
+      "status": "next",
+      "title": "Kickoff prompts and thread return paths",
       "unblocks": []
     },
     {

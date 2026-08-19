@@ -43,6 +43,7 @@ import sys
 import _fm
 import _model
 import brief as brief_mod
+import kickoff as kickoff_mod
 
 RAW = "https://raw.githubusercontent.com/hooterjackson/product-os/main/public"
 
@@ -127,8 +128,10 @@ def root_llms(model, stamp, ranked):
         "2. `BASE/api/now.json` — the ranked list, and how fresh it is.",
         "3. Pick the top item, or the one he names.",
         "   Fetch `BASE/api/items/<ID>.json`.",
-        "4. Fetch `BASE/briefs/<ID>.md` — where it stands, what's next,",
-        "   what is ALREADY RULED OUT, and which decisions bind it.",
+        "4. Fetch `BASE/kickoff/<ID>.md` — a paste-ready prompt with what is",
+        "   known, what is ALREADY RULED OUT, which repo to work in, and the",
+        "   rules. `BASE/briefs/<ID>.md` is the same content without the",
+        "   framing, if you only want the state.",
         "",
         "Then work. If a step 404s, say so; do not guess the shape.",
         "",
@@ -189,6 +192,7 @@ def root_llms(model, stamp, ranked):
             ("api/graph.json", "the dependency graph"),
             ("api/threads.json", "indexed chats, with resume-or-restart"),
             ("api/unconfirmed.json", "closed by a machine, not confirmed"),
+            ("kickoff/<ID>.md", "PASTE THIS to start work on an item"),
             ("briefs/<ID>.md", "the paste-able brief"),
             ("projects/<slug>/llms.txt", "this file, scoped to one project")]:
         lines.append("- `BASE/%s` — %s" % (rel, what))
@@ -272,6 +276,9 @@ def generate(root, model, target):
         write(target, os.path.join("briefs", "%s.md" % node.id),
               brief_mod.render(node, model, entries, stamp, repos_spec, root))
 
+    # --- kickoff prompts: the artifact he actually pastes
+    kickoff_mod.generate(root, model, target)
+
     # --- api
     write(target, os.path.join("api", "now.json"), dump({
         "freshness": fresh,
@@ -339,8 +346,18 @@ def generate(root, model, target):
                 with open(os.path.join(shard_dir, name), "r",
                           encoding="utf-8") as fh:
                     shards[name[:-5]] = json.load(fh)
+    manual = kickoff_mod.load_manual(root)
     write(target, os.path.join("api", "threads.json"),
-          dump({"freshness": fresh, "by_machine": shards}))
+          dump({"freshness": fresh, "by_machine": shards,
+                "manual_urls": {k: sorted(v) for k, v in sorted(manual.items())},
+                "return_paths": {
+                    node.id: kickoff_mod.threads_for(root, node.id, manual)
+                    for node in sorted(model.nodes.values(),
+                                       key=lambda n: _fm.sort_key(n.id))
+                    if kickoff_mod.threads_for(root, node.id, manual)},
+                "note": ("A RESUME verdict with no way back is a dead end. "
+                         "Web chats have no CLI, so their URLs live in "
+                         "state/threads/manual.yaml -- paste one in once.")}))
 
     unconfirmed = [n for n in model.nodes.values()
                    if n.status == "done" and n.get("closed_origin") != "his-word"]
@@ -370,6 +387,9 @@ def advertised(model):
     for node_id in model.nodes:
         paths.append("api/items/%s.json" % node_id)
         paths.append("briefs/%s.md" % node_id)
+    for node_id, node in model.nodes.items():
+        if node.is_active:
+            paths.append("kickoff/%s.md" % node_id)
     return paths
 
 
@@ -422,7 +442,7 @@ def main(argv=None):
     for target in targets:
         # wholesale: an orphan endpoint that llms.txt no longer advertises is
         # still fetchable, and still answers with something stale.
-        for sub in ("api", "briefs", "projects"):
+        for sub in ("api", "briefs", "projects", "kickoff"):
             shutil.rmtree(os.path.join(target, sub), ignore_errors=True)
         generate(root, model, target)
         print("wrote %s" % os.path.relpath(target, root))
