@@ -16,13 +16,29 @@ READ FIRST
   ./CLAUDE.md  the contract you work under
   ./GOAL.md    this prompt; fix its status list when you stop
 
-STAND
+STAND  (updated 2026-08-19; 4 local commits, nothing pushed, no remote)
   [done] scaffold; CLAUDE.md+AGENTS.md byte-identical; intent.md + standing-orders.md (provisional v0); README
-  [done] tools/{_fm,_git,_model,validate,rank,build,new,stale}.py — compile, unrun
-  [next] Seed: 6 projects, ~18 evidence-backed items, 5 questions, 7 decisions
-  [ ] wiki/ruled-out.md, ~45 keyword-tagged entries
-  [ ] plugin/: plugin.json, skills {next,capture,handoff}, SessionStart hook
-  [ ] verify end-to-end; local commits only
+  [done] tools/*.py — now RUN, not just compiled. Three bugs found by running them: _fm.canonicalize was not a fixed point (every file new.py wrote would have failed the canonical check); _git returned committer-local dates while the API returns UTC (silent off-by-one-day in stale.py's only number); new.py wrote questions with status "open", not in the enum.
+  [done] Seed: 6 projects, 25 items, 5 questions, 8 rulings. validate.py exits 0; rank.py orders; build.py reports a 4-hop confirmed chain and is byte-deterministic; every entity carries evidence. PROP-0001 stands behind every decided field — UNACCEPTED, awaiting Marcelo.
+  [done] wiki/ruled-out.md, 53 entries, each with keywords + source + date + grade; passes the disclosure screen
+  [done] plugin/: plugin.json, marketplace.json, skills {next,capture,handoff}, SessionStart hook. hooks.json NESTED. /capture asks nothing, run end-to-end.
+  [done] verify: lead-time arithmetic published in README (30.00 vs 4.00, operands shown); stale.py reproduces Doc 7 @ 24d and Doc 6 @ 13d behind D3 unaided, with coverage line; authority audit proven both ways (exit 1 unblessed, exit 0 with Accepts:, agent-authority keywords change passed unremarked)
+
+  [ ] NOT DONE — needs Marcelo
+      - PROP-0001 is unaccepted. Every score, cost, edge and gate in state/ is a
+        proposal wearing a value. Read it before trusting a ranking.
+      - intent.md and standing-orders.md are still "provisional": true.
+      - Q-005 (does Doc 4's $170-240 assume the $30 substitute, not the $486
+        spool?) gates EL-001's real cost. Two readings, ~$456 apart.
+      - The remote does not exist. Private when created — see R-050.
+      - gimbal-bench publication still BLOCKED — R-049.
+  [ ] NOT DONE — deferred by scope
+      - /audit's proposal engine, the thread indexer, briefs, the site,
+        llms.txt, /unblock.
+      - Multi-machine is untested. Its real test needs formd-t1, and 12 of 25
+        items carry machine_affinity: formd-t1.
+      - wiki/ruled-out.md's real audience is at the bench. It is on this Mac.
+      - No fresh-session test yet: nobody but me has been asked what to work on.
 
 Work in order. A milestone is done only when its test passes:
   seed       validate.py exits 0; rank.py returns an ordering; build.py reports a confirmed chain >=3 hops; every item has evidence with a real path+SHA

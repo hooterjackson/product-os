@@ -14,10 +14,28 @@ python3 tools/validate.py           # is this repo internally consistent?
 
 ## What makes it different from a board
 
-**Lead time is in the ranking.** A three-minute order with fourteen days of mail time
-outranks a two-hour task with none, because every day the order isn't placed, the
-entire downstream chain slides. A conventional board ranks by importance and gets that
-exactly backwards.
+**Lead time is in the ranking.** Not asserted — here are the two rows and the
+arithmetic, from `rank.py --show`, on the real seed:
+
+```
+EL-001  Order the Doc 4 LED BoM                     EL-003  Print the tolerance coupon, then the fit coupon
+
+  effort_bucket(20 min)  = 2                          effort_bucket(120 min) = 3
+  base = (4 x 4) / 2     = 8.000                      base = (3 x 4) / 3     = 4.000
+  leverage               = 1  (GB-012)                leverage               = 0
+  lift = 1 + 0.25 x 1    = 1.250                      lift = 1 + 0.25 x 0    = 1.000
+  urgency = 1 + 14/7     = 3.000                      urgency = 1 + 0/7      = 1.000
+  score = 8 x 1.25 x 3   = 30.00                      score = 4 x 1 x 1      = 4.00
+```
+
+**30.00 against 4.00, and 3.000 of that 7.5× is the urgency term alone.** Twenty
+minutes of clicking outranks two hours of real work, because the fourteen days
+start when you click and not when you are ready — and `GB-012`, the gate the whole
+Zigbee phase converges on, cannot be demonstrated without the part.
+
+A conventional board ranks by importance and gets that exactly backwards. Run
+`python3 tools/rank.py --show EL-001` and check the operands rather than
+believing the ratio; a bare ratio is not falsifiable.
 
 **Leverage is transitive.** "Wire the LEDs" directly unblocks one thing — but that
 unblocks the firmware, which unblocks the app. The score reflects the whole reachable
@@ -33,20 +51,40 @@ proposal is accepted. `validate.py` fails if that boundary is crossed.
 ## Layout
 
 ```
-CLAUDE.md · AGENTS.md     byte-identical read-first contract
-intent.md                 MINE. Root authority. Every proposal cites it.
-standing-orders.md        MINE. Judgment, made reusable.
-state/                    authored, committed — no computed value ever lives here
-  projects/<slug>/items/  one file per item
-  questions/              open questions, ranked alongside tasks
-  decisions/              rulings, with revisit triggers
-  inbox/                  raw captures. Untriaged, unranked.
-  proposals/              pending changes to decided fields
-build/                    GENERATED, git-ignored, rebuilt wholesale
-wiki/ruled-out.md         dead ends. The most expensive knowledge here.
-tools/                    stdlib Python 3.9+. No dependencies, no install.
-plugin/                   the Claude Code plugin, versioned with the data
+CLAUDE.md · AGENTS.md         byte-identical read-first contract
+intent.md                     MINE. Root authority. Every proposal cites it.
+standing-orders.md            MINE. Judgment, made reusable.
+state/                        authored, committed — no computed value ever lives here
+  projects/<slug>/project.md  the project, its north star, and who may rule
+  projects/<slug>/items/      one file per item
+  projects/<slug>/decisions/  rulings, with revisit triggers
+  questions/                  open questions, ranked alongside tasks
+  inbox/                      raw captures. Untriaged, unranked.
+  proposals/                  pending changes to decided fields
+  machines/ · repos.json      where work can happen, and where evidence lives
+build/                        GENERATED, git-ignored, rebuilt wholesale
+wiki/ruled-out.md             dead ends. The most expensive knowledge here.
+tools/                        stdlib Python 3.9+. No dependencies, no install.
+plugin/                       the Claude Code plugin, versioned with the data
 ```
+
+## Install
+
+Two commands, and they are the same two on every platform:
+
+```bash
+git clone <this repo> && cd product-os
+```
+
+then, inside Claude Code:
+
+```
+/plugin marketplace add ./product-os
+```
+
+That registers `/next`, `/capture` and `/handoff`, and the `SessionStart` hook
+that pushes matching `wiki/ruled-out.md` entries into context before you propose
+an approach.
 
 ## Knowledge is organised by re-derivation cost
 
@@ -61,8 +99,22 @@ and those four never render identically.
 
 ## Status
 
-Slice 1a-minus. Item model, scoring, validation, the staleness detector, the ruled-out
-register and three skills. Deliberately not yet built: the audit proposal engine, the
-thread indexer, per-item briefs, the site and `llms.txt`.
+**Slice 1a-minus, seeded and exercised.** 6 projects · 25 items · 5 questions ·
+8 rulings · 53 ruled-out entries · 3 skills · 1 hook. `validate.py` is clean,
+`build.py` is byte-deterministic across runs, and the deepest confirmed
+dependency chain is 4 hops.
+
+`stale.py` produces the headline finding rather than transcribing it — on first
+run it reports Doc 7 (24 days) and Doc 6 (13 days) behind D3, from commit dates,
+and prints a coverage line naming what it reached.
+
+**This repository is private**, against the original preference, because
+`wiki/ruled-out.md` seeds ~50 findings from an unpublished engineering repo —
+including security-design detail of the authority model of a brakeless
+ceiling-mounted machine. Flipping to public later is one command; unflipping is
+not. See `R-050`.
+
+Deliberately not yet built: the audit proposal engine, the thread indexer,
+per-item briefs, `/unblock`, the site and `llms.txt`.
 
 Requires Python 3.9+ and nothing else.
