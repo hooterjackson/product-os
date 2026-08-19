@@ -2,7 +2,7 @@
 
 `engineering-site` · parked · lane content · gate none
 
-**Freshness:** ⚠ engineered-lighting-site +1 since the last audit — last audit 2026-08-19 (today) · 301 commits unattributed then · could not check gimbal-bench offline
+**Freshness:** last audit 2026-08-19 (today) · 301 commits unattributed then · could not check gimbal-bench offline
 
 ## Where this stands
 

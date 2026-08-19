@@ -93,8 +93,23 @@ def read_stamp(root):
         return None
 
 
-def freshness(root, node, stamp, repos_spec):
-    """One line, always. Names what it could not check."""
+def freshness(root, node, stamp, repos_spec, volatile=True):
+    """One line, always. Names what it could not check.
+
+    `volatile=False` drops the "+N commits since the audit" delta.
+
+    That delta is a function of the local working copy's HEAD, so a COMMITTED
+    copy of this line is invalidated by the very commit that publishes it:
+    measured `+9` before a commit and `+10` after, which made `public/`
+    permanently out of sync and shipped a stale stamp to a live URL. No amount
+    of "regenerate before committing" fixes it -- regenerating and committing
+    increments it again.
+
+    So the published surface carries only the DURABLE half: when the last audit
+    ran, over what window, and what it found. That is the fact a remote
+    consumer needs and it does not move between audits. The live delta stays in
+    `build/`, for the person at the keyboard who can act on it.
+    """
     if not stamp:
         return ("(no audit has ever run — freshness unknown. "
                 "`python3 tools/audit.py` sets this.)")
@@ -134,7 +149,7 @@ def freshness(root, node, stamp, repos_spec):
     line = "last audit %s (%s)" % (when, age) if age else "last audit %s" % when
     if stamp.get("group_d") is not None:
         line += " · %d commits unattributed then" % stamp["group_d"]
-    if moved:
+    if moved and volatile:
         line = "⚠ %s since the last audit — %s" % (", ".join(moved), line)
     if unchecked:
         line += " · could not check %s offline" % ", ".join(sorted(unchecked))
@@ -177,7 +192,7 @@ def decisions_in_force(node, model):
     return out[:4]
 
 
-def render(node, model, entries, stamp, repos_spec, root):
+def render(node, model, entries, stamp, repos_spec, root, volatile=True):
     lines = ["# %s · %s" % (node.id, node.title), ""]
     lines.append("`%s` · %s · lane %s · gate %s%s" % (
         node.project, node.effective_status, node.get("lane"),
@@ -194,7 +209,7 @@ def render(node, model, entries, stamp, repos_spec, root):
                   ">",
                   "> Confirm in a sentence: "
                   "`apply.py --decided %s=status:done --said \"...\"`" % node.id]
-    lines += ["", "**Freshness:** %s" % freshness(root, node, stamp, repos_spec), ""]
+    lines += ["", "**Freshness:** %s" % freshness(root, node, stamp, repos_spec, volatile), ""]
 
     lines += ["## Where this stands", ""]
     if node.effective_status == "blocked":

@@ -104,7 +104,8 @@ def threads_for(root, item_id, manual):
     return paths
 
 
-def render(node, model, entries, stamp, repos_spec, root, manual):
+def render(node, model, entries, stamp, repos_spec, root, manual,
+           volatile=True):
     ruled = brief_mod.ruled_out_for(node, entries)[:MAX_RULED_OUT]
     repos = node.get("repos") or []
     machine = node.get("machine_affinity")
@@ -120,7 +121,7 @@ def render(node, model, entries, stamp, repos_spec, root, manual):
         % (node.project, node.effective_status, node.effort_minutes, gate,
            " · machine %s" % machine if machine else ""),
         "Freshness: %s"
-        % brief_mod.freshness(root, node, stamp, repos_spec),
+        % brief_mod.freshness(root, node, stamp, repos_spec, volatile),
         "",
     ]
 
@@ -233,7 +234,7 @@ def render(node, model, entries, stamp, repos_spec, root, manual):
     return "\n".join(lines)
 
 
-def generate(root, model, target):
+def generate(root, model, target, volatile=True):
     entries = brief_mod.parse_register(root)
     stamp = brief_mod.read_stamp(root)
     manual = load_manual(root)
@@ -245,7 +246,8 @@ def generate(root, model, target):
     for node in model.nodes.values():
         if not node.is_active:
             continue
-        text = render(node, model, entries, stamp, repos_spec, root, manual)
+        text = render(node, model, entries, stamp, repos_spec, root, manual,
+                      volatile)
         path = os.path.join(target, "kickoff", "%s.md" % node.id)
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "w", encoding="utf-8") as fh:

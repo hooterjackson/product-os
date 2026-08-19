@@ -633,6 +633,37 @@ class GateNoneIsNotTheSameAsFromThisChair(unittest.TestCase):
                     self.assertNotIn("from this chair", line)
 
 
+class PublishedStampsMustSurviveBeingPublished(unittest.TestCase):
+    """The brief's freshness line carried "+N commits since the last audit",
+    computed from local HEAD, and was committed into public/. The commit that
+    published it invalidated it -- measured +9 before, +10 after. No ordering
+    of regenerate-then-commit converges."""
+
+    def test_public_drops_the_volatile_delta(self):
+        import brief as brief_mod
+        import _model as model_mod
+        root = model_mod.find_root()
+        model = model_mod.Model.load(root)
+        stamp = brief_mod.read_stamp(root)
+        if not stamp:
+            self.skipTest("no audit stamp")
+        with open(os.path.join(root, "state", "repos.json"), encoding="utf-8") as fh:
+            spec = {k: v for k, v in json.load(fh).items()
+                    if not k.startswith("_")}
+        node = model.nodes["POS-001"]
+        durable = brief_mod.freshness(root, node, stamp, spec, volatile=False)
+        self.assertNotIn("since the last audit", durable)
+        self.assertIn("last audit", durable)
+
+    def test_no_committed_brief_carries_a_commit_delta(self):
+        for name in glob.glob(os.path.join(ROOT, "public", "briefs", "*.md")) + \
+                glob.glob(os.path.join(ROOT, "public", "kickoff", "*.md")):
+            with open(name, encoding="utf-8") as fh:
+                text = fh.read()
+            self.assertNotIn("since the last audit", text,
+                             "%s embeds a counter its own commit changes" % name)
+
+
 class ApplyRefusals(unittest.TestCase):
     """Three refusals that must not bend. Each is checked against a real seed
     item in a scratch copy of state/, not against a mock."""

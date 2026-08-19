@@ -901,6 +901,36 @@ everything. Metadata is a surface. This repo had a rule about disclosure and a
 tool that executed it against files only — which is the same class as R-054 and
 R-056, one level further out.
 
+## R-061 · Publishing an artifact whose content the act of publishing changes
+**keywords:** freshness · stamp · publish · public · stale · commit · counter · volatile · durable · sync
+**source:** measured in this repo, 2026-08-19 · grade: measured
+
+The brief's freshness line carried a live delta — `⚠ product-os +9 since the
+last audit` — computed from the local working copy's HEAD. That line was then
+**committed** into `public/`.
+
+So the commit that published the stamp invalidated it. Measured directly: `+9`
+before committing, `+10` after. `publish.py --check` went red immediately, and
+a stale stamp had already been pushed to a live URL that other machines fetch.
+
+**"Regenerate before committing" does not fix this** and it is worth being
+precise about why: regenerating produces `+10`, committing that makes it `+11`.
+There is no ordering of the two steps that converges. The artifact was a
+function of the event that shipped it.
+
+The fix is to split the fact, not to sequence the steps:
+
+- **Durable** — when the last audit ran, over what window, what it found.
+  Stable between audits, so it survives being committed. This is what `public/`
+  carries, and it is the half a remote consumer actually needs.
+- **Volatile** — "+N commits since then", a live working-copy fact. Stays in
+  `build/`, which is git-ignored, for the person at the keyboard who can act on
+  it.
+
+**The general shape:** before publishing a derived artifact, ask whether
+publishing it changes its own inputs. Anything counting commits, file sizes, or
+"time since" against the repo it lives in will.
+
 ## R-050 · `product-os` starting public
 **keywords:** product-os · public · private · disclosure · ruled-out · seed · publication
 **source:** product-os `wiki/ruled-out.md` (this file) · 2026-08-19 · grade: inferred

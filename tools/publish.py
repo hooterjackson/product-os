@@ -256,7 +256,7 @@ def project_llms(slug, project, model, stamp, ranked):
 
 # ---------------------------------------------------------------- the surface
 
-def generate(root, model, target):
+def generate(root, model, target, volatile=False):
     stamp = brief_mod.read_stamp(root)
     entries = brief_mod.parse_register(root)
     with open(os.path.join(root, "state", "repos.json"), "r",
@@ -274,10 +274,11 @@ def generate(root, model, target):
     # --- briefs: self-contained, paste-able, no link required to make sense
     for node in model.nodes.values():
         write(target, os.path.join("briefs", "%s.md" % node.id),
-              brief_mod.render(node, model, entries, stamp, repos_spec, root))
+              brief_mod.render(node, model, entries, stamp, repos_spec, root,
+                               volatile))
 
     # --- kickoff prompts: the artifact he actually pastes
-    kickoff_mod.generate(root, model, target)
+    kickoff_mod.generate(root, model, target, volatile)
 
     # --- api
     write(target, os.path.join("api", "now.json"), dump({
