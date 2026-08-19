@@ -1,10 +1,10 @@
 {
   "counts": {
-    "active": 22,
+    "active": 23,
     "blocked": 9,
     "decisions": 9,
     "done": 5,
-    "items": 34,
+    "items": 35,
     "parked": 7,
     "questions": 5
   },
@@ -368,6 +368,40 @@
       "score": 5.0,
       "status": "next",
       "title": "Kickoff prompts and thread return paths",
+      "unblocks": []
+    },
+    {
+      "authored_status": "next",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-011.md",
+      "closed_origin": null,
+      "cognitive_load": "medium",
+      "completed": null,
+      "effort_minutes": 360,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "POS-011",
+      "keywords": [
+        "action",
+        "artifact",
+        "attach",
+        "capture",
+        "connect-repo",
+        "manual-yaml",
+        "paste",
+        "reconcile",
+        "repos-json",
+        "scale"
+      ],
+      "lane": "infra",
+      "leverage": 0,
+      "machine_affinity": null,
+      "project": "product-os",
+      "reach": [],
+      "repos": [],
+      "score": 5.0,
+      "status": "next",
+      "title": "The remaining action artifacts: reconcile, attach, connect-repo, capture",
       "unblocks": []
     },
     {

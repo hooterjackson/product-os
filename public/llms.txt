@@ -54,7 +54,21 @@ _Last audited 2026-08-19. 301 commits were unattributed then._
 
 _5 item(s) are marked done on a machine's judgement, unconfirmed by him: EL-004, EL-005, POS-003, POS-004, POS-005._
 
-## 5 · Endpoints
+## 5 · The five actions — the destination is part of the artifact
+
+Three destinations and they are NOT interchangeable. Pasting a
+"link yourself to GB-001" prompt into a fresh chat fails
+confusingly.
+
+| Action | Fetch | Paste into |
+|---|---|---|
+| Start a task | `BASE/kickoff/<ID>.md` | a **new** chat |
+| Tell it what changed | `BASE/reconcile.md` | a **new** chat |
+| Link a web chat | `BASE/attach/<ID>.md` | **that** chat |
+| Connect a repo | `BASE/connect-repo.md` | an existing chat |
+| Capture a thought | `BASE/capture.md` | anywhere |
+
+## 6 · Endpoints
 
 - `BASE/api/index.json` — every endpoint, with freshness
 - `BASE/api/now.json` — the ranked list
@@ -63,7 +77,11 @@ _5 item(s) are marked done on a machine's judgement, unconfirmed by him: EL-004,
 - `BASE/api/graph.json` — the dependency graph
 - `BASE/api/threads.json` — indexed chats, with resume-or-restart
 - `BASE/api/unconfirmed.json` — closed by a machine, not confirmed
-- `BASE/kickoff/<ID>.md` — PASTE THIS to start work on an item
+- `BASE/kickoff/<ID>.md` — START A TASK — paste into a NEW chat
+- `BASE/reconcile.md` — TELL IT WHAT CHANGED — paste into a NEW chat
+- `BASE/attach/<ID>.md` — LINK A WEB CHAT — paste into THAT chat
+- `BASE/connect-repo.md` — ADD A REPO — paste into an existing chat
+- `BASE/capture.md` — CAPTURE A THOUGHT — type anywhere
 - `BASE/briefs/<ID>.md` — the paste-able brief
 - `BASE/projects/<slug>/llms.txt` — this file, scoped to one project
 

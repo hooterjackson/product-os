@@ -27,6 +27,7 @@ portfolio into context.
 - `POS-002` Point PROJECT-STATE.md at product-os — score 7.5
 - `POS-008` Surface inferred closures, record the public decision — score 5.3
 - `POS-010` Kickoff prompts and thread return paths — score 5.0
+- `POS-011` The remaining action artifacts: reconcile, attach, connect-repo, capture — score 5.0
 - `POS-007` Re-centre on software: kill lead-time, park hardware, briefs and resume verdicts — score 5.0
 - `POS-009` llms.txt and the JSON API: the agent-facing surface — score 5.0
 - `POS-006` Group D coverage: cluster 301 unattributed commits into items — score 4.0

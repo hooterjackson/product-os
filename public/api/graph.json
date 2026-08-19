@@ -287,6 +287,13 @@
       "title": "Kickoff prompts and thread return paths"
     },
     {
+      "id": "POS-011",
+      "leverage": 0,
+      "project": "product-os",
+      "status": "next",
+      "title": "The remaining action artifacts: reconcile, attach, connect-repo, capture"
+    },
+    {
       "id": "Q-001",
       "leverage": 1,
       "project": "gimbal-bench",

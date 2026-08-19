@@ -42,6 +42,7 @@ import sys
 
 import _fm
 import _model
+import actions as actions_mod
 import brief as brief_mod
 import kickoff as kickoff_mod
 
@@ -183,7 +184,21 @@ def root_llms(model, stamp, ranked):
                      ", ".join(sorted((n.id for n in unconfirmed),
                                       key=_fm.sort_key))), ""]
 
-    lines += ["## 5 · Endpoints", ""]
+    lines += ["## 5 · The five actions — the destination is part of the artifact",
+              "",
+              "Three destinations and they are NOT interchangeable. Pasting a",
+              "\"link yourself to GB-001\" prompt into a fresh chat fails",
+              "confusingly.",
+              "",
+              "| Action | Fetch | Paste into |",
+              "|---|---|---|",
+              "| Start a task | `BASE/kickoff/<ID>.md` | a **new** chat |",
+              "| Tell it what changed | `BASE/reconcile.md` | a **new** chat |",
+              "| Link a web chat | `BASE/attach/<ID>.md` | **that** chat |",
+              "| Connect a repo | `BASE/connect-repo.md` | an existing chat |",
+              "| Capture a thought | `BASE/capture.md` | anywhere |",
+              "",
+              "## 6 · Endpoints", ""]
     for rel, what in [
             ("api/index.json", "every endpoint, with freshness"),
             ("api/now.json", "the ranked list"),
@@ -192,7 +207,11 @@ def root_llms(model, stamp, ranked):
             ("api/graph.json", "the dependency graph"),
             ("api/threads.json", "indexed chats, with resume-or-restart"),
             ("api/unconfirmed.json", "closed by a machine, not confirmed"),
-            ("kickoff/<ID>.md", "PASTE THIS to start work on an item"),
+            ("kickoff/<ID>.md", "START A TASK — paste into a NEW chat"),
+            ("reconcile.md", "TELL IT WHAT CHANGED — paste into a NEW chat"),
+            ("attach/<ID>.md", "LINK A WEB CHAT — paste into THAT chat"),
+            ("connect-repo.md", "ADD A REPO — paste into an existing chat"),
+            ("capture.md", "CAPTURE A THOUGHT — type anywhere"),
             ("briefs/<ID>.md", "the paste-able brief"),
             ("projects/<slug>/llms.txt", "this file, scoped to one project")]:
         lines.append("- `BASE/%s` — %s" % (rel, what))
@@ -277,8 +296,9 @@ def generate(root, model, target, volatile=False):
               brief_mod.render(node, model, entries, stamp, repos_spec, root,
                                volatile))
 
-    # --- kickoff prompts: the artifact he actually pastes
+    # --- the five actions. Everything this tool does is one of these.
     kickoff_mod.generate(root, model, target, volatile)
+    actions_mod.generate(root, model, target, stamp, ranked)
 
     # --- api
     write(target, os.path.join("api", "now.json"), dump({
@@ -381,7 +401,8 @@ def generate(root, model, target, volatile=False):
 def advertised(model):
     """Every path this surface promises. Used by the CI link check."""
     paths = ["llms.txt", "api/index.json", "api/now.json", "api/graph.json",
-             "api/threads.json", "api/unconfirmed.json"]
+             "api/threads.json", "api/unconfirmed.json",
+             "reconcile.md", "connect-repo.md", "capture.md"]
     for slug in model.projects:
         paths.append("projects/%s/llms.txt" % slug)
         paths.append("api/projects/%s.json" % slug)
@@ -391,6 +412,7 @@ def advertised(model):
     for node_id, node in model.nodes.items():
         if node.is_active:
             paths.append("kickoff/%s.md" % node_id)
+            paths.append("attach/%s.md" % node_id)
     return paths
 
 
@@ -443,7 +465,7 @@ def main(argv=None):
     for target in targets:
         # wholesale: an orphan endpoint that llms.txt no longer advertises is
         # still fetchable, and still answers with something stale.
-        for sub in ("api", "briefs", "projects", "kickoff"):
+        for sub in ("api", "briefs", "projects", "kickoff", "attach"):
             shutil.rmtree(os.path.join(target, sub), ignore_errors=True)
         generate(root, model, target)
         print("wrote %s" % os.path.relpath(target, root))
