@@ -1,0 +1,17 @@
+{
+  "name": "product-os",
+  "owner": {
+    "name": "Marcelo Lima"
+  },
+  "metadata": {
+    "description": "The priority and context control plane for this portfolio.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "product-os",
+      "source": "./plugin",
+      "description": "Ranks work from evidence, captures without asking, writes handoffs the next session can read, and injects known dead ends before you suggest one."
+    }
+  ]
+}

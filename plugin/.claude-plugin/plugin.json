@@ -1,0 +1,15 @@
+{
+  "name": "product-os",
+  "description": "Priority and context control plane for a solo hardware/firmware/software portfolio. Ranks work from evidence, captures without asking, and injects known dead ends before you suggest one.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Marcelo Lima"
+  },
+  "keywords": [
+    "priority",
+    "context",
+    "portfolio",
+    "evidence",
+    "handoff"
+  ]
+}

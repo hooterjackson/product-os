@@ -1,0 +1,21 @@
+{
+  "_comment": [
+    "NESTED form. The loader dereferences parse(this).hooks, so the event map",
+    "must sit under a top-level 'hooks' key -- a flat {\"SessionStart\": [...]}",
+    "file parses as valid JSON, registers nothing, and fails silently. That is",
+    "the worst shape of failure for a guardrail: it looks installed."
+  ],
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/session_start.py\"",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  }
+}

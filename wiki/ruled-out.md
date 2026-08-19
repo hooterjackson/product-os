@@ -477,7 +477,7 @@ A mutation removing that guard is caught by test. The general shape: **a restore
 that is not one-directional is a way to lose data, not a way to keep it.**
 
 ## R-036 · Quieting the firmware's logging first when chasing the serial flood
-**keywords:** serial-flood · 57 · logging · browser · order · d14 · liveness · diagnosis
+**keywords:** serial-flood · 57 · logging · browser · fix-order · d14 · liveness · diagnosis
 **source:** gimbal-bench `captures/gimbal10/fixture/owner-decisions-20260814.md` @ `e4d71a9` · 2026-08-15 · grade: inferred
 
 > Quieting the firmware first would hide the browser bug under a lower volume
