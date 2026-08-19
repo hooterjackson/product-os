@@ -8,14 +8,21 @@
   },
   "items": [
     {
-      "authored_status": "next",
+      "authored_status": "doing",
       "blocked_by": [],
       "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-002.md",
       "closed_origin": null,
       "cognitive_load": "low",
       "completed": null,
       "effort_minutes": 25,
-      "evidence_found": [],
+      "evidence_found": [
+        {
+          "kind": "commit",
+          "path": null,
+          "repo": "engineered-lighting-site",
+          "sha": "a482376"
+        }
+      ],
       "gate": "none",
       "id": "POS-002",
       "keywords": [
@@ -37,7 +44,7 @@
         "product-os"
       ],
       "score": 7.5,
-      "status": "next",
+      "status": "doing",
       "title": "Point PROJECT-STATE.md at product-os",
       "unblocks": []
     },
