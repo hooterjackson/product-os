@@ -11,3 +11,11 @@
 # Example:
 #   GB-001: https://claude.ai/chat/....
 #   POS-002: https://chatgpt.com/c/....
+
+
+# WARNING, added 2026-08-19: this repo is PUBLIC (DEC-201). A URL you
+# put here is committed and therefore published. validate.py flags each
+# one so the choice is conscious -- allowlist it in
+# state/secret-allowlist.txt only if you mean to publish it. The
+# generated surface under public/ records that a URL exists without
+# repeating it; see R-062.

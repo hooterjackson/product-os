@@ -38,6 +38,9 @@ SECRET_PATTERNS = [
     ("tailnet-fqdn", re.compile(r"\b[A-Za-z0-9-]+\.[A-Za-z0-9-]+\.ts\.net\b")),
     ("tailnet-ip", re.compile(r"\b100\.(?:6[4-9]|[7-9]\d|1[01]\d|12[0-7])\.\d{1,3}\.\d{1,3}\b")),
     ("mac-address", re.compile(r"\b(?:[0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}\b")),
+    ("chat-url", re.compile(
+        r"https?://(?:claude\.ai/chat/|chatgpt\.com/c/|chat\.openai\.com/c/)"
+        r"[0-9a-zA-Z-]{8,}")),
     ("home-path", re.compile(r"/Users/[a-z][a-z0-9_-]+/")),
     ("windows-home", re.compile(r"[Cc]:\\\\?Users\\\\?[A-Z][A-Za-z]+")),
 ]

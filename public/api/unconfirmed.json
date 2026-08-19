@@ -2,9 +2,9 @@
   "freshness": {
     "generated": "2026-08-19",
     "last_audit": "2026-08-19",
-    "last_audit_window_since": "2026-07-05",
+    "last_audit_window_since": "2026-08-10",
     "source": "state/ in hooterjackson/product-os",
-    "unattributed_commits_at_last_audit": 323
+    "unattributed_commits_at_last_audit": 153
   },
   "items": [
     {
@@ -55,50 +55,42 @@
     {
       "authored_status": "done",
       "blocked_by": [],
-      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/EL-005.md",
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-002.md",
       "closed_origin": "inferred",
-      "cognitive_load": "high",
-      "completed": "2026-08-15",
-      "effort_minutes": 480,
+      "cognitive_load": "low",
+      "completed": "2026-08-19",
+      "effort_minutes": 25,
       "evidence_found": [
         {
           "kind": "commit",
-          "path": "captures/gimbal10/fixture/bench-session-20260815.md",
-          "repo": "gimbal-bench",
-          "sha": "34b9f7c"
-        },
-        {
-          "kind": "commit",
-          "path": "captures/gimbal10/fixture/bench-session2-20260815.md",
-          "repo": "gimbal-bench",
-          "sha": "19dd790"
+          "path": null,
+          "repo": "engineered-lighting-site",
+          "sha": "a482376"
         }
       ],
-      "gate": "bench",
-      "id": "EL-005",
+      "gate": "none",
+      "id": "POS-002",
       "keywords": [
-        "0x241",
-        "0x242",
-        "arm",
-        "bench",
-        "bring-up",
-        "can",
-        "health",
-        "motors",
-        "pose",
-        "ready"
+        "bootstrap",
+        "drift",
+        "handoff",
+        "ninth",
+        "pointer",
+        "project-state",
+        "state-file"
       ],
-      "lane": "hardware",
+      "lane": "content",
       "leverage": 0,
-      "machine_affinity": "formd-t1",
-      "project": "robotic-spotlight",
+      "machine_affinity": null,
+      "project": "product-os",
       "reach": [],
       "repos": [
-        "gimbal-bench"
+        "engineered-lighting-site",
+        "product-os"
       ],
-      "score": 6.25,
+      "score": 7.5,
       "status": "done",
-      "title": "CAN bring-up: both motors answering, and the first READY r=1",
+      "title": "Point PROJECT-STATE.md at product-os",
       "unblocks": []
     },
     {

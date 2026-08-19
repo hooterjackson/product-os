@@ -736,6 +736,42 @@ class EveryActionArtifactStatesItsDestination(unittest.TestCase):
                                      % os.path.basename(path))
 
 
+class ApplyParsesValuesWhole(unittest.TestCase):
+    """--field and --decided shared --evidence's comma splitter. Measured:
+    `--decided EL-001=unblocks:["GB-001","GB-002"]` parsed as two fragments,
+    wrote a truncated string into an item and injected five garbage keys into
+    its frontmatter. No error; the write succeeded. Worst on --decided, the
+    documented way for HIM to state a decided field."""
+
+    def test_a_json_value_containing_commas_survives(self):
+        got = apply_mod.parse_pairs(['EL-001=unblocks:["GB-001","GB-002"]'],
+                                    split=False)
+        self.assertEqual(got["EL-001"], ['unblocks:["GB-001","GB-002"]'])
+
+    def test_evidence_still_splits_on_commas(self):
+        got = apply_mod.parse_pairs(["GB-004=aaa1111,bbb2222"])
+        self.assertEqual(got["GB-004"], ["aaa1111", "bbb2222"])
+
+    def test_confirming_a_closure_does_not_redate_it(self):
+        """`--decided <ID>=status:done` is the documented way to CONFIRM a
+        closure. Re-stamping `completed` moved EL-005 from 2026-08-15 to
+        2026-08-19 -- eating the fact POS-008 exists to surface."""
+        import _fm as fm_mod
+        applier = apply_mod.Applier(ROOT, dry_run=True)
+        done = [n for n in applier.model.items.values()
+                if n.status == "done" and n.get("completed")]
+        if not done:
+            self.skipTest("no dated closure to confirm")
+        node = done[0]
+        before = node.get("completed")
+        fm, _body = fm_mod.load(node.path)
+        self.assertEqual(fm.get("completed"), before)
+        with open(os.path.join(ROOT, "tools", "apply.py"), encoding="utf-8") as fh:
+            source = fh.read()
+        self.assertIn('fm.setdefault("completed", today())', source,
+                      "completed is still stamped unconditionally")
+
+
 class ApplyRefusals(unittest.TestCase):
     """Three refusals that must not bend. Each is checked against a real seed
     item in a scratch copy of state/, not against a mock."""

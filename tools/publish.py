@@ -285,6 +285,16 @@ def generate(root, model, target, volatile=False):
     ranked = model.ranked()
     fresh = freshness_block(root, stamp)
 
+    # A chat URL is a private conversation identifier and this repo is PUBLIC
+    # (DEC-201). `state/threads/manual.yaml` is committed, so a URL there is
+    # already exposed -- the disclosure screen now says so and forces a
+    # conscious allowlist. What the derived surface must NOT do is multiply it
+    # across a dozen more files. public/ records THAT a URL exists and where to
+    # read it; build/ keeps the real thing, and build/ is git-ignored.
+    manual = kickoff_mod.load_manual(root)
+    redacted = {k: ["(recorded in %s — not republished)" % kickoff_mod.MANUAL]
+                for k in manual}
+
     write(target, "llms.txt", root_llms(model, stamp, ranked))
     for slug, project in sorted(model.projects.items()):
         write(target, os.path.join("projects", slug, "llms.txt"),
@@ -297,7 +307,8 @@ def generate(root, model, target, volatile=False):
                                volatile))
 
     # --- the five actions. Everything this tool does is one of these.
-    kickoff_mod.generate(root, model, target, volatile)
+    kickoff_mod.generate(root, model, target, volatile,
+                         manual=redacted if not volatile else manual)
     actions_mod.generate(root, model, target, stamp, ranked)
 
     # --- api
@@ -367,12 +378,11 @@ def generate(root, model, target, volatile=False):
                 with open(os.path.join(shard_dir, name), "r",
                           encoding="utf-8") as fh:
                     shards[name[:-5]] = json.load(fh)
-    manual = kickoff_mod.load_manual(root)
     write(target, os.path.join("api", "threads.json"),
           dump({"freshness": fresh, "by_machine": shards,
-                "manual_urls": {k: sorted(v) for k, v in sorted(manual.items())},
+                "manual_urls": {k: v for k, v in sorted(redacted.items())},
                 "return_paths": {
-                    node.id: kickoff_mod.threads_for(root, node.id, manual)
+                    node.id: kickoff_mod.threads_for(root, node.id, redacted)
                     for node in sorted(model.nodes.values(),
                                        key=lambda n: _fm.sort_key(n.id))
                     if kickoff_mod.threads_for(root, node.id, manual)},

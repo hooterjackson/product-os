@@ -64,9 +64,9 @@
   "freshness": {
     "generated": "2026-08-19",
     "last_audit": "2026-08-19",
-    "last_audit_window_since": "2026-07-05",
+    "last_audit_window_since": "2026-08-10",
     "source": "state/ in hooterjackson/product-os",
-    "unattributed_commits_at_last_audit": 323
+    "unattributed_commits_at_last_audit": 153
   },
   "nodes": [
     {
@@ -227,7 +227,7 @@
       "id": "POS-002",
       "leverage": 0,
       "project": "product-os",
-      "status": "doing",
+      "status": "done",
       "title": "Point PROJECT-STATE.md at product-os"
     },
     {

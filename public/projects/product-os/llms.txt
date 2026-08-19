@@ -24,7 +24,6 @@ portfolio into context.
 
 ## Open here
 
-- `POS-002` Point PROJECT-STATE.md at product-os — score 7.5
 - `POS-008` Surface inferred closures, record the public decision — score 5.3
 - `POS-010` Kickoff prompts and thread return paths — score 5.0
 - `POS-011` The remaining action artifacts: reconcile, attach, connect-repo, capture — score 5.0

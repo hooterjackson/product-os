@@ -63,15 +63,28 @@ def today():
     return datetime.date.today().isoformat()
 
 
-def parse_pairs(values):
-    """`ID=a,b` repeated -> {ID: [a, b]}."""
+def parse_pairs(values, split=True):
+    """`ID=a,b` repeated -> {ID: [a, b]}.
+
+    `split=False` keeps the value whole. It has to exist because --evidence
+    genuinely takes a comma list of SHAs, while --field and --decided take a
+    single value that may CONTAIN commas -- and they shared this function.
+
+    Measured: `--decided EL-001=unblocks:["GB-001","GB-002"]` parsed as two
+    fragments, wrote the string `[{"kind":"commit"` into an item's
+    evidence_found and injected five garbage keys into its frontmatter. No
+    error; the write succeeded. Worst on --decided, which is the documented way
+    for HIM to state a decided field, and `unblocks` feeds leverage -- the
+    largest multiplier in the score.
+    """
     out = {}
     for raw in values or []:
         if "=" not in raw:
             raise SystemExit("expected ID=value, got %r" % raw)
         key, _, rest = raw.partition("=")
-        out.setdefault(key.strip().upper(), []).extend(
-            [v.strip() for v in rest.split(",") if v.strip()])
+        parts = ([v.strip() for v in rest.split(",") if v.strip()] if split
+                 else [rest.strip()])
+        out.setdefault(key.strip().upper(), []).extend(parts)
     return out
 
 
@@ -172,7 +185,11 @@ class Applier(object):
                  % (" (%d found just now, unread)" % fresh if fresh else "")))
             return
         if status == "done":
-            fm["completed"] = today()
+            # Only stamp a NEW completion. Confirming an existing one is the
+            # documented flow (`--decided <ID>=status:done`), and re-dating it
+            # moved EL-005 from 2026-08-15 to 2026-08-19 -- eating the very
+            # fact POS-008 exists to surface.
+            fm.setdefault("completed", today())
             # Derived here, never accepted from the caller. `closed_origin` is
             # the answer to "did a machine decide this was finished, or did
             # he?" -- and an agent that could set it would be able to launder
@@ -299,7 +316,7 @@ def main(argv=None):
         for value in values:
             applier.set_status(item_id, value)
     for origin, group in ((AGENT, args.field), (HUMAN, args.decided)):
-        for item_id, specs in parse_pairs(group).items():
+        for item_id, specs in parse_pairs(group, split=False).items():
             for spec in specs:
                 field, _, raw = spec.partition(":")
                 try:

@@ -2,17 +2,17 @@
   "freshness": {
     "generated": "2026-08-19",
     "last_audit": "2026-08-19",
-    "last_audit_window_since": "2026-07-05",
+    "last_audit_window_since": "2026-08-10",
     "source": "state/ in hooterjackson/product-os",
-    "unattributed_commits_at_last_audit": 323
+    "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "doing",
+    "authored_status": "done",
     "blocked_by": [],
     "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-002.md",
-    "closed_origin": null,
+    "closed_origin": "inferred",
     "cognitive_load": "low",
-    "completed": null,
+    "completed": "2026-08-19",
     "effort_minutes": 25,
     "evidence_found": [
       {
@@ -43,7 +43,7 @@
       "product-os"
     ],
     "score": 7.5,
-    "status": "doing",
+    "status": "done",
     "title": "Point PROJECT-STATE.md at product-os",
     "unblocks": []
   }

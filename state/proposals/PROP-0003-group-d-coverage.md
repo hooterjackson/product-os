@@ -1,5 +1,36 @@
 # PROP-0003 — 20 items to cover group D
 
+> ## ⚠ CORRECTED 2026-08-19 — THE HEADLINE NUMBER WAS WRONG
+>
+> This proposal claimed twenty `done` items would drop group D from **301 to
+> 13**. **The real effect is zero.**
+>
+> `audit.py` removes a commit from group D only when a *finding* reports its
+> SHA, and `audit_item()` returns early for `done` items — the sole finding it
+> can emit for one is a failure ("claimed evidence does not resolve"). Verified
+> empirically: **0 SHAs reported by findings on the 6 done items currently in
+> the repo.**
+>
+> I measured glob-matching against the unattributed set instead of measuring
+> what the tool reports. A proxy substituted for the signal — the same class as
+> R-054, R-056 and R-060, in the measurement backing a proposal awaiting a yes.
+>
+> **What is still true:** the 20 clusters describe real work the seed does not
+> model, and 288 of 301 commits do fall inside their globs. What is false is
+> that creating them as `done` changes the number.
+>
+> **What would actually move it**, and it is worse than it sounds: a *live*
+> item shrinks group D by at most `BROAD_GLOB_COMMITS` = 12, because past that
+> the too-broad check suppresses its attribution entirely. Twenty live items
+> therefore cap out around 240, not 13 — and for a repo like `genio`, where 68
+> individual files each exceed 12 commits, no honest glob reaches the threshold
+> at all.
+>
+> **Do not answer this proposal as written.** The clustering is worth keeping;
+> the arithmetic and the status need redoing, and possibly the threshold does
+> too.
+
+
 **Status:** open. Nothing here has been created.
 **Raised:** 2026-08-19, work-laptop, from `POS-006`.
 **Answer in one sentence.** See *The one-sentence answer* below — the numbers are
@@ -116,7 +147,8 @@ are excluded from `ranked()` and contribute nothing to any leverage count. Their
 Proposed for all twenty: **`impact: 3`, `confidence: 4`, `effort_minutes: 240`,
 `status: done`.**
 
-So: **"yes to PROP-0003"** creates all twenty and drops group D from 301 to 13.
+~~So: **"yes to PROP-0003"** creates all twenty and drops group D from 301 to 13.~~
+**False — see the correction at the top.** Creating them as `done` changes group D by zero.
 
 If you would rather not carry twenty historical items, the alternative is
 **"just the gimbal-bench ones"** (15 items, ~91% of the reduction) or **"none of

@@ -2,9 +2,9 @@
   "freshness": {
     "generated": "2026-08-19",
     "last_audit": "2026-08-19",
-    "last_audit_window_since": "2026-07-05",
+    "last_audit_window_since": "2026-08-10",
     "source": "state/ in hooterjackson/product-os",
-    "unattributed_commits_at_last_audit": 323
+    "unattributed_commits_at_last_audit": 153
   },
   "item": {
     "authored_status": "next",

@@ -2,9 +2,9 @@
   "freshness": {
     "generated": "2026-08-19",
     "last_audit": "2026-08-19",
-    "last_audit_window_since": "2026-07-05",
+    "last_audit_window_since": "2026-08-10",
     "source": "state/ in hooterjackson/product-os",
-    "unattributed_commits_at_last_audit": 323
+    "unattributed_commits_at_last_audit": 153
   },
   "items": [
     {
@@ -121,7 +121,7 @@
       "authored_status": "done",
       "blocked_by": [],
       "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/EL-005.md",
-      "closed_origin": "inferred",
+      "closed_origin": "his-word",
       "cognitive_load": "high",
       "completed": "2026-08-15",
       "effort_minutes": 480,

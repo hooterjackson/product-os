@@ -20,18 +20,18 @@ This is a set of guesses, not a record of reality. Check it.
 
 1. `GB-001` 25.0 — Finish the M5 fault ring: a real fault storm, and the brownout case · gate bench
 2. `HAI-001` 20.0 — Rotate the GPU box's Linux password
-3. `POS-002` 7.5 — Point PROJECT-STATE.md at product-os
-4. `GB-002` 6.7 — Rescue D1-D11 off formd-t1 and commit them
-5. `Q-001` 6.0 — Does Spot Mode (Auto/Hold/Manual) survive gate A?
-6. `GB-004` 5.3 — M6 on hardware: the motor-silent limb, MUTE-CLEAR, and the armed lane · gate bench
-7. `POS-008` 5.3 — Surface inferred closures, record the public decision
-8. `Q-002` 5.3 — Does a mid-move retarget re-plan smoothly, or stop and restart?
+3. `GB-002` 6.7 — Rescue D1-D11 off formd-t1 and commit them
+4. `Q-001` 6.0 — Does Spot Mode (Auto/Hold/Manual) survive gate A?
+5. `GB-004` 5.3 — M6 on hardware: the motor-silent limb, MUTE-CLEAR, and the armed lane · gate bench
+6. `POS-008` 5.3 — Surface inferred closures, record the public decision
+7. `Q-002` 5.3 — Does a mid-move retarget re-plan smoothly, or stop and restart?
+8. `POS-010` 5.0 — Kickoff prompts and thread return paths
 
 ## What is NOT confirmed
 
-- Last audit **2026-08-19** (today), over commits since 2026-07-05.
-- **323 commits were unattributed** at that audit — work no item claims. That number is a to-do list, not an error log.
-- **5 item(s) marked done on a machine's judgement**, which you have not confirmed: EL-004, EL-005, POS-003, POS-004, POS-005.
+- Last audit **2026-08-19** (today), over commits since 2026-08-10.
+- **153 commits were unattributed** at that audit — work no item claims. That number is a to-do list, not an error log.
+- **5 item(s) marked done on a machine's judgement**, which you have not confirmed: EL-004, POS-002, POS-003, POS-004, POS-005.
 
 ## What to do
 

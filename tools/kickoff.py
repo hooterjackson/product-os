@@ -234,10 +234,10 @@ def render(node, model, entries, stamp, repos_spec, root, manual,
     return "\n".join(lines)
 
 
-def generate(root, model, target, volatile=True):
+def generate(root, model, target, volatile=True, manual=None):
     entries = brief_mod.parse_register(root)
     stamp = brief_mod.read_stamp(root)
-    manual = load_manual(root)
+    manual = load_manual(root) if manual is None else manual
     with open(os.path.join(root, "state", "repos.json"), "r",
               encoding="utf-8") as fh:
         repos_spec = {k: v for k, v in json.load(fh).items()

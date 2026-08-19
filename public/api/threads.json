@@ -314,9 +314,9 @@
   "freshness": {
     "generated": "2026-08-19",
     "last_audit": "2026-08-19",
-    "last_audit_window_since": "2026-07-05",
+    "last_audit_window_since": "2026-08-10",
     "source": "state/ in hooterjackson/product-os",
-    "unattributed_commits_at_last_audit": 323
+    "unattributed_commits_at_last_audit": 153
   },
   "manual_urls": {},
   "note": "A RESUME verdict with no way back is a dead end. Web chats have no CLI, so their URLs live in state/threads/manual.yaml -- paste one in once.",

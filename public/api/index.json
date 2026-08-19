@@ -68,7 +68,6 @@
     "attach/GB-014.md",
     "attach/HAI-001.md",
     "attach/POS-001.md",
-    "attach/POS-002.md",
     "attach/POS-006.md",
     "attach/POS-007.md",
     "attach/POS-008.md",
@@ -137,7 +136,6 @@
     "kickoff/GB-014.md",
     "kickoff/HAI-001.md",
     "kickoff/POS-001.md",
-    "kickoff/POS-002.md",
     "kickoff/POS-006.md",
     "kickoff/POS-007.md",
     "kickoff/POS-008.md",
@@ -160,8 +158,8 @@
   "freshness": {
     "generated": "2026-08-19",
     "last_audit": "2026-08-19",
-    "last_audit_window_since": "2026-07-05",
+    "last_audit_window_since": "2026-08-10",
     "source": "state/ in hooterjackson/product-os",
-    "unattributed_commits_at_last_audit": 323
+    "unattributed_commits_at_last_audit": 153
   }
 }

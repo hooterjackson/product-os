@@ -931,6 +931,63 @@ The fix is to split the fact, not to sequence the steps:
 publishing it changes its own inputs. Anything counting commits, file sizes, or
 "time since" against the repo it lives in will.
 
+## R-063 · Putting a chat URL in a committed file on a public repo
+**keywords:** manual-yaml · chat-url · attach · thread · disclosure · public · identifier · redaction · dec-201
+**source:** found by a cold test of `public/attach/GB-004.md`, 2026-08-19 · grade: measured
+
+`state/threads/manual.yaml` exists so a web chat — which has no transcript on
+disk — can be pointed at by hand. It was designed while this repo was private.
+It is now public (`DEC-201`), and the first time anyone used it the URL landed
+in **two further tracked files**: `public/api/threads.json` and
+`public/kickoff/GB-004.md`.
+
+The disclosure screen passed it silently. It has patterns for API keys, emails,
+tailnet identifiers and MACs, and none for a conversation URL — which is exactly
+the class of private identifier that file was built to collect.
+
+- **The screen now has a `chat-url` pattern.** `manual.yaml` is committed, so a
+  URL in it *is* published; the screen cannot prevent that, but it makes the
+  choice conscious. Each one must be allowlisted deliberately.
+- **`publish.py` no longer republishes them.** The derived surface records that
+  a URL exists and where to read it. `build/` keeps the real thing, git-ignored.
+
+**The residual, stated rather than solved:** on a public repo a committed
+pointer file cannot hold a private URL without publishing it. Redaction takes
+the blast radius from a dozen files to one; it does not make the one private.
+If that trade is wrong, `manual.yaml` moves outside the repo and web chats lose
+their only return path.
+
+`DEC-201`'s `revisit_if` names this trigger exactly, and it fired **before
+anything was pushed** — which is the outcome that trigger was written for.
+
+## R-064 · Measuring a proxy instead of measuring the tool's output
+**keywords:** coverage · group-d · proposal · measurement · proxy · glob · done · prop-0003 · arithmetic
+**source:** found by a cold test of `public/connect-repo.md`, 2026-08-19 · grade: measured
+
+`PROP-0003` proposed twenty `done` items and claimed they would drop group D
+from **301 to 13**. **The real effect is zero**, and the proposal was queued
+for a one-sentence yes.
+
+`audit.py` removes a commit from group D only when a *finding* reports its SHA.
+`audit_item()` returns early for `done` items, and the only finding it can emit
+for one is a failure. Verified: **0 SHAs reported by findings on the six done
+items in the repo.**
+
+The measurement script matched globs against the unattributed set and reported
+that as coverage. Glob-matching is a proxy for attribution; attribution is what
+the tool prints. **Measure the output, not a stand-in for it** — the same class
+as R-054 (empty search ≠ absent), R-056 (a rule that cannot fire) and R-060 (a
+screen aimed at one surface), this time inside the evidence for a proposal.
+
+Two facts fell out of the same test and are worth keeping:
+
+- A **live** item shrinks group D by at most `BROAD_GLOB_COMMITS` = 12, because
+  beyond that the too-broad check suppresses its attribution entirely. Twenty
+  live items cap near 240, not 13.
+- For a repo committing ~6.5×/day, **68 individual files each exceed 12
+  commits**. No honest glob reaches the threshold, so the coverage mechanism as
+  built does not scale to an active codebase without rethinking the threshold.
+
 ## R-050 · `product-os` starting public
 **keywords:** product-os · public · private · disclosure · ruled-out · seed · publication
 **source:** product-os `wiki/ruled-out.md` (this file) · 2026-08-19 · grade: inferred
@@ -1003,3 +1060,41 @@ that turned out to be genuine — see `R-054`. The rule stands; the *search* tha
 decides "cannot be found" is the part that has to be trustworthy, and mine was
 not. Withdrawing a real quote and inventing one are both ways of publishing
 something false about a source.
+
+## R-062 · Rewiring the console's read pan/tilt buttons to send position reads
+**keywords:** console · bench-ui · read · pan · tilt · sysinfo · identity · button · label · 0x92 · 0x9a · position · index.html · operator
+**source:** gimbal-bench `tools/bench_ui/static/index.html` @ `dec8bc7` · 2026-08-15 · grade: measured
+
+**The read pan / Read tilt buttons were never sending the wrong command. Do not
+"fix" them.** On `master` they are, and were, `data-cmd="r"` and
+`data-cmd="R"` — which `tools/bench_ui/commands.py` defines as `0x92 pan angle`
+and `0x92 tilt angle`. Those are position reads. Changing them breaks a working
+control.
+
+The defect was **a label collision, one section away.** The *motor-identity*
+pair — `sys a` / `sys b`, the `0xB1/B2/B5` sysinfo reads — was also labeled bare
+"Read pan" / "Read tilt". The owner, told to read pan, clicked the identity
+button and watched READY stay at `no_pose`. The bench session log
+(`34b9f7c`) recorded the symptom in the operator's frame:
+
+> The workbench read buttons send sysinfo reads, not position reads
+
+and that sentence is what makes this entry necessary — it describes a **command
+bug that did not exist**, because from the chair it was indistinguishable from
+one. The fix, `dec8bc7`, renamed the identity pair to "Identity pan" /
+"Identity tilt". No command changed. `index.html` now carries the reasoning in a
+comment beside those buttons: *a label that could be either button is a label
+for neither.*
+
+**The general form, which is the expensive part.** A defect logged from the
+operator's seat names the *symptom's* mechanism, not the *code's*. Between
+`34b9f7c` ("logged, not yet fixed") and `dec8bc7` (fixed) the stated mechanism
+changed completely, and only the second one is true. When a log says a control
+sends the wrong command, **read the control before rewriting it** — the fault is
+at least as likely to be in what the control is called.
+
+**Standing correction, 2026-08-19.** This was re-derived from the owner
+describing the repair as *"the read pan/tilt buttons actually read the position
+instead of sending a system info command."* That is the right outcome and the
+wrong mechanism, four days after it landed. The register exists so the third
+person to hear it does not go looking for a `0x9A` in the read path.
