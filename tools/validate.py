@@ -396,6 +396,40 @@ class Validator(object):
                                    "thread %d carries %r, which is not on the "
                                    "allowlist" % (index, key))
 
+    def check_public_surface(self):
+        """Every path llms.txt advertises must exist, and public/ must match a
+        fresh generation.
+
+        The cheapest catch available for the most embarrassing failure this
+        system can have: a bootstrap file that tells a model with no context to
+        fetch something that 404s. The model cannot tell a missing endpoint
+        from a broken one; it just fails, on his machine, in front of him.
+        """
+        public = os.path.join(self.root, "public")
+        if not os.path.isdir(public):
+            self.warn("W-NO-PUBLIC", "public/",
+                      "the agent-facing surface has not been generated")
+            return
+        sys.path.insert(0, os.path.join(self.root, "tools"))
+        try:
+            import publish as publish_mod
+            import _model as model_mod
+        except ImportError:
+            return
+        model = model_mod.Model.load(self.root)
+        for rel in publish_mod.advertised(model):
+            if "<" in rel:            # a template, not a literal path
+                continue
+            if not os.path.exists(os.path.join(public, rel)):
+                self.error("E-DEAD-ENDPOINT", "public/llms.txt",
+                           "advertises %s, which does not exist" % rel)
+        proc = subprocess.run(
+            [sys.executable, os.path.join(self.root, "tools", "publish.py"),
+             "--check"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        if proc.returncode != 0:
+            for line in proc.stdout.decode("utf-8", "replace").splitlines()[:6]:
+                self.error("E-PUBLIC-STALE", "public/", line.strip())
+
     def check_regressions(self):
         """Run tests/test_regressions.py as part of the gate.
 
@@ -426,6 +460,7 @@ class Validator(object):
         self.check_model(model)
         self.check_secrets()
         self.check_thread_shards()
+        self.check_public_surface()
         self.check_authority(base_ref)
         if with_tests:
             self.check_regressions()

@@ -1,0 +1,47 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "item": {
+    "authored_status": "next",
+    "blocked_by": [
+      "EL-001",
+      "GB-013"
+    ],
+    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-012.md",
+    "closed_origin": null,
+    "cognitive_load": "high",
+    "completed": null,
+    "effort_minutes": 480,
+    "evidence_found": [],
+    "gate": "bench",
+    "id": "GB-012",
+    "keywords": [
+      "drill",
+      "gate-l",
+      "join",
+      "led",
+      "light",
+      "ota-drill",
+      "parked",
+      "soak",
+      "zigbee"
+    ],
+    "lane": "firmware",
+    "leverage": 0,
+    "machine_affinity": "formd-t1",
+    "project": "gimbal-bench",
+    "reach": [],
+    "repos": [
+      "gimbal-bench"
+    ],
+    "score": 3.75,
+    "status": "blocked",
+    "title": "Gate L \u2014 the fixture joins and holds as a light",
+    "unblocks": []
+  }
+}

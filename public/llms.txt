@@ -1,0 +1,67 @@
+# product-os — read this, then start
+
+Marcelo's priority and context plane for a portfolio of software
+projects run through AI chats. You are probably here because he pasted
+two lines. Follow the bootstrap in order.
+
+**BASE** = `https://raw.githubusercontent.com/hooterjackson/product-os/main/public`
+All paths below are relative to it.
+
+## 1 · Bootstrap, in this order
+
+1. This file. You are done with it after step 4.
+2. `BASE/api/now.json` — the ranked list, and how fresh it is.
+3. Pick the top item, or the one he names.
+   Fetch `BASE/api/items/<ID>.json`.
+4. Fetch `BASE/briefs/<ID>.md` — where it stands, what's next,
+   what is ALREADY RULED OUT, and which decisions bind it.
+
+Then work. If a step 404s, say so; do not guess the shape.
+
+## 2 · Rules of engagement
+
+- **CITE THE ITEM ID IN YOUR FIRST MESSAGE.** `GB-001`, `POS-009`.
+  Writing it into the chat is what links this conversation to that work,
+  permanently and for free. It costs one token. Nothing else recovers it.
+- **Work in the repo the item names, not in product-os.** This repo
+  tracks; it does not host. `repos` on the item says where.
+- **Nothing is done without evidence** — a commit SHA, a file path, or a
+  dated note. If you cannot produce one, it is not done. Say so.
+- **Say "I couldn't look", never "no changes."** An empty result and an
+  unreachable repo are different facts and must never render alike.
+- **Do not write his fields.** `impact`, `confidence`, `effort_minutes`,
+  `cost_usd`, `unblocks`, `pin`, `gate`, `project`, `parked`/`dropped`
+  and the `evidence` rule are his. Propose instead.
+
+## 3 · You may disagree with the ranking
+
+**The score is a label, not a verdict.** It is one arithmetic reading of
+guesses he has not reviewed. If what he tells you about his situation —
+his time, his energy, where he is sitting, what he actually cares about
+today — points somewhere else, **say so once with the reason, then do
+what he says.** Once. Not as a preamble to doing it anyway.
+
+The list is a conversation starter, not a contract.
+
+## 4 · Right now
+
+`GB-001` — Finish the M5 fault ring: a real fault storm, and the brownout case
+score 25.0 · leverage 8 · 480 min · gate bench · machine formd-t1
+
+_Last audited 2026-08-19. 301 commits were unattributed then._
+
+_5 item(s) are marked done on a machine's judgement, unconfirmed by him: EL-004, EL-005, POS-003, POS-004, POS-005._
+
+## 5 · Endpoints
+
+- `BASE/api/index.json` — every endpoint, with freshness
+- `BASE/api/now.json` — the ranked list
+- `BASE/api/items/<ID>.json` — one item
+- `BASE/api/projects/<slug>.json` — one project and its items
+- `BASE/api/graph.json` — the dependency graph
+- `BASE/api/threads.json` — indexed chats, with resume-or-restart
+- `BASE/api/unconfirmed.json` — closed by a machine, not confirmed
+- `BASE/briefs/<ID>.md` — the paste-able brief
+- `BASE/projects/<slug>/llms.txt` — this file, scoped to one project
+
+Projects: engineering-site, gimbal-bench, home-ai-infra, home-app, product-os, robotic-spotlight.

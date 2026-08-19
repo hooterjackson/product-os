@@ -1,0 +1,55 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "item": {
+    "authored_status": "next",
+    "blocked_by": [
+      "GB-014"
+    ],
+    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-005.md",
+    "closed_origin": null,
+    "cognitive_load": "high",
+    "completed": null,
+    "effort_minutes": 480,
+    "evidence_found": [],
+    "gate": "none",
+    "id": "GB-005",
+    "keywords": [
+      "c-patch",
+      "mega-gate",
+      "parked",
+      "partitions",
+      "signing",
+      "variant",
+      "z-m1",
+      "zigbee"
+    ],
+    "lane": "firmware",
+    "leverage": 6,
+    "machine_affinity": "formd-t1",
+    "project": "gimbal-bench",
+    "reach": [
+      "GB-006",
+      "GB-007",
+      "GB-008",
+      "GB-009",
+      "GB-010",
+      "GB-011"
+    ],
+    "repos": [
+      "gimbal-bench"
+    ],
+    "score": 12.0,
+    "status": "blocked",
+    "title": "Z-M1 \u2014 variant, partitions and the c-patch signing scaffold",
+    "unblocks": [
+      "GB-006",
+      "GB-007"
+    ]
+  }
+}

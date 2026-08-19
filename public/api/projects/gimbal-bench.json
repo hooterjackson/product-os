@@ -1,0 +1,749 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "items": [
+    {
+      "authored_status": "next",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-001.md",
+      "closed_origin": null,
+      "cognitive_load": "high",
+      "completed": null,
+      "effort_minutes": 480,
+      "evidence_found": [],
+      "gate": "bench",
+      "id": "GB-001",
+      "keywords": [
+        "brownout",
+        "fault-ring",
+        "m5",
+        "mirror",
+        "nvs",
+        "rtc",
+        "soak",
+        "t5",
+        "watchdog",
+        "wear"
+      ],
+      "lane": "firmware",
+      "leverage": 8,
+      "machine_affinity": "formd-t1",
+      "project": "gimbal-bench",
+      "reach": [
+        "GB-005",
+        "GB-006",
+        "GB-007",
+        "GB-008",
+        "GB-009",
+        "GB-010",
+        "GB-011",
+        "GB-014"
+      ],
+      "repos": [
+        "gimbal-bench"
+      ],
+      "score": 25.0,
+      "status": "next",
+      "title": "Finish the M5 fault ring: a real fault storm, and the brownout case",
+      "unblocks": [
+        "GB-014"
+      ]
+    },
+    {
+      "authored_status": "next",
+      "blocked_by": [
+        "GB-001"
+      ],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-014.md",
+      "closed_origin": null,
+      "cognitive_load": "high",
+      "completed": null,
+      "effort_minutes": 60,
+      "evidence_found": [],
+      "gate": "external",
+      "id": "GB-014",
+      "keywords": [
+        "d15",
+        "decision",
+        "drills",
+        "fault-ring",
+        "owner",
+        "parked",
+        "phase",
+        "sequencing",
+        "un-park",
+        "zigbee"
+      ],
+      "lane": "firmware",
+      "leverage": 7,
+      "machine_affinity": null,
+      "project": "gimbal-bench",
+      "reach": [
+        "GB-005",
+        "GB-006",
+        "GB-007",
+        "GB-008",
+        "GB-009",
+        "GB-010",
+        "GB-011"
+      ],
+      "repos": [
+        "gimbal-bench"
+      ],
+      "score": 18.0,
+      "status": "blocked",
+      "title": "Un-park Zigbee \u2014 the decision D15 leaves open",
+      "unblocks": [
+        "GB-005"
+      ]
+    },
+    {
+      "authored_status": "next",
+      "blocked_by": [
+        "GB-014"
+      ],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-005.md",
+      "closed_origin": null,
+      "cognitive_load": "high",
+      "completed": null,
+      "effort_minutes": 480,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "GB-005",
+      "keywords": [
+        "c-patch",
+        "mega-gate",
+        "parked",
+        "partitions",
+        "signing",
+        "variant",
+        "z-m1",
+        "zigbee"
+      ],
+      "lane": "firmware",
+      "leverage": 6,
+      "machine_affinity": "formd-t1",
+      "project": "gimbal-bench",
+      "reach": [
+        "GB-006",
+        "GB-007",
+        "GB-008",
+        "GB-009",
+        "GB-010",
+        "GB-011"
+      ],
+      "repos": [
+        "gimbal-bench"
+      ],
+      "score": 12.0,
+      "status": "blocked",
+      "title": "Z-M1 \u2014 variant, partitions and the c-patch signing scaffold",
+      "unblocks": [
+        "GB-006",
+        "GB-007"
+      ]
+    },
+    {
+      "authored_status": "next",
+      "blocked_by": [
+        "GB-005"
+      ],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-006.md",
+      "closed_origin": null,
+      "cognitive_load": "high",
+      "completed": null,
+      "effort_minutes": 480,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "GB-006",
+      "keywords": [
+        "coalesce",
+        "mailbox",
+        "parked",
+        "preemption",
+        "stop-latch",
+        "superloop",
+        "z-m0",
+        "zigbee"
+      ],
+      "lane": "firmware",
+      "leverage": 4,
+      "machine_affinity": "formd-t1",
+      "project": "gimbal-bench",
+      "reach": [
+        "GB-008",
+        "GB-009",
+        "GB-010",
+        "GB-011"
+      ],
+      "repos": [
+        "gimbal-bench"
+      ],
+      "score": 9.0,
+      "status": "blocked",
+      "title": "Z-M0 \u2014 the \u00a79.1 mailbox primitive",
+      "unblocks": [
+        "GB-008"
+      ]
+    },
+    {
+      "authored_status": "next",
+      "blocked_by": [
+        "GB-006"
+      ],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-008.md",
+      "closed_origin": null,
+      "cognitive_load": "high",
+      "completed": null,
+      "effort_minutes": 960,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "GB-008",
+      "keywords": [
+        "apsde",
+        "gate-l",
+        "join",
+        "level",
+        "on-off",
+        "parked",
+        "router",
+        "z-m3",
+        "zczr",
+        "zigbee"
+      ],
+      "lane": "firmware",
+      "leverage": 3,
+      "machine_affinity": "formd-t1",
+      "project": "gimbal-bench",
+      "reach": [
+        "GB-009",
+        "GB-010",
+        "GB-011"
+      ],
+      "repos": [
+        "gimbal-bench"
+      ],
+      "score": 7.5,
+      "status": "blocked",
+      "title": "Z-M3 \u2014 Zigbee bring-up as a light",
+      "unblocks": [
+        "GB-009",
+        "GB-010",
+        "GB-011"
+      ]
+    },
+    {
+      "authored_status": "next",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-002.md",
+      "closed_origin": null,
+      "cognitive_load": "medium",
+      "completed": null,
+      "effort_minutes": 90,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "GB-002",
+      "keywords": [
+        "d1",
+        "d11",
+        "decisions",
+        "formd-t1",
+        "ledger",
+        "provenance",
+        "rescue",
+        "uncommitted"
+      ],
+      "lane": "content",
+      "leverage": 0,
+      "machine_affinity": "formd-t1",
+      "project": "gimbal-bench",
+      "reach": [],
+      "repos": [
+        "gimbal-bench"
+      ],
+      "score": 6.667,
+      "status": "next",
+      "title": "Rescue D1-D11 off formd-t1 and commit them",
+      "unblocks": []
+    },
+    {
+      "authored_status": "next",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/Q-001.md",
+      "closed_origin": null,
+      "cognitive_load": "high",
+      "completed": null,
+      "effort_minutes": 120,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "Q-001",
+      "keywords": [
+        "auto",
+        "d12",
+        "gate-a",
+        "hold",
+        "manual",
+        "preset",
+        "product-question",
+        "re-derive",
+        "retire",
+        "spot-mode"
+      ],
+      "lane": null,
+      "leverage": 1,
+      "machine_affinity": null,
+      "project": "gimbal-bench",
+      "reach": [
+        "GB-010"
+      ],
+      "repos": [],
+      "score": 6.0,
+      "status": "next",
+      "title": "Does Spot Mode (Auto/Hold/Manual) survive gate A?",
+      "unblocks": []
+    },
+    {
+      "authored_status": "next",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-004.md",
+      "closed_origin": null,
+      "cognitive_load": "high",
+      "completed": null,
+      "effort_minutes": 180,
+      "evidence_found": [
+        {
+          "kind": "commit",
+          "path": null,
+          "repo": "gimbal-bench",
+          "sha": "19dd790"
+        },
+        {
+          "kind": "commit",
+          "path": null,
+          "repo": "gimbal-bench",
+          "sha": "34b9f7c"
+        },
+        {
+          "kind": "commit",
+          "path": null,
+          "repo": "gimbal-bench",
+          "sha": "1525192"
+        },
+        {
+          "kind": "commit",
+          "path": null,
+          "repo": "gimbal-bench",
+          "sha": "7f5b060"
+        }
+      ],
+      "gate": "bench",
+      "id": "GB-004",
+      "keywords": [
+        "armed",
+        "bench-session",
+        "bus-no-ack",
+        "drill",
+        "m6",
+        "motor-silent",
+        "mute",
+        "mute-clear"
+      ],
+      "lane": "firmware",
+      "leverage": 0,
+      "machine_affinity": "formd-t1",
+      "project": "gimbal-bench",
+      "reach": [],
+      "repos": [
+        "gimbal-bench"
+      ],
+      "score": 5.333,
+      "status": "next",
+      "title": "M6 on hardware: the motor-silent limb, MUTE-CLEAR, and the armed lane",
+      "unblocks": []
+    },
+    {
+      "authored_status": "next",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/Q-002.md",
+      "closed_origin": null,
+      "cognitive_load": "high",
+      "completed": null,
+      "effort_minutes": 180,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "Q-002",
+      "keywords": [
+        "0xa4",
+        "broadway",
+        "d12",
+        "follow",
+        "goto",
+        "measurement",
+        "retarget",
+        "smooth-motion"
+      ],
+      "lane": null,
+      "leverage": 0,
+      "machine_affinity": null,
+      "project": "gimbal-bench",
+      "reach": [],
+      "repos": [],
+      "score": 5.333,
+      "status": "next",
+      "title": "Does a mid-move retarget re-plan smoothly, or stop and restart?",
+      "unblocks": []
+    },
+    {
+      "authored_status": "parked",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-003.md",
+      "closed_origin": null,
+      "cognitive_load": "medium",
+      "completed": null,
+      "effort_minutes": 60,
+      "evidence_found": [
+        {
+          "kind": "commit",
+          "path": null,
+          "repo": "gimbal-bench",
+          "sha": "8a4c974"
+        },
+        {
+          "kind": "commit",
+          "path": null,
+          "repo": "gimbal-bench",
+          "sha": "b0a472f"
+        }
+      ],
+      "gate": "bench",
+      "id": "GB-003",
+      "keywords": [
+        "08-12",
+        "capture",
+        "d11",
+        "d16",
+        "mute",
+        "owner-only",
+        "rail",
+        "testimony",
+        "witness"
+      ],
+      "lane": "content",
+      "leverage": 0,
+      "machine_affinity": "formd-t1",
+      "project": "gimbal-bench",
+      "reach": [],
+      "repos": [
+        "gimbal-bench"
+      ],
+      "score": 4.5,
+      "status": "parked",
+      "title": "The 08-12 witness capture the owner owes, and only the owner",
+      "unblocks": []
+    },
+    {
+      "authored_status": "next",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/Q-003.md",
+      "closed_origin": null,
+      "cognitive_load": "medium",
+      "completed": null,
+      "effort_minutes": 90,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "Q-003",
+      "keywords": [
+        "brownout",
+        "m5",
+        "mirror",
+        "power",
+        "reset-reason",
+        "ring",
+        "rtc",
+        "unknown"
+      ],
+      "lane": null,
+      "leverage": 0,
+      "machine_affinity": null,
+      "project": "gimbal-bench",
+      "reach": [],
+      "repos": [],
+      "score": 4.0,
+      "status": "next",
+      "title": "Does a brownout preserve the RTC domain?",
+      "unblocks": []
+    },
+    {
+      "authored_status": "next",
+      "blocked_by": [
+        "GB-005"
+      ],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-007.md",
+      "closed_origin": null,
+      "cognitive_load": "high",
+      "completed": null,
+      "effort_minutes": 480,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "GB-007",
+      "keywords": [
+        "c-patch",
+        "mark-valid",
+        "ota",
+        "parked",
+        "r2",
+        "residual",
+        "rollback",
+        "z-m2",
+        "zigbee"
+      ],
+      "lane": "firmware",
+      "leverage": 0,
+      "machine_affinity": "formd-t1",
+      "project": "gimbal-bench",
+      "reach": [],
+      "repos": [
+        "gimbal-bench"
+      ],
+      "score": 3.75,
+      "status": "blocked",
+      "title": "Z-M2 \u2014 the rollback ladder, D15's ruled first radio commit",
+      "unblocks": []
+    },
+    {
+      "authored_status": "next",
+      "blocked_by": [
+        "EL-001",
+        "GB-013"
+      ],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-012.md",
+      "closed_origin": null,
+      "cognitive_load": "high",
+      "completed": null,
+      "effort_minutes": 480,
+      "evidence_found": [],
+      "gate": "bench",
+      "id": "GB-012",
+      "keywords": [
+        "drill",
+        "gate-l",
+        "join",
+        "led",
+        "light",
+        "ota-drill",
+        "parked",
+        "soak",
+        "zigbee"
+      ],
+      "lane": "firmware",
+      "leverage": 0,
+      "machine_affinity": "formd-t1",
+      "project": "gimbal-bench",
+      "reach": [],
+      "repos": [
+        "gimbal-bench"
+      ],
+      "score": 3.75,
+      "status": "blocked",
+      "title": "Gate L \u2014 the fixture joins and holds as a light",
+      "unblocks": []
+    },
+    {
+      "authored_status": "next",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-013.md",
+      "closed_origin": null,
+      "cognitive_load": "medium",
+      "completed": null,
+      "effort_minutes": 480,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "GB-013",
+      "keywords": [
+        "gate-l",
+        "home-assistant",
+        "image-index",
+        "ota",
+        "provider",
+        "signer",
+        "z2m",
+        "zha",
+        "zigbee"
+      ],
+      "lane": "infra",
+      "leverage": 1,
+      "machine_affinity": null,
+      "project": "gimbal-bench",
+      "reach": [
+        "GB-012"
+      ],
+      "repos": [
+        "gimbal-bench"
+      ],
+      "score": 3.375,
+      "status": "next",
+      "title": "Stand up the HA-side Zigbee OTA server",
+      "unblocks": [
+        "GB-012"
+      ]
+    },
+    {
+      "authored_status": "next",
+      "blocked_by": [
+        "GB-008"
+      ],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-009.md",
+      "closed_origin": null,
+      "cognitive_load": "high",
+      "completed": null,
+      "effort_minutes": 240,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "GB-009",
+      "keywords": [
+        "breadcrumb",
+        "commissioning",
+        "gesture",
+        "nvs",
+        "parked",
+        "power-on",
+        "z-m4",
+        "zigbee"
+      ],
+      "lane": "firmware",
+      "leverage": 0,
+      "machine_affinity": "formd-t1",
+      "project": "gimbal-bench",
+      "reach": [],
+      "repos": [
+        "gimbal-bench"
+      ],
+      "score": 3.0,
+      "status": "blocked",
+      "title": "Z-M4 \u2014 commissioning gesture and the reset-call choice",
+      "unblocks": []
+    },
+    {
+      "authored_status": "next",
+      "blocked_by": [
+        "GB-008",
+        "Q-001"
+      ],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-010.md",
+      "closed_origin": null,
+      "cognitive_load": "high",
+      "completed": null,
+      "effort_minutes": 480,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "GB-010",
+      "keywords": [
+        "anchors",
+        "command-authenticated",
+        "gate-a",
+        "parked",
+        "predicate",
+        "refusal",
+        "z-m5",
+        "zigbee"
+      ],
+      "lane": "firmware",
+      "leverage": 0,
+      "machine_affinity": "formd-t1",
+      "project": "gimbal-bench",
+      "reach": [],
+      "repos": [
+        "gimbal-bench"
+      ],
+      "score": 3.0,
+      "status": "blocked",
+      "title": "Z-M5 \u2014 the deployed \u00a74.1 motion predicate",
+      "unblocks": []
+    },
+    {
+      "authored_status": "next",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/Q-004.md",
+      "closed_origin": null,
+      "cognitive_load": "high",
+      "completed": null,
+      "effort_minutes": 120,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "Q-004",
+      "keywords": [
+        "57",
+        "browser",
+        "d14",
+        "disarm",
+        "liveness",
+        "retry",
+        "serial-flood",
+        "tap",
+        "unknown"
+      ],
+      "lane": null,
+      "leverage": 0,
+      "machine_affinity": null,
+      "project": "gimbal-bench",
+      "reach": [],
+      "repos": [],
+      "score": 3.0,
+      "status": "next",
+      "title": "Where do 300 liveness taps a second come from?",
+      "unblocks": []
+    },
+    {
+      "authored_status": "next",
+      "blocked_by": [
+        "GB-008"
+      ],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-011.md",
+      "closed_origin": null,
+      "cognitive_load": "high",
+      "completed": null,
+      "effort_minutes": 480,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "GB-011",
+      "keywords": [
+        "attributes",
+        "dump",
+        "parked",
+        "ring",
+        "snapshotseq",
+        "telemetry",
+        "z-m6",
+        "zigbee"
+      ],
+      "lane": "firmware",
+      "leverage": 0,
+      "machine_affinity": "formd-t1",
+      "project": "gimbal-bench",
+      "reach": [],
+      "repos": [
+        "gimbal-bench"
+      ],
+      "score": 2.25,
+      "status": "blocked",
+      "title": "Z-M6 \u2014 telemetry attributes and the chunked dump",
+      "unblocks": []
+    }
+  ],
+  "project": {
+    "decision_authority": "gimbal-bench",
+    "may_rule": true,
+    "name": "Gimbal bench",
+    "north_star": "Firmware and a commissioning bench that can prove, from a record, that the fixture stays a light.",
+    "phase": "M5 fault ring layers one and two measured; Zigbee parked (D15)",
+    "repos": [
+      "gimbal-bench"
+    ],
+    "slug": "gimbal-bench"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "item": {
+    "authored_status": "doing",
+    "blocked_by": [],
+    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-001.md",
+    "closed_origin": null,
+    "cognitive_load": "high",
+    "completed": null,
+    "effort_minutes": 960,
+    "evidence_found": [
+      {
+        "kind": "commit",
+        "path": null,
+        "repo": "product-os",
+        "sha": "8890b05"
+      },
+      {
+        "kind": "commit",
+        "path": null,
+        "repo": "product-os",
+        "sha": "8175094"
+      },
+      {
+        "kind": "commit",
+        "path": null,
+        "repo": "product-os",
+        "sha": "d04a029"
+      }
+    ],
+    "gate": "none",
+    "id": "POS-001",
+    "keywords": [
+      "bootstrap",
+      "hook",
+      "plugin",
+      "product-os",
+      "rank",
+      "ruled-out",
+      "seed",
+      "slice-1a",
+      "validate"
+    ],
+    "lane": "infra",
+    "leverage": 0,
+    "machine_affinity": "work-laptop",
+    "project": "product-os",
+    "reach": [],
+    "repos": [
+      "product-os"
+    ],
+    "score": 4.0,
+    "status": "doing",
+    "title": "Build product-os slice 1a-minus",
+    "unblocks": []
+  }
+}

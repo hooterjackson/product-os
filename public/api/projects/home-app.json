@@ -1,0 +1,55 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "items": [
+    {
+      "authored_status": "next",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/APP-001.md",
+      "closed_origin": null,
+      "cognitive_load": "low",
+      "completed": null,
+      "effort_minutes": 45,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "APP-001",
+      "keywords": [
+        "changelog",
+        "coverage",
+        "evidence",
+        "history",
+        "homeapp",
+        "squashed",
+        "unreachable"
+      ],
+      "lane": "app",
+      "leverage": 0,
+      "machine_affinity": null,
+      "project": "home-app",
+      "reach": [],
+      "repos": [
+        "HomeApp"
+      ],
+      "score": 4.0,
+      "status": "next",
+      "title": "Give HomeApp an evidence rule that does not depend on git history",
+      "unblocks": []
+    }
+  ],
+  "project": {
+    "decision_authority": "home-app",
+    "may_rule": true,
+    "name": "Home app",
+    "north_star": "The household's own front end to the house.",
+    "phase": "one squashed snapshot; no usable timeline",
+    "repos": [
+      "HomeApp"
+    ],
+    "slug": "home-app"
+  }
+}

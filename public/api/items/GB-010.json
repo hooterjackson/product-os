@@ -1,0 +1,46 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "item": {
+    "authored_status": "next",
+    "blocked_by": [
+      "GB-008",
+      "Q-001"
+    ],
+    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-010.md",
+    "closed_origin": null,
+    "cognitive_load": "high",
+    "completed": null,
+    "effort_minutes": 480,
+    "evidence_found": [],
+    "gate": "none",
+    "id": "GB-010",
+    "keywords": [
+      "anchors",
+      "command-authenticated",
+      "gate-a",
+      "parked",
+      "predicate",
+      "refusal",
+      "z-m5",
+      "zigbee"
+    ],
+    "lane": "firmware",
+    "leverage": 0,
+    "machine_affinity": "formd-t1",
+    "project": "gimbal-bench",
+    "reach": [],
+    "repos": [
+      "gimbal-bench"
+    ],
+    "score": 3.0,
+    "status": "blocked",
+    "title": "Z-M5 \u2014 the deployed \u00a74.1 motion predicate",
+    "unblocks": []
+  }
+}

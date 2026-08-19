@@ -1,0 +1,54 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "item": {
+    "authored_status": "done",
+    "blocked_by": [],
+    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/EL-004.md",
+    "closed_origin": "inferred",
+    "cognitive_load": "medium",
+    "completed": "2026-07-21",
+    "effort_minutes": 240,
+    "evidence_found": [
+      {
+        "kind": "commit",
+        "path": "docs/",
+        "repo": "engineered-lighting-site",
+        "sha": "8fb39bf"
+      },
+      {
+        "kind": "commit",
+        "path": "docs/03b-print-the-frame.md",
+        "repo": "engineered-lighting-site",
+        "sha": "db41f3f"
+      }
+    ],
+    "gate": "none",
+    "id": "EL-004",
+    "keywords": [
+      "bom",
+      "motor",
+      "propagation",
+      "rmd-l-4005",
+      "rmd-l-5005",
+      "swap"
+    ],
+    "lane": "hardware",
+    "leverage": 0,
+    "machine_affinity": null,
+    "project": "robotic-spotlight",
+    "reach": [],
+    "repos": [
+      "engineered-lighting-site"
+    ],
+    "score": 6.667,
+    "status": "done",
+    "title": "Propagate the RMD-L-4005 to RMD-L-5005 motor swap sitewide",
+    "unblocks": []
+  }
+}

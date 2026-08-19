@@ -1,0 +1,62 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "item": {
+    "authored_status": "done",
+    "blocked_by": [],
+    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-004.md",
+    "closed_origin": "inferred",
+    "cognitive_load": "high",
+    "completed": "2026-08-19",
+    "effort_minutes": 90,
+    "evidence_found": [
+      {
+        "kind": "file",
+        "path": "tools/apply.py",
+        "repo": "product-os",
+        "sha": null
+      },
+      {
+        "kind": "file",
+        "path": "tests/test_regressions.py",
+        "repo": "product-os",
+        "sha": null
+      },
+      {
+        "kind": "file",
+        "path": "plugin/skills/audit/SKILL.md",
+        "repo": "product-os",
+        "sha": null
+      }
+    ],
+    "gate": "none",
+    "id": "POS-004",
+    "keywords": [
+      "agent",
+      "apply",
+      "authority",
+      "decided",
+      "guard",
+      "human",
+      "origin",
+      "proposal",
+      "said",
+      "truth"
+    ],
+    "lane": "infra",
+    "leverage": 0,
+    "machine_affinity": null,
+    "project": "product-os",
+    "reach": [],
+    "repos": [],
+    "score": 5.333,
+    "status": "done",
+    "title": "apply.py: distinguish who decided, not just what changed",
+    "unblocks": []
+  }
+}

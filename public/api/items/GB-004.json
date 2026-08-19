@@ -1,0 +1,68 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "item": {
+    "authored_status": "next",
+    "blocked_by": [],
+    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-004.md",
+    "closed_origin": null,
+    "cognitive_load": "high",
+    "completed": null,
+    "effort_minutes": 180,
+    "evidence_found": [
+      {
+        "kind": "commit",
+        "path": null,
+        "repo": "gimbal-bench",
+        "sha": "19dd790"
+      },
+      {
+        "kind": "commit",
+        "path": null,
+        "repo": "gimbal-bench",
+        "sha": "34b9f7c"
+      },
+      {
+        "kind": "commit",
+        "path": null,
+        "repo": "gimbal-bench",
+        "sha": "1525192"
+      },
+      {
+        "kind": "commit",
+        "path": null,
+        "repo": "gimbal-bench",
+        "sha": "7f5b060"
+      }
+    ],
+    "gate": "bench",
+    "id": "GB-004",
+    "keywords": [
+      "armed",
+      "bench-session",
+      "bus-no-ack",
+      "drill",
+      "m6",
+      "motor-silent",
+      "mute",
+      "mute-clear"
+    ],
+    "lane": "firmware",
+    "leverage": 0,
+    "machine_affinity": "formd-t1",
+    "project": "gimbal-bench",
+    "reach": [],
+    "repos": [
+      "gimbal-bench"
+    ],
+    "score": 5.333,
+    "status": "next",
+    "title": "M6 on hardware: the motor-silent limb, MUTE-CLEAR, and the armed lane",
+    "unblocks": []
+  }
+}

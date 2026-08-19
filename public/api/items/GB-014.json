@@ -1,0 +1,57 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "item": {
+    "authored_status": "next",
+    "blocked_by": [
+      "GB-001"
+    ],
+    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-014.md",
+    "closed_origin": null,
+    "cognitive_load": "high",
+    "completed": null,
+    "effort_minutes": 60,
+    "evidence_found": [],
+    "gate": "external",
+    "id": "GB-014",
+    "keywords": [
+      "d15",
+      "decision",
+      "drills",
+      "fault-ring",
+      "owner",
+      "parked",
+      "phase",
+      "sequencing",
+      "un-park",
+      "zigbee"
+    ],
+    "lane": "firmware",
+    "leverage": 7,
+    "machine_affinity": null,
+    "project": "gimbal-bench",
+    "reach": [
+      "GB-005",
+      "GB-006",
+      "GB-007",
+      "GB-008",
+      "GB-009",
+      "GB-010",
+      "GB-011"
+    ],
+    "repos": [
+      "gimbal-bench"
+    ],
+    "score": 18.0,
+    "status": "blocked",
+    "title": "Un-park Zigbee \u2014 the decision D15 leaves open",
+    "unblocks": [
+      "GB-005"
+    ]
+  }
+}

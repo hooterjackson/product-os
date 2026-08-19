@@ -1,0 +1,74 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "item": {
+    "authored_status": "parked",
+    "blocked_by": [],
+    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/EL-001.md",
+    "closed_origin": null,
+    "cognitive_load": "low",
+    "completed": null,
+    "effort_minutes": 20,
+    "evidence_found": [
+      {
+        "kind": "commit",
+        "path": null,
+        "repo": "engineered-lighting-site",
+        "sha": "762afdd"
+      },
+      {
+        "kind": "commit",
+        "path": null,
+        "repo": "engineered-lighting-site",
+        "sha": "d8f092b"
+      },
+      {
+        "kind": "commit",
+        "path": null,
+        "repo": "engineered-lighting-site",
+        "sha": "2c1233f"
+      },
+      {
+        "kind": "commit",
+        "path": null,
+        "repo": "engineered-lighting-site",
+        "sha": "52c5048"
+      }
+    ],
+    "gate": "none",
+    "id": "EL-001",
+    "keywords": [
+      "bom",
+      "btf",
+      "doc4",
+      "fcob",
+      "gate-l",
+      "lead-time",
+      "led",
+      "order",
+      "picobuck",
+      "purchase",
+      "star",
+      "valent-x"
+    ],
+    "lane": "hardware",
+    "leverage": 0,
+    "machine_affinity": null,
+    "project": "robotic-spotlight",
+    "reach": [],
+    "repos": [
+      "engineered-lighting-site"
+    ],
+    "score": 8.0,
+    "status": "parked",
+    "title": "Order the Doc 4 LED BoM",
+    "unblocks": [
+      "GB-012"
+    ]
+  }
+}

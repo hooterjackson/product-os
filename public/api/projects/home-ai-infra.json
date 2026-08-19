@@ -1,0 +1,52 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "items": [
+    {
+      "authored_status": "next",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/HAI-001.md",
+      "closed_origin": null,
+      "cognitive_load": "low",
+      "completed": null,
+      "effort_minutes": 15,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "HAI-001",
+      "keywords": [
+        "credential",
+        "elserver",
+        "gpu",
+        "hygiene",
+        "password",
+        "rotate",
+        "secret",
+        "ssh"
+      ],
+      "lane": "infra",
+      "leverage": 0,
+      "machine_affinity": null,
+      "project": "home-ai-infra",
+      "reach": [],
+      "repos": [],
+      "score": 20.0,
+      "status": "next",
+      "title": "Rotate the GPU box's Linux password",
+      "unblocks": []
+    }
+  ],
+  "project": {
+    "decision_authority": "home-ai-infra",
+    "may_rule": true,
+    "name": "Home AI infra",
+    "north_star": "A GPU box the perception stack can be built on without ceremony.",
+    "phase": "provisioned; credential hygiene outstanding",
+    "repos": [],
+    "slug": "home-ai-infra"
+  }
+}

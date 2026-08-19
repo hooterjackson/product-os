@@ -1,0 +1,413 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "items": [
+    {
+      "authored_status": "next",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-002.md",
+      "closed_origin": null,
+      "cognitive_load": "low",
+      "completed": null,
+      "effort_minutes": 25,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "POS-002",
+      "keywords": [
+        "bootstrap",
+        "drift",
+        "handoff",
+        "ninth",
+        "pointer",
+        "project-state",
+        "state-file"
+      ],
+      "lane": "content",
+      "leverage": 0,
+      "machine_affinity": null,
+      "project": "product-os",
+      "reach": [],
+      "repos": [
+        "engineered-lighting-site",
+        "product-os"
+      ],
+      "score": 7.5,
+      "status": "next",
+      "title": "Point PROJECT-STATE.md at product-os",
+      "unblocks": []
+    },
+    {
+      "authored_status": "done",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-004.md",
+      "closed_origin": "inferred",
+      "cognitive_load": "high",
+      "completed": "2026-08-19",
+      "effort_minutes": 90,
+      "evidence_found": [
+        {
+          "kind": "file",
+          "path": "tools/apply.py",
+          "repo": "product-os",
+          "sha": null
+        },
+        {
+          "kind": "file",
+          "path": "tests/test_regressions.py",
+          "repo": "product-os",
+          "sha": null
+        },
+        {
+          "kind": "file",
+          "path": "plugin/skills/audit/SKILL.md",
+          "repo": "product-os",
+          "sha": null
+        }
+      ],
+      "gate": "none",
+      "id": "POS-004",
+      "keywords": [
+        "agent",
+        "apply",
+        "authority",
+        "decided",
+        "guard",
+        "human",
+        "origin",
+        "proposal",
+        "said",
+        "truth"
+      ],
+      "lane": "infra",
+      "leverage": 0,
+      "machine_affinity": null,
+      "project": "product-os",
+      "reach": [],
+      "repos": [],
+      "score": 5.333,
+      "status": "done",
+      "title": "apply.py: distinguish who decided, not just what changed",
+      "unblocks": []
+    },
+    {
+      "authored_status": "doing",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-008.md",
+      "closed_origin": null,
+      "cognitive_load": "medium",
+      "completed": null,
+      "effort_minutes": 180,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "POS-008",
+      "keywords": [
+        "brief",
+        "closure",
+        "confirmed",
+        "decision",
+        "disclosure",
+        "guarantee",
+        "inferred",
+        "public",
+        "stamp",
+        "visibility"
+      ],
+      "lane": "infra",
+      "leverage": 0,
+      "machine_affinity": null,
+      "project": "product-os",
+      "reach": [],
+      "repos": [],
+      "score": 5.333,
+      "status": "doing",
+      "title": "Surface inferred closures, record the public decision",
+      "unblocks": []
+    },
+    {
+      "authored_status": "done",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-003.md",
+      "closed_origin": "inferred",
+      "cognitive_load": "high",
+      "completed": "2026-08-19",
+      "effort_minutes": 480,
+      "evidence_found": [
+        {
+          "kind": "file",
+          "path": "tools/audit.py",
+          "repo": "product-os",
+          "sha": null
+        },
+        {
+          "kind": "file",
+          "path": "tools/apply.py",
+          "repo": "product-os",
+          "sha": null
+        },
+        {
+          "kind": "file",
+          "path": "plugin/skills/audit/SKILL.md",
+          "repo": "product-os",
+          "sha": null
+        },
+        {
+          "kind": "file",
+          "path": "state/audits/work-laptop/",
+          "repo": "product-os",
+          "sha": null
+        }
+      ],
+      "gate": "none",
+      "id": "POS-003",
+      "keywords": [
+        "acceptance",
+        "attribution",
+        "audit",
+        "coverage",
+        "evidence",
+        "path-first",
+        "priorities",
+        "proposal",
+        "re-audit",
+        "unattributed"
+      ],
+      "lane": "infra",
+      "leverage": 0,
+      "machine_affinity": null,
+      "project": "product-os",
+      "reach": [],
+      "repos": [],
+      "score": 5.0,
+      "status": "done",
+      "title": "Build /audit: re-check priorities against reality",
+      "unblocks": []
+    },
+    {
+      "authored_status": "next",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-007.md",
+      "closed_origin": null,
+      "cognitive_load": "high",
+      "completed": null,
+      "effort_minutes": 480,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "POS-007",
+      "keywords": [
+        "briefs",
+        "lead-time",
+        "leverage",
+        "parked",
+        "re-centre",
+        "restart",
+        "resume",
+        "software",
+        "threads",
+        "urgency"
+      ],
+      "lane": "infra",
+      "leverage": 0,
+      "machine_affinity": null,
+      "project": "product-os",
+      "reach": [],
+      "repos": [],
+      "score": 5.0,
+      "status": "next",
+      "title": "Re-centre on software: kill lead-time, park hardware, briefs and resume verdicts",
+      "unblocks": []
+    },
+    {
+      "authored_status": "next",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-009.md",
+      "closed_origin": null,
+      "cognitive_load": "high",
+      "completed": null,
+      "effort_minutes": 480,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "POS-009",
+      "keywords": [
+        "agnostic",
+        "api",
+        "bootstrap",
+        "brief",
+        "endpoint",
+        "fetch",
+        "https",
+        "json",
+        "link-integrity",
+        "llms-txt",
+        "paste"
+      ],
+      "lane": "infra",
+      "leverage": 0,
+      "machine_affinity": null,
+      "project": "product-os",
+      "reach": [],
+      "repos": [],
+      "score": 5.0,
+      "status": "next",
+      "title": "llms.txt and the JSON API: the agent-facing surface",
+      "unblocks": []
+    },
+    {
+      "authored_status": "doing",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-001.md",
+      "closed_origin": null,
+      "cognitive_load": "high",
+      "completed": null,
+      "effort_minutes": 960,
+      "evidence_found": [
+        {
+          "kind": "commit",
+          "path": null,
+          "repo": "product-os",
+          "sha": "8890b05"
+        },
+        {
+          "kind": "commit",
+          "path": null,
+          "repo": "product-os",
+          "sha": "8175094"
+        },
+        {
+          "kind": "commit",
+          "path": null,
+          "repo": "product-os",
+          "sha": "d04a029"
+        }
+      ],
+      "gate": "none",
+      "id": "POS-001",
+      "keywords": [
+        "bootstrap",
+        "hook",
+        "plugin",
+        "product-os",
+        "rank",
+        "ruled-out",
+        "seed",
+        "slice-1a",
+        "validate"
+      ],
+      "lane": "infra",
+      "leverage": 0,
+      "machine_affinity": "work-laptop",
+      "project": "product-os",
+      "reach": [],
+      "repos": [
+        "product-os"
+      ],
+      "score": 4.0,
+      "status": "doing",
+      "title": "Build product-os slice 1a-minus",
+      "unblocks": []
+    },
+    {
+      "authored_status": "doing",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-006.md",
+      "closed_origin": null,
+      "cognitive_load": "high",
+      "completed": null,
+      "effort_minutes": 240,
+      "evidence_found": [],
+      "gate": "none",
+      "id": "POS-006",
+      "keywords": [
+        "clustering",
+        "coverage",
+        "evidence",
+        "gimbal-bench",
+        "group-d",
+        "items",
+        "paths",
+        "scaling",
+        "seed",
+        "unattributed"
+      ],
+      "lane": "infra",
+      "leverage": 0,
+      "machine_affinity": null,
+      "project": "product-os",
+      "reach": [],
+      "repos": [],
+      "score": 4.0,
+      "status": "doing",
+      "title": "Group D coverage: cluster 301 unattributed commits into items",
+      "unblocks": []
+    },
+    {
+      "authored_status": "done",
+      "blocked_by": [],
+      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-005.md",
+      "closed_origin": "inferred",
+      "cognitive_load": "high",
+      "completed": "2026-08-19",
+      "effort_minutes": 480,
+      "evidence_found": [
+        {
+          "kind": "file",
+          "path": "tools/index.py",
+          "repo": "product-os",
+          "sha": null
+        },
+        {
+          "kind": "file",
+          "path": "state/threads/by-machine/work-laptop.json",
+          "repo": "product-os",
+          "sha": null
+        },
+        {
+          "kind": "file",
+          "path": "tools/validate.py",
+          "repo": "product-os",
+          "sha": null
+        }
+      ],
+      "gate": "none",
+      "id": "POS-005",
+      "keywords": [
+        "attachment",
+        "claude-code",
+        "codex",
+        "indexer",
+        "jsonl",
+        "machine",
+        "metadata",
+        "privacy",
+        "rollout",
+        "sharding",
+        "threads"
+      ],
+      "lane": "infra",
+      "leverage": 0,
+      "machine_affinity": null,
+      "project": "product-os",
+      "reach": [],
+      "repos": [],
+      "score": 3.0,
+      "status": "done",
+      "title": "Thread indexer: bind chats to items, metadata only",
+      "unblocks": []
+    }
+  ],
+  "project": {
+    "decision_authority": "product-os",
+    "may_rule": true,
+    "name": "product-os",
+    "north_star": "Know what to work on next, and never be told progress that cannot be clicked.",
+    "phase": "slice 1a-minus",
+    "repos": [
+      "product-os"
+    ],
+    "slug": "product-os"
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "item": {
+    "authored_status": "done",
+    "blocked_by": [],
+    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-005.md",
+    "closed_origin": "inferred",
+    "cognitive_load": "high",
+    "completed": "2026-08-19",
+    "effort_minutes": 480,
+    "evidence_found": [
+      {
+        "kind": "file",
+        "path": "tools/index.py",
+        "repo": "product-os",
+        "sha": null
+      },
+      {
+        "kind": "file",
+        "path": "state/threads/by-machine/work-laptop.json",
+        "repo": "product-os",
+        "sha": null
+      },
+      {
+        "kind": "file",
+        "path": "tools/validate.py",
+        "repo": "product-os",
+        "sha": null
+      }
+    ],
+    "gate": "none",
+    "id": "POS-005",
+    "keywords": [
+      "attachment",
+      "claude-code",
+      "codex",
+      "indexer",
+      "jsonl",
+      "machine",
+      "metadata",
+      "privacy",
+      "rollout",
+      "sharding",
+      "threads"
+    ],
+    "lane": "infra",
+    "leverage": 0,
+    "machine_affinity": null,
+    "project": "product-os",
+    "reach": [],
+    "repos": [],
+    "score": 3.0,
+    "status": "done",
+    "title": "Thread indexer: bind chats to items, metadata only",
+    "unblocks": []
+  }
+}

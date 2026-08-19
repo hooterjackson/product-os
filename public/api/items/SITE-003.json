@@ -1,0 +1,54 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "item": {
+    "authored_status": "parked",
+    "blocked_by": [],
+    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/SITE-003.md",
+    "closed_origin": null,
+    "cognitive_load": "medium",
+    "completed": null,
+    "effort_minutes": 60,
+    "evidence_found": [
+      {
+        "kind": "commit",
+        "path": null,
+        "repo": "engineered-lighting-site",
+        "sha": "796559c"
+      }
+    ],
+    "gate": "none",
+    "id": "SITE-003",
+    "keywords": [
+      "amber",
+      "as-built",
+      "dlh-3up-eh",
+      "doc4",
+      "gpio",
+      "picobuck",
+      "propagation",
+      "stage5",
+      "star",
+      "xp-e2",
+      "xp-g2"
+    ],
+    "lane": "content",
+    "leverage": 0,
+    "machine_affinity": null,
+    "project": "engineering-site",
+    "reach": [],
+    "repos": [
+      "engineered-lighting-site",
+      "gimbal-bench"
+    ],
+    "score": 6.0,
+    "status": "parked",
+    "title": "Doc 4 stage 5: carry the three as-built overrides",
+    "unblocks": []
+  }
+}

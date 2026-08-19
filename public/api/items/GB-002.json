@@ -1,0 +1,43 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "item": {
+    "authored_status": "next",
+    "blocked_by": [],
+    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-002.md",
+    "closed_origin": null,
+    "cognitive_load": "medium",
+    "completed": null,
+    "effort_minutes": 90,
+    "evidence_found": [],
+    "gate": "none",
+    "id": "GB-002",
+    "keywords": [
+      "d1",
+      "d11",
+      "decisions",
+      "formd-t1",
+      "ledger",
+      "provenance",
+      "rescue",
+      "uncommitted"
+    ],
+    "lane": "content",
+    "leverage": 0,
+    "machine_affinity": "formd-t1",
+    "project": "gimbal-bench",
+    "reach": [],
+    "repos": [
+      "gimbal-bench"
+    ],
+    "score": 6.667,
+    "status": "next",
+    "title": "Rescue D1-D11 off formd-t1 and commit them",
+    "unblocks": []
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "item": {
+    "authored_status": "next",
+    "blocked_by": [],
+    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/Q-001.md",
+    "closed_origin": null,
+    "cognitive_load": "high",
+    "completed": null,
+    "effort_minutes": 120,
+    "evidence_found": [],
+    "gate": "none",
+    "id": "Q-001",
+    "keywords": [
+      "auto",
+      "d12",
+      "gate-a",
+      "hold",
+      "manual",
+      "preset",
+      "product-question",
+      "re-derive",
+      "retire",
+      "spot-mode"
+    ],
+    "lane": null,
+    "leverage": 1,
+    "machine_affinity": null,
+    "project": "gimbal-bench",
+    "reach": [
+      "GB-010"
+    ],
+    "repos": [],
+    "score": 6.0,
+    "status": "next",
+    "title": "Does Spot Mode (Auto/Hold/Manual) survive gate A?",
+    "unblocks": []
+  }
+}

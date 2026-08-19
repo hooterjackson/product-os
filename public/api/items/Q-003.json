@@ -1,0 +1,41 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "item": {
+    "authored_status": "next",
+    "blocked_by": [],
+    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/Q-003.md",
+    "closed_origin": null,
+    "cognitive_load": "medium",
+    "completed": null,
+    "effort_minutes": 90,
+    "evidence_found": [],
+    "gate": "none",
+    "id": "Q-003",
+    "keywords": [
+      "brownout",
+      "m5",
+      "mirror",
+      "power",
+      "reset-reason",
+      "ring",
+      "rtc",
+      "unknown"
+    ],
+    "lane": null,
+    "leverage": 0,
+    "machine_affinity": null,
+    "project": "gimbal-bench",
+    "reach": [],
+    "repos": [],
+    "score": 4.0,
+    "status": "next",
+    "title": "Does a brownout preserve the RTC domain?",
+    "unblocks": []
+  }
+}

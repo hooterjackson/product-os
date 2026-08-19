@@ -1,0 +1,58 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "item": {
+    "authored_status": "done",
+    "blocked_by": [],
+    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/EL-005.md",
+    "closed_origin": "inferred",
+    "cognitive_load": "high",
+    "completed": "2026-08-15",
+    "effort_minutes": 480,
+    "evidence_found": [
+      {
+        "kind": "commit",
+        "path": "captures/gimbal10/fixture/bench-session-20260815.md",
+        "repo": "gimbal-bench",
+        "sha": "34b9f7c"
+      },
+      {
+        "kind": "commit",
+        "path": "captures/gimbal10/fixture/bench-session2-20260815.md",
+        "repo": "gimbal-bench",
+        "sha": "19dd790"
+      }
+    ],
+    "gate": "bench",
+    "id": "EL-005",
+    "keywords": [
+      "0x241",
+      "0x242",
+      "arm",
+      "bench",
+      "bring-up",
+      "can",
+      "health",
+      "motors",
+      "pose",
+      "ready"
+    ],
+    "lane": "hardware",
+    "leverage": 0,
+    "machine_affinity": "formd-t1",
+    "project": "robotic-spotlight",
+    "reach": [],
+    "repos": [
+      "gimbal-bench"
+    ],
+    "score": 6.25,
+    "status": "done",
+    "title": "CAN bring-up: both motors answering, and the first READY r=1",
+    "unblocks": []
+  }
+}

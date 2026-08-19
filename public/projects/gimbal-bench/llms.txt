@@ -1,0 +1,36 @@
+# product-os — gimbal-bench
+
+Firmware and a commissioning bench that can prove, from a record, that the fixture stays a light.
+
+Scoped to this project so a chat about it does not drag the whole
+portfolio into context.
+
+**BASE** = `https://raw.githubusercontent.com/hooterjackson/product-os/main/public` — paths below are relative.
+
+## Bootstrap
+
+1. `BASE/api/projects/gimbal-bench.json` — this project's items.
+2. `BASE/api/items/<ID>.json`, then `BASE/briefs/<ID>.md`.
+3. The whole portfolio, if you need it: `BASE/llms.txt`.
+
+## Rules
+
+- **Cite the item ID in your first message.** That is the link.
+- Work in `gimbal-bench`, not in product-os.
+- Nothing is done without evidence. Say "I couldn't look", never
+  "no changes".
+- The score is a label, not a verdict. Disagree once, with a reason,
+  then do what he says.
+
+## Open here
+
+- `GB-001` Finish the M5 fault ring: a real fault storm, and the brownout case — score 25.0, gate bench
+- `GB-002` Rescue D1-D11 off formd-t1 and commit them — score 6.7
+- `Q-001` Does Spot Mode (Auto/Hold/Manual) survive gate A? — score 6.0
+- `GB-004` M6 on hardware: the motor-silent limb, MUTE-CLEAR, and the armed lane — score 5.3, gate bench
+- `Q-002` Does a mid-move retarget re-plan smoothly, or stop and restart? — score 5.3
+- `Q-003` Does a brownout preserve the RTC domain? — score 4.0
+- `GB-013` Stand up the HA-side Zigbee OTA server — score 3.4
+- `Q-004` Where do 300 liveness taps a second come from? — score 3.0
+
+_Last audited 2026-08-19._

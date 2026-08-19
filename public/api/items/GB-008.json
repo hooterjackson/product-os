@@ -1,0 +1,55 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "item": {
+    "authored_status": "next",
+    "blocked_by": [
+      "GB-006"
+    ],
+    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-008.md",
+    "closed_origin": null,
+    "cognitive_load": "high",
+    "completed": null,
+    "effort_minutes": 960,
+    "evidence_found": [],
+    "gate": "none",
+    "id": "GB-008",
+    "keywords": [
+      "apsde",
+      "gate-l",
+      "join",
+      "level",
+      "on-off",
+      "parked",
+      "router",
+      "z-m3",
+      "zczr",
+      "zigbee"
+    ],
+    "lane": "firmware",
+    "leverage": 3,
+    "machine_affinity": "formd-t1",
+    "project": "gimbal-bench",
+    "reach": [
+      "GB-009",
+      "GB-010",
+      "GB-011"
+    ],
+    "repos": [
+      "gimbal-bench"
+    ],
+    "score": 7.5,
+    "status": "blocked",
+    "title": "Z-M3 \u2014 Zigbee bring-up as a light",
+    "unblocks": [
+      "GB-009",
+      "GB-010",
+      "GB-011"
+    ]
+  }
+}

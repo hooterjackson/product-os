@@ -1,0 +1,44 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "item": {
+    "authored_status": "next",
+    "blocked_by": [],
+    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-009.md",
+    "closed_origin": null,
+    "cognitive_load": "high",
+    "completed": null,
+    "effort_minutes": 480,
+    "evidence_found": [],
+    "gate": "none",
+    "id": "POS-009",
+    "keywords": [
+      "agnostic",
+      "api",
+      "bootstrap",
+      "brief",
+      "endpoint",
+      "fetch",
+      "https",
+      "json",
+      "link-integrity",
+      "llms-txt",
+      "paste"
+    ],
+    "lane": "infra",
+    "leverage": 0,
+    "machine_affinity": null,
+    "project": "product-os",
+    "reach": [],
+    "repos": [],
+    "score": 5.0,
+    "status": "next",
+    "title": "llms.txt and the JSON API: the agent-facing surface",
+    "unblocks": []
+  }
+}

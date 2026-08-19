@@ -1,0 +1,41 @@
+{
+  "freshness": {
+    "generated": "2026-08-19",
+    "last_audit": "2026-08-19",
+    "last_audit_window_since": "2026-07-05",
+    "source": "state/ in hooterjackson/product-os",
+    "unattributed_commits_at_last_audit": 301
+  },
+  "item": {
+    "authored_status": "next",
+    "blocked_by": [],
+    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/Q-002.md",
+    "closed_origin": null,
+    "cognitive_load": "high",
+    "completed": null,
+    "effort_minutes": 180,
+    "evidence_found": [],
+    "gate": "none",
+    "id": "Q-002",
+    "keywords": [
+      "0xa4",
+      "broadway",
+      "d12",
+      "follow",
+      "goto",
+      "measurement",
+      "retarget",
+      "smooth-motion"
+    ],
+    "lane": null,
+    "leverage": 0,
+    "machine_affinity": null,
+    "project": "gimbal-bench",
+    "reach": [],
+    "repos": [],
+    "score": 5.333,
+    "status": "next",
+    "title": "Does a mid-move retarget re-plan smoothly, or stop and restart?",
+    "unblocks": []
+  }
+}

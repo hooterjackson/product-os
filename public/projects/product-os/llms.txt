@@ -1,0 +1,34 @@
+# product-os — product-os
+
+Know what to work on next, and never be told progress that cannot be clicked.
+
+Scoped to this project so a chat about it does not drag the whole
+portfolio into context.
+
+**BASE** = `https://raw.githubusercontent.com/hooterjackson/product-os/main/public` — paths below are relative.
+
+## Bootstrap
+
+1. `BASE/api/projects/product-os.json` — this project's items.
+2. `BASE/api/items/<ID>.json`, then `BASE/briefs/<ID>.md`.
+3. The whole portfolio, if you need it: `BASE/llms.txt`.
+
+## Rules
+
+- **Cite the item ID in your first message.** That is the link.
+- Work in `product-os`, not in product-os.
+- Nothing is done without evidence. Say "I couldn't look", never
+  "no changes".
+- The score is a label, not a verdict. Disagree once, with a reason,
+  then do what he says.
+
+## Open here
+
+- `POS-002` Point PROJECT-STATE.md at product-os — score 7.5
+- `POS-008` Surface inferred closures, record the public decision — score 5.3
+- `POS-007` Re-centre on software: kill lead-time, park hardware, briefs and resume verdicts — score 5.0
+- `POS-009` llms.txt and the JSON API: the agent-facing surface — score 5.0
+- `POS-006` Group D coverage: cluster 301 unattributed commits into items — score 4.0
+- `POS-001` Build product-os slice 1a-minus — score 4.0
+
+_Last audited 2026-08-19._
