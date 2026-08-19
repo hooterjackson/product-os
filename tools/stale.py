@@ -72,18 +72,18 @@ def doc_date(repos, repo_name, doc_path, reached, unreachable):
     return _git.UNREACHABLE
 
 
-def main(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--json", action="store_true")
-    args = parser.parse_args(argv)
+def find_stale(model, repos, reached, unreachable):
+    """The ruling-vs-document case, as data.
 
-    root = _model.find_root()
-    repos = load_repos(root)
-    model = _model.Model.load(root)
+    Exposed as a function so `audit.py` can GENERALISE this rather than
+    reimplement it: staleness is one shape of "the record disagrees with
+    reality", and the audit covers the others. Two detectors that answer the
+    same question differently would be the eighth state file all over again.
 
-    reached, unreachable = set(), set()
+    `reached` and `unreachable` are mutated, so the caller's coverage line
+    accounts for every repo either detector touched.
+    """
     findings, skipped = [], []
-
     for decision in sorted(model.decisions.values(), key=lambda d: d.id):
         decided = decision.get("decided")
         targets = decision.get("propagates_to") or []
@@ -111,6 +111,20 @@ def main(argv=None):
                 })
 
     findings.sort(key=lambda f: -f["days_stale"])
+    return findings, skipped
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--json", action="store_true")
+    args = parser.parse_args(argv)
+
+    root = _model.find_root()
+    repos = load_repos(root)
+    model = _model.Model.load(root)
+
+    reached, unreachable = set(), set()
+    findings, skipped = find_stale(model, repos, reached, unreachable)
 
     if args.json:
         print(json.dumps({

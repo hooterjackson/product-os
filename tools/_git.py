@@ -56,6 +56,12 @@ def is_repo(path):
     return _run(["git", "-C", path, "rev-parse", "--git-dir"]) is not None
 
 
+def remotes(path):
+    """Configured remote names. Empty means there is nothing to be stale FROM."""
+    out = _run(["git", "-C", path, "remote"])
+    return [r for r in (out or "").split() if r]
+
+
 def fetch(path, remote="origin"):
     """Fetch once per process per repo. Returns True on success."""
     key = (path, remote)

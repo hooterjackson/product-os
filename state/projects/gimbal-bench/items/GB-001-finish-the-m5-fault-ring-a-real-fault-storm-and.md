@@ -14,7 +14,7 @@
   "lead_time_days": 0,
   "cost_usd": null,
   "unblocks": [
-    "GB-005"
+    "GB-014"
   ],
   "unblocks_inferred": [],
   "answers": [],
@@ -73,8 +73,13 @@ about itself:
 ## Why this gates the Zigbee phase
 
 D15's title is the edge: *"Zigbee stays parked until the fault ring and the
-drills are done."* GB-001 → GB-005 in this repo is that sentence, mechanised. It
-is **not** permission to un-park — that is an owner decision nobody has taken.
+drills are done."* But the fault ring is only the **first** of its two
+conditions, and neither of them is permission.
+
+So this item does not point at Z-M1. It points at **GB-014**, the un-park
+decision itself, which points at Z-M1. The chain reads *fault ring → a decision
+nobody has taken → Z-M1*, which is the honest shape: finishing this item does
+not un-park anything.
 
 ## Acceptance
 

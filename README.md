@@ -8,9 +8,22 @@ about it** — and it refuses to answer it dishonestly.
 
 ```bash
 python3 tools/rank.py --explain     # the top item and why
+python3 tools/audit.py              # is any of this still true?
 python3 tools/stale.py              # published docs that contradict a ruling
 python3 tools/validate.py           # is this repo internally consistent?
 ```
+
+`/audit` is the one to sit down with. It re-reads the repos, attributes commits to
+items **by path** — the commit subjects here are things like *"map the fall that
+never comes"*, so no keyword rule would ever match them — and sorts what it finds
+into four groups: **A** applies on a bare "merge", **B** is escalated, **C** is
+refused with the reason, and **D** is every commit it could not attribute.
+
+**D is mandatory and printed every run**, because an audit that says "nothing
+changed" when it means "I recognised nothing" is indistinguishable from success
+and would end trust in the tool. Acceptance is one sentence — *"yes to A, do B1 at
+$240, drop B3"* — and `tools/apply.py` does exactly that, refusing `done` without
+evidence and routing human-authority fields to `state/proposals/`.
 
 ## What makes it different from a board
 
@@ -37,12 +50,34 @@ A conventional board ranks by importance and gets that exactly backwards. Run
 `python3 tools/rank.py --show EL-001` and check the operands rather than
 believing the ratio; a bare ratio is not falsifiable.
 
-**Leverage is transitive.** "Wire the LEDs" directly unblocks one thing — but that
-unblocks the firmware, which unblocks the app. The score reflects the whole reachable
-set, not the direct children.
+**Leverage is transitive.** An item's score reflects everything downstream through
+confirmed edges, not its direct children. `GB-001` unblocks one item directly and
+**8** transitively, which triples its score:
+
+```
+GB-001   base 5.000  ×  lift (1 + 0.25 × 8) = 3.000  ×  urgency 1.000  =  15.00
+```
+
+**Honestly, though: the two halves of that argument are carried by different items
+on this seed, and no single item demonstrates both.** `EL-001` ranks first on
+urgency 3.0 with leverage 1; `GB-001` heads the 5-hop chain with leverage 8 and
+ranks third. Lead time is doing the work at the top of the list and leverage is
+doing it in the middle. Stated because the tidier claim — one item proving both —
+would be false.
 
 **Rank is derived, never stored.** There is no ordered list in this repo. `rank.py`
 recomputes it from the score inputs every run, so there is nothing to drift.
+
+**The score is a label, not a verdict.** It is a priority chip, and the ordering is
+the owner's. `pin` is ordinary use, not an exception. When his order and the
+arithmetic diverge the system says so **once**, with the reason, and then does what
+he said.
+
+**The list is a conversation starter, not a contract.** Accuracy comes from
+`/audit` re-checking it against the repos, repeatedly — not from the guesses having
+been right the first time. On its first real run it found that an item written two
+days earlier was already wrong, and that two quotes this repo had published as
+unsourced were genuine.
 
 **The system proposes; it never decides.** Scores and reasoning are computed freely
 into `build/`. The inputs those scores read are human-authority and change only when a

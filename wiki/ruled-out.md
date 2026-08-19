@@ -334,8 +334,15 @@ electrically on the trunk — and it has a named limit:
 > There is no instrument on this bench that measures rail voltage, and the CAN
 > transport cannot distinguish *unpowered* from *disconnected*.
 
-**EL-002** exists to close this. Until it is closed, any statement about the
-supply is the owner's account plus a consistent measurement, not a measurement.
+**SUPERSEDED IN PART, 2026-08-19.** Doc 4a (`d8f092b`, 2026-08-17) names the
+bench meter — a **TESMEN TM-510** — so rail *voltage* is measurable now. What
+survives is narrower and still real: the meter has **no current range**, so the
+tape's per-zone current figures are derived from the spool's rating rather than
+measured, and CP12 is a *watch-and-expect* check.
+
+Left standing rather than rewritten, per the rule at the top of this file: the
+2026-08-14 statement was true when it was made, and seeing it superseded three
+days later is the more useful record. `EL-002` is rescoped to the current range.
 
 ## R-025 · Listen-only mode on the CANable `candleLight` tap
 **keywords:** canable · candlelight · listen-only · silent-mode · tap · ack · capture · contamination
@@ -515,6 +522,31 @@ One axis, five-minute windows, no vibration. **Do not cite Mε as closed.**
 
 # Zigbee and transport
 
+## R-055 · Proving the armed-lane mute by physically unplugging a connector
+**keywords:** mute · armed · lane · drill · unplug · transient · ack · disarm · mutesim · m6 · bench
+**source:** gimbal-bench `captures/gimbal10/fixture/bench-session2-20260815.md` @ `19dd790` · 2026-08-15 · grade: measured
+
+The drill is self-defeating and the capture works out why:
+
+> the armed-lane mute resists physical-unplug drills — the pull's transient
+> kills an armed frame before the mute can accrue.
+
+The instant the connector moved, the electrical transient cost an armed PAN
+heartbeat its ACK, and the standing armed no-ACK law disarmed within one frame —
+`ERR tx failed op=0x9A axis=pan` → `SAFE - ordinary transmission failed`. The
+session left the armed lane before the mute could exist in it.
+
+**The fixture was not wrong.** The capture's own verdict:
+
+> arguably the most correct thing the fixture did all day
+
+The named replacement is the dev-gated reply-drop drill on the `+mutesim` image,
+which drops replies without touching the wiring. `GB-004` carries it.
+
+Two limbs of that drill DID land the same session — motor-silent latched at
+1.9 s, MUTE-CLEAR on replug — so this entry rules out a **method**, not the
+milestone.
+
 ## R-039 · Un-parking Zigbee before the fault ring and the drills
 **keywords:** zigbee · parked · d15 · un-park · fault-ring · m5 · drills · owner-decision · preemption
 **source:** gimbal-bench `captures/gimbal10/fixture/owner-decisions-20260814.md` @ `e4d71a9` · 2026-08-15 · grade: measured
@@ -676,6 +708,40 @@ which are woven through evidence captures.
 **A retro-scrub is not forbidden by `ACK-ALTERED.md`** — see R-026. The argument
 against scrubbing is editorial, not constitutional.
 
+## R-054 · GitHub code search as a substitute for grep
+**keywords:** code-search · grep · gh · search · verification · false-negative · quote · withdrawal · method · audit
+**source:** measured against both repos, 2026-08-19 · grade: measured
+
+**A `gh api search/code` query that returns nothing is not evidence that the
+string is absent.** It returns nothing for indexing lag, for large files, for
+recently pushed commits, and it does so with the same empty result as a genuine
+miss. There is no distinguishing signal.
+
+Measured, twice, on 2026-08-19. Both of these were reported ABSENT from both
+repositories on the strength of empty code-search results, and both are real:
+
+    "this bench's meter has no current range"
+        -> docs/04a-wire-the-zones.md:331   (d8f092b, 2026-08-17)
+    "Marcelo to call"
+        -> PROJECT-STATE.md:158             (88a3a58, 2026-08-01)
+
+The second had been sitting in the repo for eighteen days. Code search simply
+did not return it.
+
+**The consequence was worse than a missed fact.** Both strings were quoted in
+the approved plan; both were withdrawn from seeded items as unsourced, with a
+provenance note published saying the source did not exist. That is a false claim
+about a source, made confidently, in the file whose entire purpose is provenance
+— committed as `8175094`.
+
+**The rule: fetch the file and grep it.** `gh api .../contents/PATH | base64 -d`
+then `grep`. Code search is for discovery when you do not know where to look. It
+is never the thing that establishes a negative. And a negative about a quote is
+exactly the claim that has to be right.
+
+Found by the first real `/audit` run, in group D, from a commit no path rule
+claimed.
+
 ## R-050 · `product-os` starting public
 **keywords:** product-os · public · private · disclosure · ruled-out · seed · publication
 **source:** product-os `wiki/ruled-out.md` (this file) · 2026-08-19 · grade: inferred
@@ -720,7 +786,10 @@ conclusion.
 A plan shipped a composite quote that existed nowhere — inside a section headed
 *"edges the evidence states, quoted."*
 
-**If the string cannot be found, do not put quotation marks around it.** Two items
-in the current seed (`EL-002`, `SITE-003`) carry provenance notes recording quotes
-that were withdrawn for exactly this reason on 2026-08-19; the underlying facts
-survived on different sources.
+**If the string cannot be found, do not put quotation marks around it.**
+
+**Amended 2026-08-19.** This entry was used to justify withdrawing two quotes
+that turned out to be genuine — see `R-054`. The rule stands; the *search* that
+decides "cannot be found" is the part that has to be trustworthy, and mine was
+not. Withdrawing a real quote and inventing one are both ways of publishing
+something false about a source.

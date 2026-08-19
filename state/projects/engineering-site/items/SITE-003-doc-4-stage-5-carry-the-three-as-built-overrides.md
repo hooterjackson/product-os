@@ -39,7 +39,15 @@
       "note": "A commit carrying the star, pin-map and mount overrides, or an explicit as-built box saying the bench differs and how."
     }
   ],
-  "evidence_found": [],
+  "evidence_found": [
+    {
+      "kind": "commit",
+      "repo": "engineered-lighting-site",
+      "sha": "796559c",
+      "date": "2026-08-19",
+      "note": "attributed by tools/audit.py on 2026-08-19"
+    }
+  ],
   "repos": [
     "engineered-lighting-site",
     "gimbal-bench"
@@ -70,7 +78,15 @@ Two more from the same review, worth folding in: the stage-1 **2.0 A supply
 limit** must rise to ~3 A by stage 6, and the entity is **"Spot Light"
 (`light.spot1`)**, not Doc 4's "Spotlight".
 
-**Provenance note.** An earlier draft of this item claimed the DLH-3UP-EH
-housing was outstanding with "Marcelo to call" as the source. That string is not
-in either repository. What the source actually establishes is that the housing
-is what the bench uses and Doc 4 does not name it. The item is scoped to that.
+**Provenance note, corrected 2026-08-19.** An earlier draft of this item said
+the phrase "Marcelo to call" appeared in neither repository, and withdrew it.
+**That was wrong — the string is real**, at `PROJECT-STATE.md:158`, and it makes
+the mount row an owner-flagged open decision rather than a documentation gap:
+
+> BoM ripple NOT yet applied (Marcelo to call): where the housing purchase
+> lands — it supersedes Doc 4's flat heatsink at the fixture stage.
+
+So the housing is not merely undocumented in Doc 4; **the BoM ripple was
+deliberately deferred to him and has not been applied.** The withdrawal came
+from trusting GitHub code search instead of grepping the files already on disk
+— see `R-054`.

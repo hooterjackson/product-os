@@ -39,7 +39,29 @@
       "note": "validate.py exits 0; rank.py returns an ordering; build.py reports a confirmed chain of >= 3 hops; stale.py reproduces the Doc 6 / D3 contradiction unaided."
     }
   ],
-  "evidence_found": [],
+  "evidence_found": [
+    {
+      "kind": "commit",
+      "repo": "product-os",
+      "sha": "8890b05",
+      "date": "2026-08-19",
+      "note": "attributed by tools/audit.py on 2026-08-19"
+    },
+    {
+      "kind": "commit",
+      "repo": "product-os",
+      "sha": "8175094",
+      "date": "2026-08-19",
+      "note": "attributed by tools/audit.py on 2026-08-19"
+    },
+    {
+      "kind": "commit",
+      "repo": "product-os",
+      "sha": "d04a029",
+      "date": "2026-08-19",
+      "note": "attributed by tools/audit.py on 2026-08-19"
+    }
+  ],
   "repos": [
     "product-os"
   ],

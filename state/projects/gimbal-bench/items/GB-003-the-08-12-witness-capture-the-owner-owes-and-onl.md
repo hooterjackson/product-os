@@ -37,7 +37,22 @@
       "note": "A dated, attributed capture of the 08-12 episode: what survived the 60-second power cycle and what revived it."
     }
   ],
-  "evidence_found": [],
+  "evidence_found": [
+    {
+      "kind": "commit",
+      "repo": "gimbal-bench",
+      "sha": "8a4c974",
+      "date": "2026-08-19",
+      "note": "attributed by tools/audit.py on 2026-08-19"
+    },
+    {
+      "kind": "commit",
+      "repo": "gimbal-bench",
+      "sha": "b0a472f",
+      "date": "2026-08-19",
+      "note": "attributed by tools/audit.py on 2026-08-19"
+    }
+  ],
   "repos": [
     "gimbal-bench"
   ],

@@ -1,64 +1,129 @@
-# Goal prompt — finish product-os slice 1a-minus
+# Goal prompt — build /audit
 
-Paste the block below into a fresh session in `~/Claude/product-os`. It is written to
-work cold, with no chat history, because that is the failure this repo exists to fix.
+Paste the block below into a fresh session in `~/Claude/product-os`. Written to work
+cold, with no chat history.
 
-Kept under 4000 characters. The `STAND` list is the only part that goes stale —
-update it when you stop.
+## STAND — updated 2026-08-19, after the first real `/audit`
+
+**6 local commits, nothing pushed, no remote.** `validate.py` exits 0 · 27 items ·
+5 questions · 8 rulings · 55 register entries · **5-hop** confirmed chain ·
+byte-deterministic build.
+
+**Built and verified before this session (slice 1a-minus):** the item model, scoring,
+`validate.py` / `rank.py` / `build.py` / `new.py` / `stale.py`, the evidence-backed
+seed, `wiki/ruled-out.md`, and the plugin with three skills plus the `SessionStart`
+hook. Three tool bugs were found only by running them — `_fm.canonicalize` was not a
+fixed point, `_git` returned committer-local dates against a UTC API, and `new.py`
+wrote a status outside the enum.
+
+**`/audit` — DONE (POS-003).** `tools/audit.py` (read-only) + `tools/apply.py`
+(applies one accepted sentence) + `plugin/skills/audit`. Path-first attribution, four
+groups, **mandatory group D**, coverage line by name. `apply.py` refuses `done`
+without evidence that existed *before the run*, and routes human-authority fields to
+`state/proposals/`. Records land in `state/audits/<machine>/`.
+
+**The un-park decision is a node.** `GB-014` sits between `GB-001` and `GB-005`, so
+the chain reads *fault ring → a decision nobody has taken → Z-M1*.
+
+**Q-005 resolved by reading Doc 4, not escalated.** Every Doc 4 row sums to $621–666;
+swap the $486 Valent X spool for the $30 BTF substitute and it is $165–210 against a
+published header of $170–240. The header assumes the substitute. Only the tape choice
+is still his, and it is a ~$451 decision.
+
+**The first audit caught me publishing a falsehood about a source.** Last session I
+wrote — in two seeded items and in the register — that two quoted strings appeared in
+neither repo. **Both are real:** *"this bench's meter has no current range"* at
+`docs/04a-wire-the-zones.md:331` (`d8f092b`) and *"Marcelo to call"* at
+`PROJECT-STATE.md:158` (`88a3a58`, eighteen days old). I had trusted GitHub code
+search instead of grepping files already on disk. Corrected in both items; `R-054`
+records the method failure. `EL-002` is rescoped: the bench **has** a volt meter
+(TESMEN TM-510) and lacks a **current** range.
+
+**`GB-004`:** `19dd790` proves the motor-silent limb and MUTE-CLEAR; the armed lane
+was not reached and **cannot** be by that method (`R-055`). `done` refused twice, for
+two different correct reasons.
+
+## Not done
+
+- **`state/audits/` has one entry.** The second run is the one that proves the
+  window-since-last-audit path, and it needs a day to pass.
+- **Group D is 99 commits.** Most are genuinely outside the seed's 27 items. That is
+  the honest finding, not a bug — but it means the seed under-covers `gimbal-bench`.
+- **Nine evidence globs are too broad or match nothing**, reported in group B.
+  They are human-authority; proposed, not fixed.
+- **No remote. `gimbal-bench` still private (`R-049`).** PROP-0001 still unaccepted,
+  which v4 says is fine.
+- Deferred: the thread indexer, briefs, the site, `llms.txt`, `/unblock`,
+  multi-machine (12 of 27 items are `machine_affinity: formd-t1`).
+
+Kept under 4000 characters. Update this section when milestones land.
 
 ---
 
 ```
-Cite POS-001 in your first message. Continue building product-os slice 1a-minus in ~/Claude/product-os.
+Cite the product-os item covering /audit in your first message. If none exists, create
+it with tools/new.py and cite that.
 
-READ FIRST
-  ~/.claude/plans/read-bootstrap-md-and-follow-mighty-wave.md  the approved plan (v3)
-  ./CLAUDE.md  the contract you work under
-  ./GOAL.md    this prompt; fix its status list when you stop
+Slice 1a-minus is BUILT and VERIFIED: 4 commits, no remote, validate.py exits 0,
+25 items, 53 register entries, 4-hop chain, byte-deterministic.
 
-STAND  (updated 2026-08-19; 4 local commits, nothing pushed, no remote)
-  [done] scaffold; CLAUDE.md+AGENTS.md byte-identical; intent.md + standing-orders.md (provisional v0); README
-  [done] tools/*.py — now RUN, not just compiled. Three bugs found by running them: _fm.canonicalize was not a fixed point (every file new.py wrote would have failed the canonical check); _git returned committer-local dates while the API returns UTC (silent off-by-one-day in stale.py's only number); new.py wrote questions with status "open", not in the enum.
-  [done] Seed: 6 projects, 25 items, 5 questions, 8 rulings. validate.py exits 0; rank.py orders; build.py reports a 4-hop confirmed chain and is byte-deterministic; every entity carries evidence. PROP-0001 stands behind every decided field — UNACCEPTED, awaiting Marcelo.
-  [done] wiki/ruled-out.md, 53 entries, each with keywords + source + date + grade; passes the disclosure screen
-  [done] plugin/: plugin.json, marketplace.json, skills {next,capture,handoff}, SessionStart hook. hooks.json NESTED. /capture asks nothing, run end-to-end.
-  [done] verify: lead-time arithmetic published in README (30.00 vs 4.00, operands shown); stale.py reproduces Doc 7 @ 24d and Doc 6 @ 13d behind D3 unaided, with coverage line; authority audit proven both ways (exit 1 unblessed, exit 0 with Accepts:, agent-authority keywords change passed unremarked)
+Read first: ~/.claude/plans/read-bootstrap-md-and-follow-mighty-wave.md — START WITH
+THE v4 SECTION. It changes direction and answers your open questions. Then CLAUDE.md.
 
-  [ ] NOT DONE — needs Marcelo
-      - PROP-0001 is unaccepted. Every score, cost, edge and gate in state/ is a
-        proposal wearing a value. Read it before trusting a ranking.
-      - intent.md and standing-orders.md are still "provisional": true.
-      - Q-005 (does Doc 4's $170-240 assume the $30 substitute, not the $486
-        spool?) gates EL-001's real cost. Two readings, ~$456 apart.
-      - The remote does not exist. Private when created — see R-050.
-      - gimbal-bench publication still BLOCKED — R-049.
-  [ ] NOT DONE — deferred by scope
-      - /audit's proposal engine, the thread indexer, briefs, the site,
-        llms.txt, /unblock.
-      - Multi-machine is untested. Its real test needs formd-t1, and 12 of 25
-        items carry machine_affinity: formd-t1.
-      - wiki/ruled-out.md's real audience is at the bench. It is on this Mac.
-      - No fresh-session test yet: nobody but me has been asked what to work on.
+YOUR QUESTIONS, ANSWERED
+  PROP-0001 is NOT a gate. The ranked list is a conversation starter, not a contract.
+    Marcelo decides in the moment; accuracy comes from repeated re-auditing, not a
+    one-time acceptance. Leave it as a starting position — no review UI. Same for
+    intent.md / standing-orders.md staying provisional.
+  Q-005 (~$456 spool): resolve by READING Doc 4, don't escalate by reflex. Header says
+    ~$170-240, row 4 of the same table says $486. Most likely the header assumes the
+    $30 BTF substitute. Verify. Escalate only if irreconcilable.
+  D15's park as an edge, not status: parked — you were RIGHT. `parked` means set aside
+    indefinitely; D15 names its own un-park condition, so it is sequencing, not scope.
+    Fix the cost you identified by making the decision a NODE: insert an explicit
+    un-park decision item between GB-001 and GB-005, so the chain reads "fault ring ->
+    a decision not yet taken -> Z-M1". A chain containing an unmade decision is
+    exactly what this system should surface.
 
-Work in order. A milestone is done only when its test passes:
-  seed       validate.py exits 0; rank.py returns an ordering; build.py reports a confirmed chain >=3 hops; every item has evidence with a real path+SHA
-  ruled-out  every entry has keywords, source, date, and passes validate.py's disclosure screen
-  plugin     hooks.json uses the NESTED {"hooks":{...}} form; /capture asks nothing
-  verify     publish the arithmetic behind the lead-time claim (rank.py --show ID); stale.py reproduces the Doc 6/D3 contradiction unaided, with its coverage line
+THE WORK: build /audit — the system Marcelo actually wants. A chat he can sit down
+with repeatedly that re-checks priorities against reality.
 
-RULES — two earlier plan versions were broken by review, both for trusting a mechanical signal over the primary source:
- 1 Never seed from a local clone. ~/Claude/engineered-lighting is 54 commits stale and `git rev-list --count HEAD..origin/main` still says 0. Read remotes: gh api repos/hooterjackson/REPO/contents/PATH --jq .content | base64 -d. gimbal-bench is PRIVATE, branch `master`.
- 2 Never paraphrase inside quotation marks. v2 shipped a composite quote that existed nowhere. Can't find the string? Don't quote it.
- 3 A word count is not a decision. "Doc 6 has 11 ESPHome lines" is not "retire Doc 6" — spot-bench.yaml marks Doc 6's watchdog/failsafe/presets STILL LIVE. Scope retirement to wifi:/api:/mqtt: as TRANSPORT only. engineering-site items may never rule anything; each is parented to a gimbal-bench ruling ID.
- 4 Zigbee is RULED (D3, 2026-08-14) AND PARKED (D15). Not dead, not next. D15's successor is the fault ring (M5).
- 5 Publish arithmetic, never a bare ratio. v1 printed a wrong number; v2 printed "27x" with no operands.
- 6 Draw an edge only if a source states it. Inferred ones go in unblocks_inferred — excluded from leverage, never forces blocked.
- 7 Nothing is done without evidence_found. If you couldn't reach a repo, say "I couldn't look", never "no changes".
+  a Read-only pass. For each item with `repos`, fetch and compare what the item claims
+    against what commits and files show. stale.py already does the ruling-vs-doc case;
+    generalise it, don't replace it.
+  b EVIDENCE MATCHING IS PATH-FIRST. Marcelo writes commit subjects like "map the fall
+    that never comes". No keyword rule will match those. Match `paths:` globs first;
+    message matching is fallback only.
+  c Four output groups: A applies on a bare "merge" · B escalated, I will not decide
+    these · C refused, with the reason · D commits I could not attribute. D is
+    MANDATORY and first-class — an audit that says "nothing changed" when it means "I
+    recognised nothing" is the one failure that ends trust in this tool.
+  d Always print the coverage line: repos expected, reached, unreachable, by name.
+  e ACCEPTANCE IS ONE SENTENCE IN CHAT. Marcelo says "yes to A, do B1 at $240, drop
+    B3" and the skill applies exactly that — no file-editing ritual. Write the durable
+    record to state/audits/<machine>/ afterwards so nobody re-litigates it.
+  f Refuse to mark anything done without evidence_found. That rule does not bend.
+
+ALSO
+  Score becomes a LABEL, not a verdict; `pin` moves from exception to ordinary use.
+  When his order and the math diverge, say so ONCE with the reason, then do what he
+  said. Record honestly that leverage isn't carrying this seed: EL-001 ranks first on
+  urgency 3.0 with leverage 1, while the 4-hop chain sits on GB-001 at rank 3.
+
+ACCEPTANCE
+  /audit runs against the real repos, produces all four groups plus the coverage line,
+  finds at least one real status change with a SHA, and refuses at least one thing for
+  lack of evidence, saying which. validate.py still exits 0.
+
+CARRY FORWARD
+  Never seed from a local clone (~/Claude/engineered-lighting is 54 commits stale and
+  rev-list still says 0 — fetch first, never fall back to a local ref). Never
+  paraphrase inside quotation marks. Draw an edge only if a source states it. If you
+  could not reach a repo, say "I couldn't look".
 
 STOP AND ASK
- - Do NOT flip gimbal-bench public. Authorized but BLOCKED: a capture names a third party's personal email beside a tailnet incident, no sign they were told. Plan §6.
- - Do NOT create the remote or push. product-os starts PRIVATE — ruled-out.md seeds ~45 findings from the private repo. Commit locally; ask first.
- - Do NOT write human-authority fields (impact, confidence, effort_minutes, lead_time_days, cost_usd, unblocks, pin, project, gate, dropped/parked, evidence rule, intent.md, standing-orders.md). Propose instead.
+  Do NOT create the remote or push — private when created. Do NOT flip gimbal-bench
+  public (R-049). Do NOT write human-authority fields; propose instead.
 
-When you stop, update GOAL.md's status list and say plainly what isn't done.
+When you stop, update GOAL.md's STAND list and say plainly what is not done.
 ```

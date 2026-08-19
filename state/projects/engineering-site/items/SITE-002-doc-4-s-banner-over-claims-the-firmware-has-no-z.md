@@ -36,7 +36,15 @@
       "note": "A commit correcting the banner to match what the firmware actually has."
     }
   ],
-  "evidence_found": [],
+  "evidence_found": [
+    {
+      "kind": "commit",
+      "repo": "engineered-lighting-site",
+      "sha": "796559c",
+      "date": "2026-08-19",
+      "note": "attributed by tools/audit.py on 2026-08-19"
+    }
+  ],
   "repos": [
     "engineered-lighting-site",
     "gimbal-bench"
