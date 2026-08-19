@@ -189,6 +189,39 @@ otherwise since the seed. It overstated the size (claimed 9 leaked items; `GB-00
 `GB-011` are already excluded as blocked — the real leak is **1 of 14**, `GB-002`,
 "Rescue D1-D11 *off* formd-t1"). Added `rank.py --here`; corrected `CLAUDE.md`.
 
+**POS-010 — kickoff prompts and return paths. DONE.** `public/kickoff/<ID>.md`, one
+per active item, ~2–3 KB, opening with *"Cite <ID> in your first message"*. The
+most-used artifact of this whole build was a hand-written paste-ready prompt, written
+by hand about a dozen times; that was the tool's job and it wasn't doing it.
+
+`state/threads/manual.yaml` is wired — a flat `key: url` list parsed in eight lines, no
+YAML dependency, addable from a phone. A RESUME verdict with no way back is a dead end
+wearing a green label, and web chats have no CLI. Exposed in `api/threads.json` under
+`return_paths` and in each item's kickoff.
+
+**The cold kickoff test passed and found two stale things here.** A subagent given one
+prompt and nothing else started correct work with no follow-up questions — cited
+POS-002, knew what was ruled out, worked in the named repo, refused to close anything,
+left the push to a human. It also found (both verified before accepting):
+
+- **POS-002's premise was stale the day I wrote it.** I claimed `PROJECT-STATE.md`
+  still lists two shipped prompts as pending; it self-corrected in `acd0611` on
+  2026-07-29, before the seed. Drafted from a clone 54 commits behind — `R-044`
+  reproduced inside an item's *content* rather than a report, which is sharper than
+  anything in the CLAUDE.md table.
+- **`repos.json` said product-os was private with no remote**, contradicting `DEC-201`.
+
+**The disclosure screen never looked at commit metadata (`R-060`).** A work address
+reached one public commit and `--amend` did not remove it: `e30c955` is unreachable
+from any branch and **still served by GitHub by SHA**. Only GitHub support can purge
+it. `check_commit_identities()` now scans all refs and the reflog — reachable history
+is an error, orphans are a warning, never silent.
+
+**`public/` shipped a stamp that committing it invalidated (`R-061`).** The freshness
+line embedded `+N commits since the last audit`, computed from local HEAD: `+9` before
+the commit, `+10` after. No ordering of regenerate-then-commit converges. Split into a
+durable half (`public/`) and a volatile half (`build/`).
+
 ## How to talk about state — I kept getting this wrong
 
 **PROP-0001 and PROP-0002 are not blockers and never were.** v4 said so and my recaps
