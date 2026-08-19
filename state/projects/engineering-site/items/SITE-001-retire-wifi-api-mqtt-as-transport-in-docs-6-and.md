@@ -3,7 +3,7 @@
   "id": "SITE-001",
   "title": "Retire wifi:/api:/mqtt: as TRANSPORT in Docs 6 and 7",
   "project": "engineering-site",
-  "status": "next",
+  "status": "parked",
   "lane": "content",
   "gate": "none",
   "machine_affinity": null,

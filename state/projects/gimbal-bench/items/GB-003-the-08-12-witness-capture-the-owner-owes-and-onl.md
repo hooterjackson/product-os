@@ -3,7 +3,7 @@
   "id": "GB-003",
   "title": "The 08-12 witness capture the owner owes, and only the owner",
   "project": "gimbal-bench",
-  "status": "next",
+  "status": "parked",
   "lane": "content",
   "gate": "bench",
   "machine_affinity": "formd-t1",

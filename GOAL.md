@@ -5,10 +5,10 @@ cold, with no chat history.
 
 ## STAND — updated 2026-08-19, after the first real `/audit`
 
-**9 local commits at the time of writing, nothing pushed, no remote.** `validate.py`
-exits 0 · 30 items (5 done) · 5 questions · 8 rulings · 58 register entries · **5-hop**
-confirmed chain · **40 gated tests** · byte-deterministic build · one thread shard,
-3 threads bound.
+**10 local commits at the time of writing, nothing pushed, no remote.** `validate.py`
+exits 0 · 31 items (20 active, 7 parked, 4 done) · 5 questions (1 parked) · 8 rulings ·
+58 register entries · **51 gated tests** · byte-deterministic build · 24 briefs ·
+13 threads with resume/restart verdicts.
 
 **Built and verified before this session (slice 1a-minus):** the item model, scoring,
 `validate.py` / `rank.py` / `build.py` / `new.py` / `stale.py`, the evidence-backed
@@ -146,6 +146,25 @@ asserted.
 showed, five sessions running — I was counting the commit I was about to make. In a
 repo whose pitch is numbers that can be checked, a count habitually one high is the
 exact shape of the thing it exists to catch. Verified counts only from here.
+
+**POS-007 — re-centred on software, on Marcelo's word (`--decided`).** *"This tool is
+about planning vibe code software projects and chats. All the hardware is bought."*
+
+- **`urgency` is gone.** Measured before removal: 2 of 30 items carried any
+  `lead_time_days`, both purchases — inert on 28, tripling the score on 2 that no longer
+  matter. `LEVERAGE_WEIGHT` 0.25 → 0.5, because dependency depth is what orders software
+  work. **`GB-001` (leverage 8) went from #3 to #1**: `5.000 × 5.000 = 25.00`.
+  `lead_time_days` is still recorded and still displayed; it just no longer moves order.
+- **8 parked, not deleted** — EL-001/002/003 (purchases, prints), SITE-001/002/003
+  (docs-site propagation), GB-003 (bench-only owner capture), Q-005 (the tape question).
+  Any comes back in a sentence. **20 active items across 4 codebases.**
+- **Briefs are generated every build** — `build/briefs/<ID>.md`, 24 of them: where it
+  stands · what's next · already ruled out (keyword-scoped) · decisions in force ·
+  **a freshness stamp that always prints**, including "no audit has ever run" and
+  "could not check gimbal-bench offline".
+- **Every indexed thread carries a resume-or-restart verdict and its reason.** 4 resume,
+  9 restart. Commands verified before printing: `claude -r` is on PATH; codex is *not*,
+  so it is emitted by full path from inside ChatGPT.app.
 
 ## How to talk about state — I kept getting this wrong
 

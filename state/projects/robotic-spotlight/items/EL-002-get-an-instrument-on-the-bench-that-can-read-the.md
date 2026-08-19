@@ -3,7 +3,7 @@
   "id": "EL-002",
   "title": "The bench meter has no current range",
   "project": "robotic-spotlight",
-  "status": "next",
+  "status": "parked",
   "lane": "hardware",
   "gate": "none",
   "machine_affinity": null,

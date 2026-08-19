@@ -3,7 +3,7 @@
   "id": "EL-003",
   "title": "Print the tolerance coupon, then the fit coupon",
   "project": "robotic-spotlight",
-  "status": "next",
+  "status": "parked",
   "lane": "hardware",
   "gate": "printer",
   "machine_affinity": null,

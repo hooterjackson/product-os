@@ -49,6 +49,7 @@ import io
 import json
 import os
 import re
+import shutil
 import sys
 
 import _fm
@@ -66,7 +67,78 @@ CLAUDE_PROJECTS = "~/.claude/projects"
 THREAD_KEYS = {
     "id", "tool", "title", "started", "last_active", "cwd", "branch",
     "prompts", "items", "cited_unknown", "path", "files", "forks", "parent",
+    "verdict", "verdict_reason", "command",
 }
+
+# --- resume or restart ------------------------------------------------------
+# The second question this tool exists to answer: which of these chats relates
+# to the work, and do I resume it or start fresh.
+#
+# Resume only when the chat's model of reality is still the current one. If
+# commits landed after its last message, that chat is provably behind and the
+# brief is not -- reopening it means arguing with a model of a repo that no
+# longer exists.
+STALE_DAYS = 7
+LONG_PROMPTS = 60
+
+# Verified on this machine before being printed. `claude` is on PATH; the codex
+# binary is NOT, it lives inside the ChatGPT app bundle, so its command is
+# emitted with a full path or not at all. A resume command that fails is worse
+# than a sentence that works.
+CLAUDE_BIN = "claude"
+CODEX_BIN = "/Applications/ChatGPT.app/Contents/Resources/codex"
+
+
+def resume_command(thread):
+    tool = thread.get("tool")
+    ident = thread.get("id")
+    if not ident:
+        return None
+    if tool == "claude-code":
+        if not shutil.which(CLAUDE_BIN):
+            return None
+        cwd = thread.get("cwd")
+        return "cd %s && %s -r %s" % (cwd or "~", CLAUDE_BIN, ident)
+    if tool == "codex":
+        if not os.path.exists(CODEX_BIN):
+            return None
+        return "%s resume %s" % (CODEX_BIN, ident)
+    return None
+
+
+def verdict_for(thread, today, latest_commit, repo_for_cwd):
+    """RESUME, RESTART, or a stated reason for neither."""
+    last = (thread.get("last_active") or "")[:10]
+    if not last:
+        return "restart", "no last-activity timestamp — cannot tell how stale it is"
+
+    try:
+        age = (today - datetime.date.fromisoformat(last)).days
+    except ValueError:
+        return "restart", "unparseable last-activity date %r" % last
+
+    repo = repo_for_cwd.get(thread.get("cwd"))
+    landed = None
+    if repo and latest_commit.get(repo):
+        landed = latest_commit[repo][:10] > last
+
+    if landed:
+        return ("restart",
+                "%s has commits after this chat's last message — its model of "
+                "the repo is provably behind, and the brief is not" % repo)
+    if age > STALE_DAYS:
+        return "restart", "%d days stale (threshold %d)" % (age, STALE_DAYS)
+    if (thread.get("prompts") or 0) > LONG_PROMPTS:
+        return ("restart",
+                "%d prompts — long enough that its early context is noise"
+                % thread["prompts"])
+    if landed is None:
+        return ("resume",
+                "%d day(s) old, this machine; could NOT check whether work "
+                "landed in its repo — resume, but re-read the brief first" % age)
+    return ("resume",
+            "%d day(s) old, this machine, and nothing has landed in %s since"
+            % (age, repo or "its repo"))
 
 # Keys that must never appear, at any depth, in a shard.
 FORBIDDEN_KEY = re.compile(r"(?i)message|content|text|body|prompt_text|summary")
@@ -411,6 +483,35 @@ def build(root, machine):
             stats["generation_collisions"] += len(stale)
             thread.setdefault("cited_unknown", set()).update(stale)
         thread["items"] = kept
+    # --- resume or restart, per thread
+    stamp_path = os.path.join(root, "build", "audit-stamp.json")
+    latest_commit = {}
+    if os.path.exists(stamp_path):
+        try:
+            with open(stamp_path, "r", encoding="utf-8") as fh:
+                latest_commit = json.load(fh).get("latest_commit") or {}
+        except ValueError:
+            pass
+    repo_for_cwd = {}
+    try:
+        with open(os.path.join(root, "state", "repos.json"), "r",
+                  encoding="utf-8") as fh:
+            for name, spec in json.load(fh).items():
+                if name.startswith("_") or not isinstance(spec, dict):
+                    continue
+                if spec.get("local"):
+                    repo_for_cwd[tilde(os.path.expanduser(spec["local"]))] = name
+    except (OSError, ValueError):
+        pass
+    today = datetime.date.today()
+    for thread in threads:
+        verdict, reason = verdict_for(thread, today, latest_commit, repo_for_cwd)
+        thread["verdict"] = verdict
+        thread["verdict_reason"] = reason
+        thread["command"] = resume_command(thread) if verdict == "resume" else None
+        if verdict == "resume" and not thread["command"]:
+            thread["verdict_reason"] += (" · no verified command on this machine "
+                                         "— open it from the app's session picker")
     threads = [clean(t) for t in threads]
     threads.sort(key=lambda t: (t.get("last_active") or "", t.get("id") or ""),
                  reverse=True)
@@ -482,6 +583,15 @@ def main(argv=None):
               % ", ".join(cov["cited_but_unknown_ids"]))
         print("    A finding, not an error -- either a typo or an item that "
               "was never written.")
+    print()
+    print("Resume or restart")
+    for thread in shard["threads"][:10]:
+        mark = "RESUME " if thread["verdict"] == "resume" else "restart"
+        print("  %s %-9s %s" % (mark, thread["tool"],
+                                (thread.get("title") or thread["id"])[:44]))
+        print("           %s" % thread["verdict_reason"])
+        if thread.get("command"):
+            print("           $ %s" % thread["command"])
     print()
     print("Coverage: read %d codex + %d claude files · skipped %d malformed "
           "line(s), %d unreadable file(s) · excluded %d sidechain · %d own-repo "

@@ -3,7 +3,7 @@
   "id": "Q-005",
   "title": "Does Doc 4's $170-240 range assume the $30 substitute, not the $486 spool?",
   "project": "engineering-site",
-  "status": "next",
+  "status": "parked",
   "gates": [],
   "impact": 3,
   "confidence": 4,

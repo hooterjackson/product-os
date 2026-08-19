@@ -19,6 +19,7 @@ import tempfile
 
 import _fm
 import _model
+import brief as brief_mod
 import rank as rank_mod
 
 
@@ -157,6 +158,22 @@ def build(root, out_dir):
     write(out_dir, "now.md", render_now(model))
     write(out_dir, "chain.md", render_chain(model))
     write(out_dir, "api/now.json", render_api(model))
+
+    # Briefs are not a deferred phase. They are the per-item answer to "where
+    # does this stand", and they are regenerated wholesale so they can never
+    # drift from state/ the way a hand-maintained file does.
+    entries = brief_mod.parse_register(model.root)
+    stamp = brief_mod.read_stamp(model.root)
+    with open(os.path.join(model.root, "state", "repos.json"), "r",
+              encoding="utf-8") as fh:
+        repos_spec = {k: v for k, v in json.load(fh).items()
+                      if not k.startswith("_")}
+    for node in model.nodes.values():
+        if not node.is_active:
+            continue
+        write(out_dir, os.path.join("briefs", "%s.md" % node.id),
+              brief_mod.render(node, model, entries, stamp, repos_spec,
+                               model.root))
     return model
 
 

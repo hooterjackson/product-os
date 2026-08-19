@@ -481,6 +481,29 @@ def audit(root, since, only_item=None):
         if rest:
             unattributed[name] = rest
 
+    # The stamp briefs read for their freshness line. Written to build/ because
+    # it is derived, and a brief that cannot say how stale it is must say THAT
+    # rather than print nothing.
+    heads, latest = {}, {}
+    for name, repo in repos.items():
+        if repo.commits:
+            heads[name] = repo.commits[0][0]
+            latest[name] = max(c[1] for c in repo.commits)
+    stamp_dir = os.path.join(root, "build")
+    try:
+        os.makedirs(stamp_dir, exist_ok=True)
+        with open(os.path.join(stamp_dir, "audit-stamp.json"), "w",
+                  encoding="utf-8") as fh:
+            json.dump({
+                "date": datetime.date.today().isoformat(),
+                "window_since": since,
+                "heads": heads,
+                "latest_commit": latest,
+                "group_d": sum(len(v) for v in unattributed.values()),
+            }, fh, indent=2, sort_keys=True)
+    except OSError:
+        pass
+
     coverage = {
         "window_since": since,
         "truncated": sorted(n for n, r in repos.items() if r.truncated),

@@ -101,6 +101,12 @@ class Applier(object):
     def _apply(self, item_id, what, origin):
         self.applied.append((item_id, what, origin))
 
+    def kind_of(self, item_id):
+        """Questions are not items. `_fm` orders their keys differently, so
+        writing a question with kind="item" produces a valid file that fails
+        the canonical check -- which is exactly what parking Q-005 did."""
+        return "question" if item_id in self.model.questions else "item"
+
     def node(self, item_id):
         node = self.model.nodes.get(item_id)
         if node is None:
@@ -135,7 +141,7 @@ class Applier(object):
             return
         fm["evidence_found"] = found
         fm["updated"] = today()
-        self.write(node.path, fm, body, "item")
+        self.write(node.path, fm, body, self.kind_of(item_id))
         self.added_this_run.setdefault(item_id, []).extend(added)
         self._apply(item_id, "evidence_found += %s" % ", ".join(added), AGENT)
 
@@ -169,7 +175,7 @@ class Applier(object):
             fm["completed"] = today()
         fm["status"] = status
         fm["updated"] = today()
-        self.write(node.path, fm, body, "item")
+        self.write(node.path, fm, body, self.kind_of(item_id))
         self._apply(item_id, "status -> %s" % status, origin)
 
     def set_field(self, item_id, field, value, origin=AGENT):
@@ -189,7 +195,7 @@ class Applier(object):
         fm, body = _fm.load(node.path)
         fm[field] = value
         fm["updated"] = today()
-        self.write(node.path, fm, body, "item")
+        self.write(node.path, fm, body, self.kind_of(item_id))
         self._apply(item_id, "%s -> %r" % (field, value), origin)
 
     def write(self, path, fm, body, kind):

@@ -53,23 +53,22 @@ def explain(node, model):
     else:
         noun = "item" if node.leverage == 1 else "items"
 
-    if node.leverage == 0 and lead == 0:
-        return "%s of work; nothing downstream is waiting." % effort.capitalize()
-
     parts = [effort]
     if cost:
         parts.append(cost)
     subject = " and ".join(parts)
 
     if node.leverage == 0:
-        return ("%s, and %s of waiting that starts when you click, not when "
-                "you're ready." % (subject.capitalize(), humanize_lead(lead)))
+        return "%s of work; nothing downstream is waiting." % effort.capitalize()
 
     sentence = "%s stand between you and unblocking %d %s" % (
         subject.capitalize(), node.leverage, noun)
     if lead:
-        sentence += (", and %s of lead time that starts when you click, "
-                     "not when you're ready" % humanize_lead(lead))
+        # Stated, never used as an argument. The lead-time term was removed
+        # from the score on 2026-08-19; leaving persuasive language behind
+        # would be the ranking arguing for something it no longer computes.
+        sentence += " (it also carries %s of lead time, recorded but not " \
+                    "ranked on)" % humanize_lead(lead)
     return sentence + "."
 
 
@@ -79,21 +78,24 @@ def arithmetic(node):
     impact = node.get("impact") or 0
     confidence = node.get("confidence") or 0
     bucket = _model.effort_bucket(node.effort_minutes)
-    lead = node.get("lead_time_days") or 0
-    urg = _model.urgency(lead)
     base = (impact * confidence) / float(bucket)
     lift = 1.0 + _model.LEVERAGE_WEIGHT * node.leverage
-    return [
-        "effort_bucket(%d min)     = %d" % (node.effort_minutes, bucket),
-        "base = (%d x %d) / %d      = %.3f" % (impact, confidence, bucket, base),
-        "leverage                  = %d  %s" % (
+    lead = node.get("lead_time_days") or 0
+    rows = [
+        "effort_bucket(%d min)  = %d" % (node.effort_minutes, bucket),
+        "base = (%d x %d) / %d   = %.3f" % (impact, confidence, bucket, base),
+        "leverage               = %d  %s" % (
             node.leverage,
             "(" + ", ".join(sorted(node.reach, key=_fm.sort_key)) + ")"
             if node.reach else "(nothing downstream)"),
-        "lift = 1 + 0.25 x %-2d      = %.3f" % (node.leverage, lift),
-        "urgency = 1 + %d/7        = %.3f" % (lead, urg),
-        "score = %.3f x %.3f x %.3f = %.2f" % (base, lift, urg, node.score),
+        "lift = 1 + %.2f x %-2d   = %.3f" % (
+            _model.LEVERAGE_WEIGHT, node.leverage, lift),
+        "score = %.3f x %.3f     = %.2f" % (base, lift, node.score),
     ]
+    if lead:
+        rows.append("lead_time_days         = %d  (recorded, does NOT move the "
+                    "order -- see _model.py)" % lead)
+    return rows
 
 
 def main(argv=None):

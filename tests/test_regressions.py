@@ -372,6 +372,120 @@ class ItemIdsAreUniqueOnlyWithinASeedGeneration(unittest.TestCase):
         self.assertIn("generation_collisions", source)
 
 
+class QuestionsAreNotItems(unittest.TestCase):
+    """apply.py wrote every entity with kind="item". `_fm` orders a question's
+    keys differently, so parking Q-005 produced a valid file that failed the
+    canonical check -- a corruption introduced by the tool whose job is to keep
+    state consistent."""
+
+    def test_kind_is_resolved_per_entity(self):
+        applier = apply_mod.Applier(ROOT, dry_run=True)
+        self.assertEqual(applier.kind_of("Q-001"), "question")
+        self.assertEqual(applier.kind_of("GB-001"), "item")
+
+    def test_no_hardcoded_item_kind_remains(self):
+        with open(os.path.join(ROOT, "tools", "apply.py"), encoding="utf-8") as fh:
+            source = fh.read()
+        self.assertNotIn('body, "item")', source,
+                         "a write still hardcodes kind=item")
+
+    def test_every_question_file_is_canonical(self):
+        import _fm as fm_mod
+        for path in glob.glob(os.path.join(ROOT, "state", "questions", "*.md")):
+            with open(path, encoding="utf-8") as fh:
+                original = fh.read()
+            self.assertEqual(fm_mod.canonicalize(original, "question", path),
+                             original, "%s is not canonical" % path)
+
+
+class BriefsAlwaysCarryFreshness(unittest.TestCase):
+    """A brief without a freshness stamp reads as current. That is the same
+    shape as PROJECT-STATE.md listing two prompts as pending that had already
+    shipped -- so the stamp prints even when the answer is "I don't know"."""
+
+    def test_stamp_has_an_honest_form_when_no_audit_has_run(self):
+        import brief as brief_mod
+        node = type("N", (), {"get": lambda self, k, d=None: None})()
+        line = brief_mod.freshness(ROOT, node, None, {})
+        self.assertIn("no audit has ever run", line)
+
+    def test_unreachable_repos_are_named_not_assumed_unchanged(self):
+        import brief as brief_mod
+        node = type("N", (), {"get": lambda self, k, d=None:
+                              ["gimbal-bench"] if k == "repos" else None})()
+        line = brief_mod.freshness(ROOT, node, {"date": "2026-08-19",
+                                                "heads": {}}, {})
+        self.assertIn("could not check", line)
+
+    def test_every_generated_brief_has_a_stamp(self):
+        briefs = glob.glob(os.path.join(ROOT, "build", "briefs", "*.md"))
+        if not briefs:
+            self.skipTest("no briefs built yet")
+        for path in briefs:
+            with open(path, encoding="utf-8") as fh:
+                self.assertIn("**Freshness:**", fh.read(),
+                              "%s has no freshness stamp" % path)
+
+
+class ResumeCommandsAreVerifiedBeforePrinting(unittest.TestCase):
+    """A resume command that fails is worse than a sentence that works. The
+    codex binary is not on PATH -- it lives inside ChatGPT.app -- so a bare
+    `codex resume` would have been printed and would not have run."""
+
+    def test_no_command_is_emitted_for_a_restart(self):
+        import json as json_mod
+        shard = os.path.join(ROOT, "state", "threads", "by-machine")
+        for path in glob.glob(os.path.join(shard, "*.json")):
+            with open(path, encoding="utf-8") as fh:
+                data = json_mod.load(fh)
+            for thread in data.get("threads") or []:
+                if thread.get("verdict") == "restart":
+                    self.assertIsNone(thread.get("command"),
+                                      "a restart carries a resume command")
+
+    def test_every_thread_carries_a_verdict_and_a_reason(self):
+        import json as json_mod
+        shard = os.path.join(ROOT, "state", "threads", "by-machine")
+        files = glob.glob(os.path.join(shard, "*.json"))
+        if not files:
+            self.skipTest("no shard")
+        for path in files:
+            with open(path, encoding="utf-8") as fh:
+                data = json_mod.load(fh)
+            for thread in data.get("threads") or []:
+                self.assertIn(thread.get("verdict"), ("resume", "restart"))
+                self.assertTrue(thread.get("verdict_reason"))
+
+    def test_codex_is_addressed_by_full_path_since_it_is_not_on_path(self):
+        import index as index_mod
+        self.assertTrue(index_mod.CODEX_BIN.startswith("/"),
+                        "codex must be a full path; it is not on PATH")
+
+
+class LeadTimeNoLongerMovesTheOrder(unittest.TestCase):
+    """Measured before removal: 2 of 30 items carried any lead_time_days and
+    both were purchases. The term was inert on 28 items and tripled the score
+    on the two that no longer matter."""
+
+    def test_score_ignores_lead_time(self):
+        import _model as model_mod
+        model = model_mod.Model.load(ROOT)
+        node = next(iter(model.items.values()))
+        before = model.score(node)
+        original = node.fm.get("lead_time_days")
+        node.fm["lead_time_days"] = 999
+        try:
+            self.assertEqual(model.score(node), before,
+                             "lead_time_days still moves the score")
+        finally:
+            node.fm["lead_time_days"] = original
+
+    def test_urgency_is_gone(self):
+        import _model as model_mod
+        self.assertFalse(hasattr(model_mod, "urgency"))
+        self.assertFalse(hasattr(model_mod, "LEAD_DIVISOR"))
+
+
 class ApplyRefusals(unittest.TestCase):
     """Three refusals that must not bend. Each is checked against a real seed
     item in a scratch copy of state/, not against a mock."""

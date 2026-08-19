@@ -17,8 +17,14 @@ import _fm
 # These are knobs, not truths. Changing one is a decision about how the system
 # weighs your time, and should be recorded as such.
 
-LEVERAGE_WEIGHT = 0.25
-LEAD_DIVISOR = 7.0
+# Dependency depth is what orders software work. The portfolio is 30 items
+# across four codebases with a 5-hop chain in it, and what decides "do this
+# first" is how much of that chain is waiting -- not a clock.
+#
+# Raised 0.25 -> 0.5 on 2026-08-19 with the lead-time term's removal. At 0.25 an
+# 8-deep item got a 3.0x lift and still lost to a 20-minute chore; at 0.5 it gets
+# 5.0x and surfaces, which is the behaviour the chain was drawn for.
+LEVERAGE_WEIGHT = 0.5
 
 # effort_minutes -> the 1-5 denominator. `effort` is derived, never authored:
 # a human estimates minutes far more reliably than an abstract 1-5, and one
@@ -36,20 +42,21 @@ def effort_bucket(minutes):
     return 5
 
 
-def urgency(lead_time_days):
-    """1 + lead/7.
-
-    The spec divides lead time by effort as well, which counts effort twice --
-    it is already the score's denominator. Two independent reviews flagged the
-    resulting quadratic, and the proposed cap bound at 15.75 days, below this
-    portfolio's normal case. Dropping the division removes the problem rather
-    than clamping it.
-
-    The trade, recorded honestly: the spec's version means "cheap action,
-    expensive clock". This one means just "clock" -- a 40-hour long-lead task
-    now gets the same multiplier as a 3-minute one.
-    """
-    return 1.0 + (lead_time_days or 0) / LEAD_DIVISOR
+# `urgency` is GONE, by Marcelo's decision on 2026-08-19.
+#
+# It was built for a procurement problem that is finished. Measured before
+# removal: 2 of 30 items carried any `lead_time_days` and both were purchases,
+# so the term was inert on 28 items and tripled the score on the two that no
+# longer matter. `EL-001` ranked #1 in this portfolio for weeks on a 3.0x
+# multiplier for shipping time on parts that were already photographed on the
+# bench.
+#
+# The hardware is bought. This tool plans SOFTWARE -- firmware, the
+# commissioning console, HomeApp, the perception stack, and itself -- and a
+# calendar term answers a question nobody is asking any more.
+#
+# `lead_time_days` stays in the schema and is still displayed. It is a real
+# fact about an item; it just no longer moves the order.
 
 
 class Entity(object):
@@ -217,7 +224,7 @@ class Model(object):
         bucket = effort_bucket(node.effort_minutes)
         base = (impact * confidence) / float(bucket)
         lift = 1.0 + LEVERAGE_WEIGHT * node.leverage
-        return base * lift * urgency(node.get("lead_time_days"))
+        return base * lift
 
     # -- ranking ------------------------------------------------------------
 

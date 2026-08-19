@@ -3,7 +3,7 @@
   "id": "SITE-003",
   "title": "Doc 4 stage 5: carry the three as-built overrides",
   "project": "engineering-site",
-  "status": "next",
+  "status": "parked",
   "lane": "content",
   "gate": "none",
   "machine_affinity": null,

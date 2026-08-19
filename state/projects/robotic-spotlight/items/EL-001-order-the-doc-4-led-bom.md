@@ -3,7 +3,7 @@
   "id": "EL-001",
   "title": "Order the Doc 4 LED BoM",
   "project": "robotic-spotlight",
-  "status": "next",
+  "status": "parked",
   "lane": "hardware",
   "gate": "none",
   "machine_affinity": null,

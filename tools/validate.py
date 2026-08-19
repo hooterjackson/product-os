@@ -53,6 +53,7 @@ ALLOWLIST_FILE = "state/secret-allowlist.txt"
 SHARD_THREAD_KEYS = {
     "id", "tool", "title", "started", "last_active", "cwd", "branch",
     "prompts", "items", "cited_unknown", "path", "files", "forks", "parent",
+    "verdict", "verdict_reason", "command",
 }
 FORBIDDEN_SHARD_KEY = re.compile(
     r"(?i)message|content|text|body|prompt_text|summary|snippet|excerpt")

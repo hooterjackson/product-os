@@ -3,7 +3,7 @@
   "id": "SITE-002",
   "title": "Doc 4's banner over-claims: the firmware has no Zigbee stack",
   "project": "engineering-site",
-  "status": "next",
+  "status": "parked",
   "lane": "content",
   "gate": "none",
   "machine_affinity": null,
