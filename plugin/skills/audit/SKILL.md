@@ -71,18 +71,46 @@ Use `--dry-run` first only if the change is large or you are unsure you parsed
 him correctly. Otherwise just do it — asking him to confirm what he just said is
 the ritual this is designed to remove.
 
-## 5 · What apply.py will refuse, and you must not work around
+## 5 · `--field` is you. `--decided` is him.
 
-- **`status: done` without evidence that existed before the run.** Evidence the
-  audit discovered a moment ago has not been read by anyone. Found evidence
-  lands this run; closing happens next run, after he has looked. Do not paper
-  over this by writing the file directly.
-- **Human-authority fields** — `impact`, `confidence`, `effort_minutes`,
-  `lead_time_days`, `cost_usd`, `unblocks`, `pin`, `project`, `gate`,
-  `machine_affinity`, the `evidence` rule, and the `dropped`/`parked` statuses.
-  They go to `state/proposals/` instead.
+**When he states a fact about his own project, apply it.** Scores, costs, scope,
+gates, priorities, `parked` — all of it. Use `--decided`, which requires
+`--said` carrying his words:
 
-## 6 · Ordering is his
+```bash
+python3 tools/apply.py --decided EL-001=cost_usd:486 \
+  --said "the tape is the Valent X, cost is 486"
+```
+
+**Do not file a proposal for something he just told you.** A proposal is
+addressed to him; writing one in response to his own sentence routes his
+decision into a queue for himself. That was a real bug in this tool.
+
+Use `--field` when *you* inferred the value — from a commit, a doc, a
+calculation. Then human-authority fields propose, correctly, because the person
+who should check them is not the person who said them.
+
+**Never write `--decided` for something he did not say.** The flag is a claim
+about who spoke, it is recorded permanently in the audit entry, and getting it
+wrong makes a guess indistinguishable from a decision forever.
+
+## 6 · The two refusals that do not bend, for anyone
+
+These are **truth** guards, not authority guards. His word does not clear them
+and you must not work around them:
+
+- **`status: done` without evidence that existed before the run.** He cannot
+  make an unevidenced completion evidenced by asserting it. Found evidence lands
+  this run; closing happens next run, after somebody has read it.
+- **Anything you would have to write to the file directly** to get past the
+  above. If you find yourself reaching for `Edit` on an item file to set
+  `status: done`, stop.
+
+If he insists an item is finished and there is no evidence, that is not a
+disagreement to win — say what evidence would settle it, and offer to record a
+dated manual note, which is evidence.
+
+## 7 · Ordering is his
 
 The computed score is a **label, like a priority chip — not a verdict**. `pin` is
 ordinary, not an exception; use it when he tells you an order.
@@ -90,12 +118,18 @@ ordinary, not an exception; use it when he tells you an order.
 When his order and the math diverge, **say so once, with the reason, then do what
 he said.** Once. Not every run, and never as a preamble to doing it anyway.
 
-Worth knowing before you argue: `EL-001` is a 20-minute, $205 order that looks
-like a chore and ranks first only because everything downstream slides two weeks
-without it. That is the insight a hand-ordered list loses — so it is worth one
-sentence, and exactly one.
+Worth knowing before you argue: a 20-minute order with a fortnight of shipping
+looks like a chore and ranks above real work only because everything downstream
+slides while it sits unclicked. That is the insight a hand-ordered list loses —
+so it is worth one sentence, and exactly one.
 
-## 7 · The record
+And worth knowing before you argue *too hard*: this skill used to cite `EL-001`
+here as the live example of that. `EL-001` turned out to be already bought, on
+an evidence rule that could never have told anyone. **Argue for the mechanism,
+never for a specific item's number** — the numbers are guesses that the audit
+converges, which is the entire point of running it again.
+
+## 8 · The record
 
 `apply.py` writes `state/audits/<machine>/`, including on a run where everything
 was refused. Then:

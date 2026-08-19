@@ -189,6 +189,86 @@ class UnsatisfiableRulesAreNotSilence(unittest.TestCase):
         self.assertIn("no path in %s matches", source)
 
 
+class AuthorityGuardFiresAtTheAgentNotTheOwner(unittest.TestCase):
+    """The guard exists to stop the AGENT silently reprioritising. It was
+    briefly stopping the owner from deciding his own project:
+
+        $ apply.py --field EL-001=cost_usd:486 --said "the tape is the Valent X"
+        proposed  EL-001  cost_usd — human-authority. Proposed, not written.
+
+    He stated a fact about his own build and the tool filed a proposal for him
+    to approve later. Two guards had been conflated — one about *who decided*,
+    one about *whether it is provable* — and only the first may yield to him."""
+
+    def live_item_without_evidence(self, applier):
+        return next(n.id for n in applier.model.items.values()
+                    if n.status != "done" and not n.get("evidence_found"))
+
+    def test_human_stated_decided_field_applies(self):
+        applier = apply_mod.Applier(ROOT, dry_run=True)
+        applier.set_field("EL-001", "cost_usd", 486, origin=apply_mod.HUMAN)
+        self.assertEqual(applier.proposed, [], "his own decision was queued for him")
+        self.assertEqual(len(applier.applied), 1)
+        item_id, what, origin = applier.applied[0]
+        self.assertEqual((item_id, origin), ("EL-001", apply_mod.HUMAN))
+        self.assertIn("cost_usd", what)
+
+    def test_agent_inferred_decided_field_still_proposes(self):
+        applier = apply_mod.Applier(ROOT, dry_run=True)
+        applier.set_field("EL-001", "cost_usd", 486, origin=apply_mod.AGENT)
+        self.assertEqual(applier.applied, [], "agent wrote a decided field")
+        self.assertEqual(len(applier.proposed), 1)
+        self.assertEqual(applier.proposed[0][1], "cost_usd")
+
+    def test_agent_is_the_default_origin(self):
+        """Forgetting to say who decided must fail SAFE, toward proposing."""
+        applier = apply_mod.Applier(ROOT, dry_run=True)
+        applier.set_field("EL-001", "impact", 5)
+        self.assertEqual(applier.applied, [])
+        self.assertTrue(applier.proposed)
+
+    def test_done_without_evidence_is_refused_even_when_he_says_it(self):
+        """TRUTH guard, not an authority guard. He cannot make an unevidenced
+        completion evidenced by asserting it."""
+        applier = apply_mod.Applier(ROOT, dry_run=True)
+        target = self.live_item_without_evidence(applier)
+        applier.set_status(target, "done", origin=apply_mod.HUMAN)
+        self.assertEqual(applier.applied, [], "his word overrode a truth guard")
+        self.assertTrue(any("REFUSED status=done" in why
+                            for _, why in applier.refused))
+
+    def test_he_can_park_but_the_agent_cannot(self):
+        for origin, applies in ((apply_mod.HUMAN, True), (apply_mod.AGENT, False)):
+            applier = apply_mod.Applier(ROOT, dry_run=True)
+            applier.set_status("GB-008", "parked", origin=origin)
+            self.assertEqual(bool(applier.applied), applies,
+                             "parked/%s behaved wrongly" % origin)
+
+    def test_agent_authority_field_applies_unremarked_at_either_origin(self):
+        for origin in (apply_mod.AGENT, apply_mod.HUMAN):
+            applier = apply_mod.Applier(ROOT, dry_run=True)
+            applier.set_field("EL-002", "cognitive_load", "low", origin=origin)
+            self.assertEqual(applier.proposed, [])
+            self.assertEqual(len(applier.applied), 1)
+
+    def test_decided_requires_his_words_on_the_record(self):
+        """--decided asserts he said something. Without --said the assertion is
+        unattributed, and an unattributed human decision is indistinguishable
+        from an agent writing whatever it likes."""
+        proc = subprocess.run(
+            [sys.executable, os.path.join(ROOT, "tools", "apply.py"),
+             "--dry-run", "--decided", "EL-001=cost_usd:486"],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self.assertEqual(proc.returncode, 2)
+        self.assertIn(b"--said", proc.stderr)
+
+    def test_origin_is_recorded_in_the_audit_entry(self):
+        applier = apply_mod.Applier(ROOT, dry_run=True)
+        applier.set_field("EL-001", "cost_usd", 486, origin=apply_mod.HUMAN)
+        _path, text = applier.record("the tape is the Valent X", None, None)
+        self.assertIn("on his word", text)
+
+
 class ApplyRefusals(unittest.TestCase):
     """Three refusals that must not bend. Each is checked against a real seed
     item in a scratch copy of state/, not against a mock."""

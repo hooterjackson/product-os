@@ -5,9 +5,9 @@ cold, with no chat history.
 
 ## STAND — updated 2026-08-19, after the first real `/audit`
 
-**6 local commits, nothing pushed, no remote.** `validate.py` exits 0 · 27 items ·
-5 questions · 8 rulings · 55 register entries · **5-hop** confirmed chain ·
-byte-deterministic build.
+**9 local commits, nothing pushed, no remote.** `validate.py` exits 0 · 28 items
+(3 done) · 5 questions · 8 rulings · 56 register entries · **5-hop** confirmed chain ·
+29 gated tests · byte-deterministic build.
 
 **Built and verified before this session (slice 1a-minus):** the item model, scoring,
 `validate.py` / `rank.py` / `build.py` / `new.py` / `stale.py`, the evidence-backed
@@ -43,8 +43,8 @@ records the method failure. `EL-002` is rescoped: the bench **has** a volt meter
 was not reached and **cannot** be by that method (`R-055`). `done` refused twice, for
 two different correct reasons.
 
-**Regression tests — DONE.** `tests/test_regressions.py`, 15 assertions over the four
-defect classes that have actually shipped here, wired into `validate.py` as
+**Regression tests — DONE.** `tests/test_regressions.py`, **29 assertions** over the
+six defect classes that have actually shipped here, wired into `validate.py` as
 `E-REGRESSION` (skip with `--no-tests`). Proven both ways: reintroducing the
 `_fm.canonicalize` bug turns the gate red, restoring it turns it green.
 
@@ -84,21 +84,53 @@ rule was already in `CLAUDE.md` and `audit.py` committed the error anyway**, bec
 **Which tape was bought is NOT verified and stays Marcelo's.** The 1800 K channel
 implies Valent X; that is an inference from a spec, not a photograph. Q-005 open.
 
+**POS-004 — the authority guard was firing at the wrong person. DONE.**
+`apply.py --field EL-001=cost_usd:486 --said "…"` used to file a proposal *for him
+to approve later*, routing his own decision into a queue addressed to himself. Two
+guards were conflated:
+
+- **Authority** (*who decided?*) exists to stop the **agent** reprioritising. It now
+  yields to his word.
+- **Truth** (*is it provable?*) refuses `done` without `evidence_found` for
+  **everyone**, him included. Unchanged, and verified unchanged.
+
+Origin lives in the flag name, not in `--said` — an agent can populate `--said` too.
+`--field` = agent (default; forgetting fails safe toward proposing), `--decided` = he
+said it and requires `--said` (exit 2 without). Every applied line is stamped
+`on his word` or `inferred` in the audit record, permanently. 29 tests, gate green.
+
+## How to talk about state — I kept getting this wrong
+
+**PROP-0001 and PROP-0002 are not blockers and never were.** v4 said so and my recaps
+reintroduced them three times under "needs Marcelo". Nothing in `state/` gates
+anything. Scores, scope, evidence rules, priorities and status are **fluid** —
+adjustable in a sentence, no ceremony. Being wrong is cheap because the audit
+converges it; verification is continuous, not a precondition for action.
+
+Genuinely his, and short: **real-world commitments** the tool records but never
+decides (the ~$451 tape, un-parking Zigbee, making a repo public), and **the
+cold-start test**, which is a measurement no agent can run credibly. None of these
+block software.
+
 ## Not done
 
-- **The cold-start test has never been run.** That is the largest untested claim
-  this repo makes about itself, and it needs an observer who is not me.
-- **`state/audits/` has one entry.** The second run is the one that proves the
-  window-since-last-audit path, and it needs a day to pass.
-- **The tests cover four defect classes, not the tools.** 2,706 lines of Python
-  and ~180 lines of test. Everything not on that list is still only checked by
-  somebody running it and looking.
-- **Group D is 99 commits.** Most are genuinely outside the seed's 27 items. That is
-  the honest finding, not a bug — but it means the seed under-covers `gimbal-bench`.
-- **Nine evidence globs are too broad or match nothing**, reported in group B.
-  They are human-authority; proposed, not fixed.
-- **No remote. `gimbal-bench` still private (`R-049`).** PROP-0001 still unaccepted,
-  which v4 says is fine.
+- **THE LOOP HAS NEVER RUN END TO END.** `/next` → do the work → `/handoff`, by
+  Marcelo, on real work. This is the next thing, and every friction it surfaces is a
+  real requirement instead of a guessed one. Everything below matters less.
+- **The full cold-start test is unrun.** A partial one found the flagship item wrong;
+  criterion 4 (ruled-out injected by the hook) stays unmeasured, because a subagent
+  never receives `SessionStart`. Needs a genuine fresh session with the plugin
+  installed — and an observer who is not me.
+- **`state/audits/` has three entries, all from one day.** The window-since-last-audit
+  path still needs a second calendar day to prove.
+- **The tests cover six defect classes, not the tools.** 3,098 lines of Python against
+  328 of test. Everything off that list is still checked only by somebody running it
+  and looking.
+- **Group D is 108 commits.** The honest finding, not a bug: the seed under-covers
+  `gimbal-bench`.
+- **30 group-B findings outstanding**, mostly evidence rules that are too broad or
+  cannot fire. Fluid — a sentence each, no ceremony.
+- **No remote. `gimbal-bench` still private (`R-049`).**
 - Deferred: the thread indexer, briefs, the site, `llms.txt`, `/unblock`,
   multi-machine (12 of 27 items are `machine_affinity: formd-t1`).
 

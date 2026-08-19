@@ -12,15 +12,32 @@ tool does exactly what it is told and nothing else.
 
     python3 tools/apply.py --dry-run ...        show, change nothing
 
-Two refusals are hard-coded and do not bend:
+## Two different guards, and conflating them broke this tool
 
-1. **`done` without `evidence_found` is refused.** Not warned about; refused.
-2. **Human-authority fields are refused.** `impact`, `confidence`,
-   `effort_minutes`, `lead_time_days`, `cost_usd`, `unblocks`, `pin`,
-   `project`, `gate`, `machine_affinity`, `evidence`, and the `dropped` /
-   `parked` statuses. Those get written to `state/proposals/` instead, which is
-   what "the system proposes, it never decides" means when it is load-bearing
-   rather than decorative.
+**AUTHORITY guards answer "who decided this?"** They exist to stop *the agent*
+silently reprioritising. They were never meant to stop the owner from deciding
+his own project. For a while they did exactly that:
+
+    $ apply.py --field EL-001=cost_usd:486 --said "the tape is the Valent X"
+    proposed  EL-001  cost_usd — human-authority. Proposed, not written.
+
+He stated a fact about his own build and the tool filed a proposal for him to
+approve later. It routed his decision into a queue addressed to himself.
+
+**TRUTH guards answer "is this provable?"** `done` without `evidence_found` is
+refused for *everyone*, him included. That is not about authority and it does
+not bend.
+
+## How origin is carried
+
+`--field` is the agent speaking; `--decided` is Marcelo speaking. The flag name
+IS the claim, which is the point: writing `--decided` when he did not say it is
+a deliberate falsehood rather than a slip. `--decided` also requires `--said`,
+so his words are on the record beside the change, and every applied entry is
+stamped `on his word` or `inferred` so the two never blur later.
+
+    --field    ID=FIELD:JSON   agent-inferred; human-authority fields PROPOSE
+    --decided  ID=FIELD:JSON   he said it; applies. Requires --said.
 
 Every run appends to `state/audits/<machine>/`, including a refused one. A
 refusal nobody recorded gets re-litigated next month by somebody who does not
@@ -36,6 +53,10 @@ import sys
 import _fm
 import _model
 import new as new_mod
+
+
+AGENT = "agent"
+HUMAN = "human"
 
 
 def today():
@@ -77,6 +98,9 @@ class Applier(object):
             for node in self.model.nodes.values()
         }
 
+    def _apply(self, item_id, what, origin):
+        self.applied.append((item_id, what, origin))
+
     def node(self, item_id):
         node = self.model.nodes.get(item_id)
         if node is None:
@@ -113,20 +137,24 @@ class Applier(object):
         fm["updated"] = today()
         self.write(node.path, fm, body, "item")
         self.added_this_run.setdefault(item_id, []).extend(added)
-        self.applied.append((item_id, "evidence_found += %s" % ", ".join(added)))
+        self._apply(item_id, "evidence_found += %s" % ", ".join(added), AGENT)
 
-    def set_status(self, item_id, status):
+    def set_status(self, item_id, status, origin=AGENT):
         node = self.node(item_id)
         if node is None:
             return
-        if status in _fm.HUMAN_STATUSES:
+        # AUTHORITY guard -- about who decided, so his word clears it.
+        if status in _fm.HUMAN_STATUSES and origin != HUMAN:
             self.proposed.append(
                 (item_id, "status", status,
                  "`%s` is a scope decision with taste in it, and leverage "
                  "excludes it -- so setting it would move every upstream "
-                 "score." % status))
+                 "score. Say so yourself and it applies." % status))
             return
         fm, body = _fm.load(node.path)
+        # TRUTH guard -- about whether it is provable, so origin is
+        # irrelevant. This one refuses him too, and that is correct: he cannot
+        # make an unevidenced completion evidenced by asserting it.
         if status == "done" and not self.prior_evidence.get(item_id):
             fresh = len(self.added_this_run.get(item_id) or [])
             self.refused.append(
@@ -142,22 +170,27 @@ class Applier(object):
         fm["status"] = status
         fm["updated"] = today()
         self.write(node.path, fm, body, "item")
-        self.applied.append((item_id, "status -> %s" % status))
+        self._apply(item_id, "status -> %s" % status, origin)
 
-    def set_field(self, item_id, field, value):
+    def set_field(self, item_id, field, value, origin=AGENT):
         node = self.node(item_id)
         if node is None:
             return
-        if _fm.AUTHORITY.get(field) == _fm.HUMAN:
+        if field == "status":
+            return self.set_status(item_id, value, origin=origin)
+        # AUTHORITY guard. The agent inferring a decided value proposes; the
+        # owner stating one applies. Same field, different speaker.
+        if _fm.AUTHORITY.get(field) == _fm.HUMAN and origin != HUMAN:
             self.proposed.append(
                 (item_id, field, value,
-                 "`%s` is human-authority. Proposed, not written." % field))
+                 "`%s` is human-authority and I inferred this. Proposed, not "
+                 "written -- say it yourself and it applies." % field))
             return
         fm, body = _fm.load(node.path)
         fm[field] = value
         fm["updated"] = today()
         self.write(node.path, fm, body, "item")
-        self.applied.append((item_id, "%s -> %r" % (field, value)))
+        self._apply(item_id, "%s -> %r" % (field, value), origin)
 
     def write(self, path, fm, body, kind):
         if self.dry_run:
@@ -180,7 +213,9 @@ class Applier(object):
         if note:
             lines += ["", "**Note:** %s" % note]
         lines += ["", "## Applied", ""]
-        lines += ["- %s — %s" % (i, w) for i, w in self.applied] or ["- nothing"]
+        lines += ["- %s — %s  _(%s)_" % (i, w, "on his word" if o == HUMAN
+                                         else "inferred")
+                  for i, w, o in self.applied] or ["- nothing"]
         lines += ["", "## Refused", ""]
         if self.refused:
             lines += ["- %s — %s" % (i, w) for i, w in self.refused]
@@ -195,6 +230,13 @@ class Applier(object):
                 lines.append("- **%s** `%s` → `%r`  \n  %s" % (item_id, field, value, why))
         else:
             lines += ["- nothing"]
+        if any(o == HUMAN for _, _, o in self.applied):
+            lines += ["",
+                      "_Entries marked **on his word** were applied because he "
+                      "said so, not because anything was inferred. That "
+                      "distinction is recorded here permanently: a decided "
+                      "value and a guessed one must never become "
+                      "indistinguishable after the fact._"]
         lines += ["", "---", "",
                   "Written by `tools/apply.py`. The ranked list is a "
                   "conversation starter; this file is the part that does not "
@@ -213,12 +255,22 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--evidence", action="append", metavar="ID=SHA[,SHA]")
     parser.add_argument("--status", action="append", metavar="ID=STATUS")
-    parser.add_argument("--field", action="append", metavar="ID=FIELD:JSON")
+    parser.add_argument("--field", action="append", metavar="ID=FIELD:JSON",
+                        help="agent-inferred; human-authority fields propose")
+    parser.add_argument("--decided", action="append", metavar="ID=FIELD:JSON",
+                        help="HE said it; applies, including decided fields. "
+                             "Requires --said.")
     parser.add_argument("--said", help="his acceptance sentence, verbatim")
     parser.add_argument("--note")
     parser.add_argument("--window")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args(argv)
+
+    if args.decided and not (args.said or "").strip():
+        sys.stderr.write(
+            "--decided claims Marcelo decided this, so --said must carry his "
+            "words.\nRefusing to record an unattributed human decision.\n")
+        return 2
 
     root = _model.find_root()
     applier = Applier(root, dry_run=args.dry_run)
@@ -228,19 +280,22 @@ def main(argv=None):
     for item_id, values in parse_pairs(args.status).items():
         for value in values:
             applier.set_status(item_id, value)
-    for item_id, specs in parse_pairs(args.field).items():
-        for spec in specs:
-            field, _, raw = spec.partition(":")
-            try:
-                value = json.loads(raw)
-            except ValueError:
-                value = raw
-            applier.set_field(item_id, field, value)
+    for origin, group in ((AGENT, args.field), (HUMAN, args.decided)):
+        for item_id, specs in parse_pairs(group).items():
+            for spec in specs:
+                field, _, raw = spec.partition(":")
+                try:
+                    value = json.loads(raw)
+                except ValueError:
+                    value = raw
+                applier.set_field(item_id, field, value, origin=origin)
 
     path, text = applier.record(args.said, args.note, args.window)
 
-    for item_id, what in applier.applied:
-        print("applied   %-9s %s" % (item_id, what))
+    for item_id, what, origin in applier.applied:
+        print("applied   %-9s %-46s %s"
+              % (item_id, what,
+                 "(on his word)" if origin == HUMAN else "(inferred)"))
     for item_id, why in applier.refused:
         print("REFUSED   %-9s %s" % (item_id, why))
     for item_id, field, _value, why in applier.proposed:
