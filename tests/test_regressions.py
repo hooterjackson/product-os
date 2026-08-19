@@ -673,6 +673,69 @@ class PublishedStampsMustSurviveBeingPublished(unittest.TestCase):
                                      "changes" % os.path.basename(name))
 
 
+class EveryActionArtifactStatesItsDestination(unittest.TestCase):
+    """Three destinations -- a new chat, an existing chat with repo access, a
+    terminal -- and they are not interchangeable. Pasting "link yourself to
+    GB-001" into a fresh chat fails confusingly. These get read far from
+    whatever page produced them, so the destination is part of the artifact."""
+
+    def test_all_five_actions_have_an_artifact(self):
+        public = os.path.join(ROOT, "public")
+        for rel in ("reconcile.md", "connect-repo.md", "capture.md"):
+            self.assertTrue(os.path.exists(os.path.join(public, rel)), rel)
+        for sub in ("kickoff", "attach"):
+            self.assertTrue(glob.glob(os.path.join(public, sub, "*.md")), sub)
+
+    def test_each_artifact_says_where_it_is_pasted(self):
+        public = os.path.join(ROOT, "public")
+        targets = glob.glob(os.path.join(public, "*.md")) + \
+            glob.glob(os.path.join(public, "attach", "*.md")) + \
+            glob.glob(os.path.join(public, "kickoff", "*.md"))
+        for path in targets:
+            with open(path, encoding="utf-8") as fh:
+                head = "".join(fh.readlines()[:8])
+            name = os.path.basename(path)
+            if os.path.basename(os.path.dirname(path)) == "kickoff":
+                self.assertIn("Cite ", head, "%s: no citation line" % name)
+                continue
+            self.assertTrue(
+                "PASTE THIS" in head or "TYPE THIS" in head,
+                "%s does not say where it goes" % name)
+
+    def test_attach_is_specific_not_a_template(self):
+        for path in glob.glob(os.path.join(ROOT, "public", "attach", "*.md")):
+            item_id = os.path.basename(path)[:-3]
+            with open(path, encoding="utf-8") as fh:
+                text = fh.read()
+            self.assertIn(item_id, text, "%s does not embed its id" % item_id)
+            self.assertIn("by-machine", text,
+                          "%s omits the do-not-write warning" % item_id)
+
+    def test_connect_repo_warns_that_coverage_scales_with_items(self):
+        with open(os.path.join(ROOT, "public", "connect-repo.md"),
+                  encoding="utf-8") as fh:
+            text = fh.read()
+        self.assertIn("ITEMS, not repos", text)
+        self.assertIn("group D", text)
+
+    def test_capture_promises_to_ask_nothing(self):
+        with open(os.path.join(ROOT, "public", "capture.md"),
+                  encoding="utf-8") as fh:
+            text = fh.read()
+        self.assertIn("capture is broken", text)
+
+    def test_no_action_artifact_embeds_a_volatile_counter(self):
+        """R-061 applies to these too."""
+        public = os.path.join(ROOT, "public")
+        for path in (glob.glob(os.path.join(public, "*.md")) +
+                     glob.glob(os.path.join(public, "attach", "*.md"))):
+            with open(path, encoding="utf-8") as fh:
+                for line in fh:
+                    self.assertNotIn("since the last audit —", line,
+                                     "%s embeds a live delta"
+                                     % os.path.basename(path))
+
+
 class ApplyRefusals(unittest.TestCase):
     """Three refusals that must not bend. Each is checked against a real seed
     item in a scratch copy of state/, not against a mock."""
