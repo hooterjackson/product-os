@@ -942,6 +942,20 @@ machine (R-027, R-032, R-034).
 
 Flipping to public later is one command. Unflipping is not.
 
+**SUPERSEDED 2026-08-19.** `DEC-201` makes product-os **public** and names R-050
+in its `supersedes` field. The content description above is still accurate — this
+file does carry that material — but `validate.py`'s disclosure screen finds no
+credential, email, tailnet identifier or MAC in any of it, and Marcelo created and
+pushed the public remote himself. What survives is the asymmetry, unchanged:
+unflipping is still not one command. So `DEC-201` carries a `revisit_if` that
+reopens the decision when a future register entry would publish a credential, an
+identifier, or a third party's information — *before* that entry is committed,
+not after. `gimbal-bench` stays private (`R-049`).
+
+Left standing rather than rewritten, per the rule at the top of this file: the
+recommendation was sound for the content it was reasoning about, and seeing what
+overtook it is the more useful record.
+
 ## R-051 · Trusting a header date over the git history under it
 **keywords:** project-state · header · date · pending · stale · handoff · state-file · drift
 **source:** engineered-lighting-site `PROJECT-STATE.md` @ `88a3a58` · 2026-08-01 · grade: measured

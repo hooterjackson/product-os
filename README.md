@@ -27,76 +27,52 @@ evidence and routing human-authority fields to `state/proposals/`.
 
 ## What makes it different from a board
 
-**Lead time is in the ranking.** Not asserted — here are two rows and the
-arithmetic, from `rank.py --show`, on the real state:
+**Dependency depth orders the work.** An item's score reflects everything
+downstream through confirmed edges, not just its direct children. `GB-001`
+unblocks one item directly and **8** transitively, which is why it leads:
 
 ```
-EL-002  The bench meter has no current range        EL-003  Print the tolerance coupon, then the fit coupon
-
-  effort_bucket(20 min)  = 2                          effort_bucket(120 min) = 3
-  base = (3 x 4) / 2     = 6.000                      base = (3 x 4) / 3     = 4.000
-  leverage               = 0                          leverage               = 0
-  lift = 1 + 0.25 x 0    = 1.000                      lift = 1 + 0.25 x 0    = 1.000
-  urgency = 1 + 5/7      = 1.714                      urgency = 1 + 0/7      = 1.000
-  score = 6 x 1 x 1.714  = 10.29                      score = 4 x 1 x 1      = 4.00
+GB-001   base (5 x 4)/4 = 5.000  x  lift (1 + 0.5 x 8) = 5.000  =  25.00
 ```
 
-Twenty minutes of ordering outranks two hours of real work, because the five days
-start when you click and not when you are ready. A conventional board ranks by
-importance and gets that backwards. Run `rank.py --show EL-002` and check the
-operands rather than believing the ratio; a bare ratio is not falsifiable.
+Run `python3 tools/rank.py --show GB-001` and check the operands rather than
+believing the number. A bare ratio is not falsifiable.
 
-### The example this section used to use was wrong, and that is the better story
+**`--here` means here.** `--gate none` is ungated and may include another
+machine's work; `--here` also filters by `machine_affinity`. The distinction is
+in this README because `CLAUDE.md` got it wrong from the seed until a
+no-context subagent read what the code actually did.
 
-Until 2026-08-19 this paragraph starred `EL-001` — *order the Doc 4 LED BoM*, 20
-minutes, $205, 14 days of lead, ranked #1 at `8.000 × 1.250 × 3.000 = 30.00`. A
-cold-start test found the parts **already photographed on the bench**, and the
-reason nobody noticed is the point of this whole repo:
+### Two things this README said that were false
 
-> `EL-001`'s evidence rule named `docs/bom-checklist.md` — a checklist whose own
+Until 2026-08-19 this section starred `EL-001` — *order the Doc 4 LED BoM* —
+ranked #1 on a lead-time term. Both halves were wrong:
+
+> `EL-001`'s evidence rule named `docs/bom-checklist.md`, a checklist whose own
 > second line reads *"state persists in your browser (nothing leaves your
 > device)."* Ticking every box writes nothing to the repo. **The rule was
 > structurally unsatisfiable: the item could never close, no matter what was
-> bought.**
+> bought.** The parts were already photographed on the bench.
 
-The arithmetic was never wrong. The item under it was, for weeks, at rank #1, in
-this README and in every summary given about it. **A number that cannot be
-checked against reality is decoration**, and the fix is not a better guess at the
-outset — it is `/audit`, run repeatedly, by somebody willing to be told the
-flagship is wrong. See `wiki/ruled-out.md` `R-056`.
+And the **lead-time term itself is gone.** Measured before removing it: 2 of 30
+items carried any `lead_time_days` and both were purchases, so it was inert on
+28 items and tripled the score on the two that no longer mattered. The hardware
+is bought; this tool plans software.
 
-**Leverage is transitive.** An item's score reflects everything downstream through
-confirmed edges, not its direct children. `GB-001` unblocks one item directly and
-**8** transitively, which triples its score:
+**A number that cannot be checked against reality is decoration.** The fix was
+never a better guess at the outset — it is `/audit`, run repeatedly, by somebody
+willing to be told the flagship is wrong. See `R-056`, `R-061`.
 
-```
-GB-001   base 5.000  ×  lift (1 + 0.25 × 8) = 3.000  ×  urgency 1.000  =  15.00
-```
+**Rank is derived, never stored.** There is no ordered list in this repo.
 
-**Honestly, though: the two halves of that argument are carried by different items
-on this seed, and no single item demonstrates both.** `EL-001` ranks first on
-urgency 3.0 with leverage 1; `GB-001` heads the 5-hop chain with leverage 8 and
-ranks third. Lead time is doing the work at the top of the list and leverage is
-doing it in the middle. Stated because the tidier claim — one item proving both —
-would be false.
+**The score is a label, not a verdict.** `pin` is ordinary use. When his order
+and the arithmetic diverge the system says so **once**, with the reason, then
+does what he said.
 
-**Rank is derived, never stored.** There is no ordered list in this repo. `rank.py`
-recomputes it from the score inputs every run, so there is nothing to drift.
-
-**The score is a label, not a verdict.** It is a priority chip, and the ordering is
-the owner's. `pin` is ordinary use, not an exception. When his order and the
-arithmetic diverge the system says so **once**, with the reason, and then does what
-he said.
-
-**The list is a conversation starter, not a contract.** Accuracy comes from
-`/audit` re-checking it against the repos, repeatedly — not from the guesses having
-been right the first time. On its first real run it found that an item written two
-days earlier was already wrong, and that two quotes this repo had published as
-unsourced were genuine.
-
-**The system proposes; it never decides.** Scores and reasoning are computed freely
-into `build/`. The inputs those scores read are human-authority and change only when a
-proposal is accepted. `validate.py` fails if that boundary is crossed.
+**The system proposes; it never decides** — except when he decides. `--field` is
+the agent speaking and human-authority fields propose; `--decided` is him, and
+applies. Two guards, deliberately separate: authority asks *who decided this*,
+truth asks *is this provable*. `done` without evidence is refused for everyone.
 
 ## Layout
 
@@ -118,23 +94,41 @@ tools/                        stdlib Python 3.9+. No dependencies, no install.
 plugin/                       the Claude Code plugin, versioned with the data
 ```
 
-## Install
+## Use it from anywhere, with no clone
 
-Two commands, and they are the same two on every platform:
+The product is **copyable prompts**, not the ranking. Paste one line into a chat
+on any machine — a phone, a bench PC, claude.ai — and it picks up current state:
+
+```
+Read https://raw.githubusercontent.com/hooterjackson/product-os/main/public/llms.txt and follow it.
+```
+
+Five actions, and **the destination is part of the artifact** because pasting
+the right text into the wrong place is the main failure mode:
+
+| Action | Fetch from `public/` | Paste into |
+|---|---|---|
+| Start a task | `kickoff/<ID>.md` | a **new** chat |
+| Tell it what changed | `reconcile.md` | a **new** chat |
+| Link a web chat | `attach/<ID>.md` | **that** chat |
+| Connect a repo | `connect-repo.md` | an existing chat with repo access |
+| Capture a thought | `capture.md` | anywhere |
+
+`public/` is committed precisely so this works without a clone; `build/` stays
+git-ignored, and `publish.py --check` keeps the two from drifting.
+
+### Optionally, the plugin
+
+On a machine you set up deliberately:
 
 ```bash
 git clone <this repo> && cd product-os
 ```
 
-then, inside Claude Code:
-
-```
-/plugin marketplace add ./product-os
-```
-
-That registers `/next`, `/capture` and `/handoff`, and the `SessionStart` hook
-that pushes matching `wiki/ruled-out.md` entries into context before you propose
-an approach.
+then, inside Claude Code, `/plugin marketplace add ./product-os` — which
+registers `/next`, `/capture`, `/handoff` and `/audit`, plus the `SessionStart`
+hook that injects matching `wiki/ruled-out.md` entries before you propose an
+approach. **The plugin is a convenience, not the product.**
 
 ## Knowledge is organised by re-derivation cost
 
@@ -149,22 +143,23 @@ and those four never render identically.
 
 ## Status
 
-**Slice 1a-minus, seeded and exercised.** 6 projects · 25 items · 5 questions ·
-8 rulings · 53 ruled-out entries · 3 skills · 1 hook. `validate.py` is clean,
-`build.py` is byte-deterministic across runs, and the deepest confirmed
-dependency chain is 4 hops.
+**Slice 1a-minus plus the agent-facing half of 1b.** 6 projects · 31 items
+(20 active, 8 parked) · 5 questions · 9 rulings · 61 ruled-out entries ·
+4 skills · 1 hook · 71 gated tests. `validate.py` is clean, `build.py` is
+byte-deterministic, and the deepest confirmed dependency chain is 5 hops — with
+an unmade decision sitting in the middle of it, which is what the graph is for.
 
-`stale.py` produces the headline finding rather than transcribing it — on first
-run it reports Doc 7 (24 days) and Doc 6 (13 days) behind D3, from commit dates,
-and prints a coverage line naming what it reached.
+`stale.py` produces its headline finding rather than transcribing it: on each
+run it reports Doc 7 and Doc 6 behind ruling D3, from commit dates, with a
+coverage line naming what it reached.
 
-**This repository is private**, against the original preference, because
-`wiki/ruled-out.md` seeds ~50 findings from an unpublished engineering repo —
-including security-design detail of the authority model of a brakeless
-ceiling-mounted machine. Flipping to public later is one command; unflipping is
-not. See `R-050`.
+**This repository is public by `DEC-201`.** `wiki/ruled-out.md` carries findings
+derived from a private engineering repo; the disclosure screen finds no
+credential, email, tailnet identifier or MAC, and the decision carries a revisit
+trigger. `gimbal-bench` itself stays private — not a disclosure judgement, but
+because a capture names a third party.
 
-Deliberately not yet built: the audit proposal engine, the thread indexer,
-per-item briefs, `/unblock`, the site and `llms.txt`.
+Deliberately not built: the five human views (a design pass is running), the
+site, `llms.txt` hosting beyond raw URLs, `/unblock`.
 
 Requires Python 3.9+ and nothing else.

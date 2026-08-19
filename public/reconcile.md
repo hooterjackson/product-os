@@ -30,7 +30,7 @@ This is a set of guesses, not a record of reality. Check it.
 ## What is NOT confirmed
 
 - Last audit **2026-08-19** (today), over commits since 2026-07-05.
-- **301 commits were unattributed** at that audit — work no item claims. That number is a to-do list, not an error log.
+- **322 commits were unattributed** at that audit — work no item claims. That number is a to-do list, not an error log.
 - **5 item(s) marked done on a machine's judgement**, which you have not confirmed: EL-004, EL-005, POS-003, POS-004, POS-005.
 
 ## What to do
