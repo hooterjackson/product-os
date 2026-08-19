@@ -596,6 +596,43 @@ class SettledDecisionsAreWrittenDown(unittest.TestCase):
                         "a decision with no revisit trigger is a gag order")
 
 
+class GateNoneIsNotTheSameAsFromThisChair(unittest.TestCase):
+    """CLAUDE.md documented `--gate none` as "only what can start from this
+    chair" and it never was: gate and machine_affinity are independent filters.
+    Measured on this Mac, 1 of 14 leaked -- GB-002, "Rescue D1-D11 OFF
+    formd-t1", which by its own title cannot be done here.
+
+    Found by a no-context subagent following llms.txt, which is the point of
+    that test: it had no idea what the right answer was."""
+
+    def test_here_filters_by_machine_as_well_as_gate(self):
+        import _model as model_mod
+        import new as new_mod
+        root = model_mod.find_root()
+        model = model_mod.Model.load(root)
+        me = new_mod.machine_id(root)
+        rows = model.ranked(gate="none", machine=me)
+        for node in rows:
+            affinity = node.get("machine_affinity")
+            self.assertIn(affinity, (None, me),
+                          "%s is pinned to %s and was offered here"
+                          % (node.id, affinity))
+
+    def test_gate_none_alone_still_does_not_filter_by_machine(self):
+        """The old behaviour is kept and simply no longer mis-described."""
+        import _model as model_mod
+        model = model_mod.Model.load(model_mod.find_root())
+        self.assertGreaterEqual(len(model.ranked(gate="none")),
+                                len(model.ranked(gate="none",
+                                                 machine="work-laptop")))
+
+    def test_claude_md_no_longer_claims_gate_none_means_this_chair(self):
+        with open(os.path.join(ROOT, "CLAUDE.md"), encoding="utf-8") as fh:
+            for line in fh:
+                if "--gate none" in line:
+                    self.assertNotIn("from this chair", line)
+
+
 class ApplyRefusals(unittest.TestCase):
     """Three refusals that must not bend. Each is checked against a real seed
     item in a scratch copy of state/, not against a mock."""

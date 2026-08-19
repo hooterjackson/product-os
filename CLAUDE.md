@@ -16,7 +16,8 @@ python3 tools/rank.py                 # the ranked list, one line each
 python3 tools/rank.py --explain       # the top item, with why
 python3 tools/rank.py --time 60       # something that actually finishes in an hour
 python3 tools/rank.py --energy low    # mechanical work only
-python3 tools/rank.py --gate none     # only what can start from this chair
+python3 tools/rank.py --here          # only what can start from this chair
+python3 tools/rank.py --gate none     # ungated — MAY include other machines' work
 ```
 
 Rank is **derived**, never stored. There is no ordered list anywhere in this repo —

@@ -105,6 +105,9 @@ def main(argv=None):
     parser.add_argument("--energy", choices=["low", "medium", "high"])
     parser.add_argument("--gate", help="e.g. none, bench, printer")
     parser.add_argument("--machine")
+    parser.add_argument("--here", action="store_true",
+                        help="what can start from THIS chair: gate none AND "
+                             "this machine")
     parser.add_argument("--limit", type=int, default=12)
     parser.add_argument("--all", action="store_true",
                         help="include blocked items")
@@ -116,7 +119,19 @@ def main(argv=None):
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
 
-    model = _model.Model.load(_model.find_root())
+    root = _model.find_root()
+    model = _model.Model.load(root)
+
+    # `--gate none` was documented as "only what can start from this chair" and
+    # was never that: gate and machine_affinity are independent filters, so an
+    # item gated `none` but pinned to another machine came through. Measured on
+    # this Mac: 1 of 14, GB-002 -- "Rescue D1-D11 OFF formd-t1", which by its
+    # own title cannot be done here. Found by a no-context subagent following
+    # llms.txt, which is the point of that test.
+    if args.here:
+        args.gate = "none"
+        import new as new_mod
+        args.machine = args.machine or new_mod.machine_id(root)
     if model.errors:
         for err in model.errors:
             sys.stderr.write("warning: %s\n" % err)

@@ -169,6 +169,26 @@ about planning vibe code software projects and chats. All the hardware is bought
   9 restart. Commands verified before printing: `claude -r` is on PATH; codex is *not*,
   so it is emitted by full path from inside ChatGPT.app.
 
+**POS-009 — the agent-facing surface. DONE.** `public/llms.txt` (3.0 KB), per-project
+files (1.5 KB), the JSON API, and paste-able briefs — all fetchable over plain HTTPS
+with no clone, no plugin, no install. `public/` is committed because `build/` is
+git-ignored and product-os has no Pages site, so a bootstrap in `build/` is fetchable
+by nobody; `publish.py --check` keeps it from drifting. `validate.py` fails on any
+advertised path that 404s (`E-DEAD-ENDPOINT`) or on drift (`E-PUBLIC-STALE`), both
+proven by deleting `api/graph.json`.
+
+**The cold-bootstrap test passed, and found a bug.** A subagent with no context, given
+only the two-line paste: checked provenance before obeying, verified the published API
+against live `rank.py`, correctly rejected `GB-001` (bench, `formd-t1`) and refused
+`HAI-001` (credential rotation — not a machine's job), landed on **POS-002**, and cited
+`R-051` and the acceptance criteria accurately.
+
+It then reported that **`--gate none` is not "what can start from this chair"** —
+`gate` and `machine_affinity` are independent filters. True, and `CLAUDE.md` had said
+otherwise since the seed. It overstated the size (claimed 9 leaked items; `GB-005`–
+`GB-011` are already excluded as blocked — the real leak is **1 of 14**, `GB-002`,
+"Rescue D1-D11 *off* formd-t1"). Added `rank.py --here`; corrected `CLAUDE.md`.
+
 ## How to talk about state — I kept getting this wrong
 
 **PROP-0001 and PROP-0002 are not blockers and never were.** v4 said so and my recaps
