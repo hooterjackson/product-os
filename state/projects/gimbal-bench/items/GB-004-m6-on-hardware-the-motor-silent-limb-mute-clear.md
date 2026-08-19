@@ -134,3 +134,36 @@ it independently because the evidence had not been read before the run; both
 refusals are correct and they are not the same refusal.
 
 **Reached:** gimbal-bench · **Could not reach:** —
+
+### 2026-08-19 · work-laptop — chat linked by hand
+**Did:** Wrote this item's return path by hand. `state/threads/manual.yaml` now
+carries a `GB-004:` line pointing at the web chat that ran the bench work. That
+chat has no transcript on disk, so `tools/index.py` was never going to find it —
+it is the first entry the file has ever held.
+
+This changes the standing of the entry above rather than adding to it. That entry
+was reconstructed **second-hand**, by `/audit` reading four commits on this Mac.
+The session that actually latched `MUTE motor-silent` and cleared it on replug is
+now reachable directly.
+
+**Findings deliberately not restated.** All three limbs — motor-silent PROVEN,
+MUTE-CLEAR PROVEN, armed lane not reached — are already recorded above, and the
+method that failed is already `R-055` at grade `measured`, sourced to
+`captures/gimbal10/fixture/bench-session2-20260815.md` @ `19dd790`. Writing them
+a second time would leave two accounts of one session, free to drift apart. The
+register needed no amendment, so it got none.
+
+**Next:** unchanged — the dev-gated reply-drop drill on the `+mutesim` image, as
+its own short bench moment. `gate: bench`, `machine_affinity: formd-t1`: **resume
+on formd-t1**, not here.
+
+**Ruled out:** nothing new today.
+
+**Status:** left at `next`. Two limbs of three, and the remaining one needs a
+bench session that cannot start from this chair — neither `doing` nor `done` is
+true from here.
+
+**Reached:** product-os · **Could not reach:** gimbal-bench — not cloned on
+work-laptop (`state/repos.json` `local: null`), private, and the `gh` call was
+blocked in this session. **I could not look.** Nothing above rests on my having
+verified the hardware today; it rests on commits attributed earlier.

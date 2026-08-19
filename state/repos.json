@@ -11,6 +11,14 @@
     "authority": false,
     "public": true
   },
+  "genio": {
+    "owner": "hooterjackson",
+    "local": null,
+    "default_branch": "main",
+    "authority": false,
+    "public": true,
+    "note": "gênio / 9enio.com. Not cloned on work-laptop; evidence comes from the GitHub API. Merge-commit PR workflow: 57 of the 294 commits in the 2026-07-05 window have two parents, which audit.py's API path counts and its local path (--no-merges) would not. Registering this repo alone does NOT make it appear in the audit -- audit() builds its repo set from item `repos` fields, not from this file. See PROP-0004."
+  },
   "gimbal-bench": {
     "owner": "hooterjackson",
     "local": null,

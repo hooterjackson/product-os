@@ -62,7 +62,7 @@
   "created": "2026-08-19",
   "updated": "2026-08-19",
   "completed": "2026-08-15",
-  "closed_origin": "inferred"
+  "closed_origin": "his-word"
 }
 ---
 
@@ -82,3 +82,34 @@ defects found by the owner driving.
 
 Kept `gate: bench` after completion so that filtered views of history stay
 honest about where this happened. It was not this Mac.
+
+## Handoffs
+
+### 2026-08-19 · work-laptop · `/reconcile`
+
+**Did:** confirmed the closure **on Marcelo's word** — "I got both motors
+answering on CAN at the bench." `closed_origin` moves `inferred` → `his-word`.
+Nothing else about the item changed; the two capture SHAs were already here and
+already sufficient.
+
+`completed` was restored to **2026-08-15** by hand after `apply.py` overwrote it
+with today's date. The captures date this work; the confirmation does not
+re-date it. See the tooling defect noted below.
+
+**The other half of the same sentence does not belong to this item.** Marcelo
+also said he fixed the console read pan/tilt buttons. That is console work, it
+is not what this item claims, and the repo tells a different story about it —
+recorded as `R-062`. Attaching it here would have let a true sentence
+launder a wrong mechanism into an evidenced item.
+
+**Next:** nothing on this item. The fixture reaching ready is not the fixture
+being finished — `GB-004` carries the armed-lane work, `EL-001`/`EL-003` the
+LED head.
+
+**Ruled out:** `R-062` — rewiring the console's read pan/tilt buttons. They were
+never wrong.
+
+**Reached:** `gimbal-bench` (GitHub API, `master` @ `9549189`, pushed
+2026-08-16). · **Could not reach:** `formd-t1`, the bench PC — so if a bench
+session happened there today, it is not visible from this laptop and nothing
+here claims it did.

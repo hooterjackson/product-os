@@ -3,7 +3,7 @@
   "id": "POS-002",
   "title": "Point PROJECT-STATE.md at product-os",
   "project": "product-os",
-  "status": "doing",
+  "status": "done",
   "lane": "content",
   "gate": "none",
   "machine_affinity": null,
@@ -40,7 +40,7 @@
       "repo": "engineered-lighting-site",
       "sha": "a482376",
       "date": "2026-08-19",
-      "note": "LOCAL ONLY -- committed on work-laptop, NOT pushed. main is 1 ahead of origin/main. The pointer does not exist for any other machine until this is pushed, which is why status is doing and not done."
+      "note": "PUSHED, verified 2026-08-19 on work-laptop: `git fetch origin` then `git branch -r --contains a482376` returns origin/main, and origin/main IS a482376. Supersedes the earlier LOCAL-ONLY note on this same SHA -- the pointer now exists for every machine, which was the one condition this item held itself doing for."
     }
   ],
   "repos": [
@@ -49,7 +49,9 @@
   ],
   "parent_ruling": null,
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-19",
+  "completed": "2026-08-19",
+  "closed_origin": "inferred"
 }
 ---
 
@@ -119,3 +121,27 @@ an accepted decision.
 (fetched, in sync), and three `raw.githubusercontent.com` product-os endpoints
 — `llms.txt`, `api/now.json`, `kickoff/POS-002.md`, all HTTP 200. ·
 **Could not reach:** —
+
+### 2026-08-19 · work-laptop · `/reconcile`
+
+**Did:** nothing to the site repo — **the push had already happened.** Fetched
+`~/Claude/engineered-lighting` and `origin/main` *is* `a482376`;
+`git branch -r --contains a482376` returns `origin/main`. The one condition the
+entry above left open ("push `a482376`, then flip to done") is met, so this
+item is `done` and its `evidence_found` note — which still read *LOCAL ONLY,
+NOT pushed* — has been corrected on the same SHA.
+
+Note what closed this item: **a fetch, not a report.** The paragraph above,
+written by a session that could see the commit locally, would have rendered as
+"not pushed" forever to anyone who trusted it instead of the remote. The
+correction cost one `git fetch`.
+
+**Next:** nothing. `closed_origin` is `inferred` — a machine judged this
+finished off the remote ref, not Marcelo. If that judgement is right, confirming
+it costs one sentence.
+
+**Ruled out:** nothing new.
+
+**Reached:** `engineered-lighting-site` (fetched, `a482376`), `gimbal-bench`
+(GitHub API, `master` @ `9549189`). · **Could not reach:** `formd-t1` — the
+bench PC is not this laptop and product-os is not installed there.
