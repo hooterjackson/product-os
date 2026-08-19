@@ -70,7 +70,7 @@ covered `unblocks`, `answers`, `gates` and repo names and stopped there.
       Verified both ways: fires on the `genio` cite at `state/repos.json:20`
       when the proposal is absent, silent when it is present.
 - [x] `PROP-0004` committed, which is what makes the `genio` citation resolve.
-- [x] `R-063` records the class with its four instances; `R-064` records the
+- [x] `R-065` records the class with its four instances; `R-066` records the
       two-agents-one-tree cascade that surrounded the work.
 - [x] The rule added to `CLAUDE.md` **beside** the mechanical-signal table, not
       inside it, and `AGENTS.md` kept byte-identical.
@@ -90,6 +90,6 @@ a superseded marker on a low-overlap entry is never injected at all.
 
 Raising the cap trades context budget for coverage, and weighting corrections
 above overlap changes what the hook is *for*. Both are judgement calls with taste
-in them, so neither is made here. `R-063` carries the measurement.
+in them, so neither is made here. `R-065` carries the measurement.
 
 ## Handoffs

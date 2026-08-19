@@ -171,7 +171,7 @@ misplaced correction, **put it where the reader already is** — which means
 knowing what your reader actually reads. `brief.py` and `kickoff.py` take an
 entry's *first paragraph*; the `SessionStart` hook takes the whole body but only
 the top six entries by keyword overlap. A correction outside either window did
-not happen. `wiki/ruled-out.md` `R-063` has the measured instance: 121 committed
+not happen. `wiki/ruled-out.md` `R-065` has the measured instance: 121 committed
 files served a claim `DEC-201` had already reversed, while `publish.py --check`
 correctly reported the surface in sync.
 

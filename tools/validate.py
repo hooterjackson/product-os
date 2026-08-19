@@ -255,6 +255,33 @@ class Validator(object):
                 self.error("E-DERIVED-PRESENT", path,
                            "%r is computed and must not be stored" % derived)
 
+    def check_register_ids(self):
+        """A register ID must appear once.
+
+        Two agents appending to `wiki/ruled-out.md` against the same HEAD each
+        take "the next free number" and compute the same answer, and appending
+        is the one operation that looks conflict-free to git. That produced two
+        `R-063`s and two `R-064`s in one afternoon with this tool exiting 0 --
+        the register is the most expensive knowledge here, and a duplicate ID
+        makes a citation ambiguous about which entry it means. See `R-066`.
+        """
+        path = os.path.join(self.root, "wiki", "ruled-out.md")
+        if not os.path.exists(path):
+            return
+        seen = {}
+        with open(path, "r", encoding="utf-8") as fh:
+            for number, line in enumerate(fh, 1):
+                found = re.match(r"^## (R-\d+)\b", line)
+                if not found:
+                    continue
+                entry = found.group(1)
+                if entry in seen:
+                    self.error("E-REGISTER-DUPLICATE", "wiki/ruled-out.md",
+                               "%s is already defined at line %d"
+                               % (entry, seen[entry]), line=number)
+                else:
+                    seen[entry] = number
+
     def check_proposal_refs(self):
         """A cited proposal must exist.
 
@@ -567,6 +594,7 @@ class Validator(object):
         self.check_contract_docs()
         model = _model.Model.load(self.root)
         self.check_model(model)
+        self.check_register_ids()
         self.check_proposal_refs()
         self.check_secrets()
         self.check_thread_shards()

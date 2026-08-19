@@ -1099,7 +1099,7 @@ instead of sending a system info command."* That is the right outcome and the
 wrong mechanism, four days after it landed. The register exists so the third
 person to hear it does not go looking for a `0x9A` in the read path.
 
-## R-063 · Placing a correction where the consumer does not read it
+## R-065 · Placing a correction where the consumer does not read it
 **keywords:** correction · superseded · excerpt · first-paragraph · banner · stamp · visibility · consumed · register · brief · kickoff · group-d · truncation · reader · drift
 **source:** product-os `tools/brief.py:66` · 2026-08-19 · grade: measured
 
@@ -1138,8 +1138,8 @@ line**. So an entry's visibility there depends on how many keywords it shares,
 not on whether it carries a correction. A superseded marker on a low-overlap
 entry is never injected at all. Position is one cut; rank is another.
 
-## R-064 · Two agents writing one working tree
-**keywords:** concurrency · two-agents · one-tree · worktree · torn-read · false-alarm · multi-machine · sharding · race · uncommitted · git-add-all · diagnosis
+## R-066 · Two agents writing one working tree
+**keywords:** concurrency · two-agents · one-tree · worktree · torn-read · false-alarm · multi-machine · sharding · race · uncommitted · git-add-all · duplicate-id · diagnosis
 **source:** product-os, this session on work-laptop · 2026-08-19 · grade: measured
 
 The multi-machine design makes **cross-machine** conflict structurally
@@ -1156,7 +1156,7 @@ gap produced a false-alarm cascade in a single afternoon:
   uncommitted `POS-002`, `GB-004` and `manual.yaml` edits.
 - **a failing test** — `test_an_unconfirmed_close_is_flagged_on_the_face_of_its_brief`,
   which was the guard working correctly: `POS-002` had just become an inferred
-  closure whose brief still said `doing`. See `R-063`.
+  closure whose brief still said `doing`. See `R-065`.
 
 None of it was a defect in the committed tree. **The safe move is to diagnose and
 not regenerate:** running `publish.py` would have baked another session's
@@ -1170,3 +1170,13 @@ it. And a mechanical signal lied again in a new way: the 49 `PARSE FAIL` lines
 that first looked like repo damage were a **wrong function name in the scanning
 script** — the tool was broken, not the data. Suspect the instrument before the
 subject.
+
+**It then bit this very entry.** Both sessions appended to `wiki/ruled-out.md`
+against the same `HEAD`, each taking the next free number, and the register
+briefly carried **two `R-063`s and two `R-064`s** — one pair about chat URLs and
+a measured proxy, one pair about excerpt cuts and this cascade. `validate.py`
+exited 0 the whole time, because nothing resolved register IDs. The mine were
+renumbered to `R-065`/`R-066`; `E-REGISTER-DUPLICATE` now makes the collision an
+error rather than something you notice by reading. **The next free ID is not a
+lock.** Two agents reading the same tail of a file both compute the same answer,
+and appending is exactly the operation that looks conflict-free to git.
