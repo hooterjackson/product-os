@@ -440,7 +440,20 @@
       "cognitive_load": "medium",
       "completed": null,
       "effort_minutes": 60,
-      "evidence_found": [],
+      "evidence_found": [
+        {
+          "kind": "commit",
+          "path": null,
+          "repo": "product-os",
+          "sha": "093dbe9"
+        },
+        {
+          "kind": "commit",
+          "path": null,
+          "repo": "product-os",
+          "sha": "cdb5eb4"
+        }
+      ],
       "gate": "none",
       "id": "POS-012",
       "keywords": [
