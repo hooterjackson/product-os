@@ -5,7 +5,10 @@ cold, with no chat history.
 
 ## STAND — updated 2026-08-19, after the first real `/audit`
 
-**10 local commits at the time of writing, nothing pushed, no remote.** `validate.py`
+**11 commits. `origin` EXISTS and the repo is PUBLIC — Marcelo created and pushed it
+at 14:13 (reflog: `update by push`), not me.** `origin/main` is at `c95172a`; the
+`POS-007` commit is local and unpushed pending his word. See the disclosure note at the
+foot of this file.** `validate.py`
 exits 0 · 31 items (20 active, 7 parked, 4 done) · 5 questions (1 parked) · 8 rulings ·
 58 register entries · **51 gated tests** · byte-deterministic build · 24 briefs ·
 13 threads with resume/restart verdicts.
@@ -200,7 +203,14 @@ block software.
   seed. It backfills on its own as sessions accumulate — transcripts persist on disk.
 - **30 group-B findings outstanding**, mostly evidence rules that are too broad or
   cannot fire. Fluid — a sentence each, no ceremony.
-- **No remote. `gimbal-bench` still private (`R-049`).**
+- **`product-os` is PUBLIC and `wiki/ruled-out.md` is on it** — 58 entries, 84 quoted
+  lines, many verbatim from the *private* `gimbal-bench`, with its file paths and
+  commit SHAs. `validate.py`'s screen passes (no credential, email, tailnet ID or MAC),
+  so this is a judgement call about engineering disclosure, not a leak. `R-050`
+  recommended starting private for exactly this content; that recommendation is now
+  overtaken by his own push and is his to re-decide.
+- **`gimbal-bench` itself remains private (`R-049`)** — unchanged, and the third-party
+  paragraph is still un-anonymised.
 - Deferred: the thread indexer, briefs, the site, `llms.txt`, `/unblock`,
   multi-machine (12 of 27 items are `machine_affinity: formd-t1`).
 
