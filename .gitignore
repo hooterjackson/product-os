@@ -1,0 +1,15 @@
+# The computed/decided boundary is this one line.
+#
+# state/  is authored, committed, yours. It contains no computed value:
+#         no score, no leverage, no rank, no blocked_by, no threads.
+# build/  is computed, regenerated wholesale, never committed.
+#
+# Git-ignoring build/ does two jobs at once: it makes the boundary physical
+# rather than conventional, and it removes every generated-file merge conflict
+# between machines.
+/build/
+
+.cache/
+.DS_Store
+__pycache__/
+*.pyc

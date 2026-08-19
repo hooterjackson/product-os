@@ -1,0 +1,37 @@
+{
+  "_comment": [
+    "Where each tracked repo lives. `local` is a clone on this machine; null means",
+    "not cloned here, and evidence has to come from the GitHub API instead.",
+    "`authority` marks the repo whose rulings outrank published narrative."
+  ],
+  "engineered-lighting-site": {
+    "owner": "hooterjackson",
+    "local": "~/Claude/engineered-lighting",
+    "default_branch": "main",
+    "authority": false,
+    "public": true
+  },
+  "gimbal-bench": {
+    "owner": "hooterjackson",
+    "local": null,
+    "default_branch": "master",
+    "authority": true,
+    "public": false
+  },
+  "HomeApp": {
+    "owner": "hooterjackson",
+    "local": null,
+    "default_branch": "main",
+    "authority": false,
+    "public": true,
+    "note": "One squashed commit (2026-06-12). No usable git timeline; evidence must come from CHANGELOG.md and docs/ instead."
+  },
+  "home-ai-infra": {
+    "owner": null,
+    "local": null,
+    "default_branch": null,
+    "authority": false,
+    "public": false,
+    "note": "No repository exists. Auditable only via manual/file evidence; the work lives on engineeredlightingserver1."
+  }
+}
