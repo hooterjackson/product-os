@@ -486,6 +486,37 @@ class LeadTimeNoLongerMovesTheOrder(unittest.TestCase):
         self.assertFalse(hasattr(model_mod, "LEAD_DIVISOR"))
 
 
+class TheDoneGuardIsASpeedBumpNotAWall(unittest.TestCase):
+    """Closing POS-003 walked through the guard in two commands: write
+    evidence_found (agent authority), then close. "Before the run" is a process
+    boundary, not readership. The guard still stops the common case; what it
+    cannot stop is the actor that authors both sides. The durable guarantee is
+    the origin stamp, so that must never be droppable."""
+
+    def test_the_limitation_is_recorded_where_it_will_be_read(self):
+        with open(os.path.join(ROOT, "wiki", "ruled-out.md"), encoding="utf-8") as fh:
+            register = fh.read()
+        self.assertIn("R-059", register)
+        self.assertIn("process boundary, not readership", register)
+
+    def test_an_inferred_close_is_stamped_as_inferred(self):
+        applier = apply_mod.Applier(ROOT, dry_run=True)
+        target = next((n.id for n in applier.model.items.values()
+                       if n.get("evidence_found") and n.status != "done"), None)
+        if target is None:
+            self.skipTest("no item with prior evidence still open")
+        applier.set_status(target, "done", origin=apply_mod.AGENT)
+        self.assertTrue(applier.applied)
+        self.assertEqual(applier.applied[0][2], apply_mod.AGENT)
+
+    def test_the_record_distinguishes_his_word_from_inference(self):
+        applier = apply_mod.Applier(ROOT, dry_run=True)
+        applier.set_field("EL-002", "cognitive_load", "low",
+                          origin=apply_mod.AGENT)
+        _p, text = applier.record("x", None, None)
+        self.assertIn("_(inferred)_", text)
+
+
 class ApplyRefusals(unittest.TestCase):
     """Three refusals that must not bend. Each is checked against a real seed
     item in a scratch copy of state/, not against a mock."""

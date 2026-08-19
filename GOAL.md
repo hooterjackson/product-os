@@ -10,7 +10,7 @@ at 14:13 (reflog: `update by push`), not me.** `origin/main` is at `c95172a`; th
 `POS-007` commit is local and unpushed pending his word. See the disclosure note at the
 foot of this file.** `validate.py`
 exits 0 · 31 items (20 active, 7 parked, 4 done) · 5 questions (1 parked) · 8 rulings ·
-58 register entries · **51 gated tests** · byte-deterministic build · 24 briefs ·
+59 register entries · **54 gated tests** · byte-deterministic build · 24 briefs ·
 13 threads with resume/restart verdicts.
 
 **Built and verified before this session (slice 1a-minus):** the item model, scoring,
@@ -20,7 +20,7 @@ hook. Three tool bugs were found only by running them — `_fm.canonicalize` was
 fixed point, `_git` returned committer-local dates against a UTC API, and `new.py`
 wrote a status outside the enum.
 
-**`/audit` — DONE (POS-003).** `tools/audit.py` (read-only) + `tools/apply.py`
+**`/audit` — POS-003, now `done` with evidence.** `tools/audit.py` (read-only) + `tools/apply.py`
 (applies one accepted sentence) + `plugin/skills/audit`. Path-first attribution, four
 groups, **mandatory group D**, coverage line by name. `apply.py` refuses `done`
 without evidence that existed *before the run*, and routes human-authority fields to
@@ -184,6 +184,11 @@ block software.
 
 ## Not done
 
+- **The done-without-evidence guard is a speed bump, not a wall** (`R-059`). Closing
+  `POS-003` walked through it in two commands — write `evidence_found`, then close —
+  because "before the run" is a process boundary, not readership. It still stops the
+  common case. The durable guarantee is the `(inferred)` vs `on his word` stamp, not
+  the snapshot.
 - **THE LOOP HAS NEVER RUN END TO END.** `/next` → do the work → `/handoff`, by
   Marcelo, on real work. This is the next thing, and every friction it surfaces is a
   real requirement instead of a guessed one. Everything below matters less.

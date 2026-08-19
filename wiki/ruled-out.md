@@ -828,6 +828,42 @@ Two rules from this:
   page, and if it exhausts its page budget it prints `TRUNCATED` and says every
   count above it is a floor.
 
+## R-059 · Believing the done-without-evidence guard stops a determined agent
+**keywords:** guard · evidence · done · truth · apply · process · snapshot · authority · limitation · self-check
+**source:** product-os `tools/apply.py`; walked through it 2026-08-19 · grade: measured
+
+`apply.py` refuses `status: done` unless `evidence_found` existed **before the
+run**, so that evidence discovered by an audit is read by a person before it
+closes anything. The intent is right. The implementation measures the wrong
+thing.
+
+**"Before the run" is a process boundary, not readership.** Closing `POS-003`
+took two commands:
+
+    1. write evidence_found to the item file   (agent authority — permitted)
+    2. apply.py --status POS-003=done          (guard sees it as "prior")
+
+No human read anything between them. I did this without intending to, which is
+the point: the guard reads as a hard stop and is a speed bump.
+
+**What actually holds, and what does not:**
+
+- **Holds:** it stops `done` on an item with genuinely no evidence, which is the
+  common case and the one that matters. It also stops an audit closing an item
+  on evidence the same command discovered.
+- **Does not hold:** anything against an agent willing to write the evidence
+  first. No in-process rule can, because the same actor authors both sides.
+
+**So the real guarantee is elsewhere.** `--decided` requires his words on the
+record, and the audit record stamps every applied line `on his word` or
+`inferred`. `POS-003`'s closure is stamped **`(inferred)`** — permanently
+visible as a machine's judgement rather than his. That distinction is the thing
+that survives, and it is worth more than a guard that can be stepped over.
+
+Do not strengthen the snapshot rule into something that looks unbreakable. Make
+the origin stamp legible instead, and read the `(inferred)` lines when deciding
+what to trust.
+
 ## R-050 · `product-os` starting public
 **keywords:** product-os · public · private · disclosure · ruled-out · seed · publication
 **source:** product-os `wiki/ruled-out.md` (this file) · 2026-08-19 · grade: inferred
