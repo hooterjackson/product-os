@@ -47,6 +47,16 @@ FORBIDDEN_PATHS = re.compile(
 
 ALLOWLIST_FILE = "state/secret-allowlist.txt"
 
+# Thread shards are metadata only. Duplicated from index.py ON PURPOSE: a
+# shared constant would let one edit relax both gates at once, and the whole
+# point of this check is that it is independent of the tool that writes.
+SHARD_THREAD_KEYS = {
+    "id", "tool", "title", "started", "last_active", "cwd", "branch",
+    "prompts", "items", "cited_unknown", "path", "files", "forks", "parent",
+}
+FORBIDDEN_SHARD_KEY = re.compile(
+    r"(?i)message|content|text|body|prompt_text|summary|snippet|excerpt")
+
 VALID_STATUS = {"next", "doing", "done", "blocked", "dropped", "parked"}
 VALID_LANE = {"hardware", "firmware", "app", "infra", "content"}
 VALID_GATE = {"none", "awaiting-parts", "bench", "printer", "gpu", "external"}
@@ -345,6 +355,46 @@ class Validator(object):
 
     # -- driver -------------------------------------------------------------
 
+    def check_thread_shards(self):
+        """Thread shards carry METADATA ONLY, and this re-checks it here.
+
+        `index.py` filters against its own allowlist on the way out. This check
+        exists because that is the wrong place to trust: the shard is derived
+        from 405 GiB of unredacted working conversation, this repo may go
+        public, and a one-line change to the indexer could start emitting
+        message bodies without anything noticing. Two independent gates, one of
+        which lives in the CI path.
+        """
+        pattern = os.path.join(self.root, "state", "threads", "by-machine", "*.json")
+        for path in sorted(glob.glob(pattern)):
+            try:
+                with open(path, "r", encoding="utf-8") as fh:
+                    shard = json.load(fh)
+            except (OSError, ValueError) as exc:
+                self.error("E-SHARD-UNPARSEABLE", path, str(exc))
+                continue
+            name = os.path.splitext(os.path.basename(path))[0]
+            if shard.get("machine") != name:
+                self.error("E-SHARD-MACHINE", path,
+                           "shard says machine %r but the filename says %r; "
+                           "one file per machine, one writer per file"
+                           % (shard.get("machine"), name))
+            for index, thread in enumerate(shard.get("threads") or []):
+                if not isinstance(thread, dict):
+                    self.error("E-SHARD-SHAPE", path,
+                               "thread %d is not an object" % index)
+                    continue
+                for key in thread:
+                    if FORBIDDEN_SHARD_KEY.search(key):
+                        self.error("E-SHARD-LEAK", path,
+                                   "thread %d carries %r -- shards are metadata "
+                                   "only and this repo may go public"
+                                   % (index, key))
+                    elif key not in SHARD_THREAD_KEYS:
+                        self.error("E-SHARD-KEY", path,
+                                   "thread %d carries %r, which is not on the "
+                                   "allowlist" % (index, key))
+
     def check_regressions(self):
         """Run tests/test_regressions.py as part of the gate.
 
@@ -374,6 +424,7 @@ class Validator(object):
         model = _model.Model.load(self.root)
         self.check_model(model)
         self.check_secrets()
+        self.check_thread_shards()
         self.check_authority(base_ref)
         if with_tests:
             self.check_regressions()

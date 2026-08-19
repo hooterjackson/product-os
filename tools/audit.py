@@ -53,6 +53,9 @@ DEFAULT_WINDOW_DAYS = 45
 # Above this, a glob is describing a subsystem rather than an item's work.
 BROAD_GLOB_COMMITS = 12
 
+# 20 pages = 2000 commits. Beyond this the window is the wrong tool.
+MAX_COMMIT_PAGES = 20
+
 
 # --------------------------------------------------------------- repo access
 
@@ -69,6 +72,7 @@ class Repo(object):
         self.commits = None       # [(sha, iso, subject)] within the window
         self.files = None         # sha -> [changed paths]
         self.tree = None          # every path at HEAD
+        self.truncated = False    # hit the page cap; counts are a floor
         self.unread_files = set()  # shas whose file list could not be read
         self.claimed = set()      # shas some item claimed
 
@@ -147,15 +151,32 @@ def commits(repo, since, path=None):
                 rows.append((parts[0][:7], parts[1], parts[2]))
         return rows
     if repo.mode == "api":
-        query = "repos/%s/%s/commits?sha=%s&since=%sT00:00:00Z&per_page=100" % (
-            repo.spec["owner"], repo.name, repo.branch, since)
-        if path:
-            query += "&path=%s" % path
-        data = _gh(query)
-        if data is None or not isinstance(data, list):
-            return _git.UNREACHABLE
-        return [(c["sha"][:7], c["commit"]["committer"]["date"],
-                 c["commit"]["message"].split("\n")[0]) for c in data]
+        # PAGINATE. A single per_page=100 request returned exactly 100 commits
+        # for gimbal-bench when the true count since the same date was 245, and
+        # reported it as the answer. Group D -- the coverage signal, the number
+        # that says "I recognised nothing here" -- was silently capped, and a
+        # capped coverage number is worse than none because it looks precise.
+        # The tell was the roundness: exactly 100.
+        rows = []
+        page = 1
+        while page <= MAX_COMMIT_PAGES:
+            query = ("repos/%s/%s/commits?sha=%s&since=%sT00:00:00Z"
+                     "&per_page=100&page=%d"
+                     % (repo.spec["owner"], repo.name, repo.branch, since, page))
+            if path:
+                query += "&path=%s" % path
+            data = _gh(query)
+            if data is None or not isinstance(data, list):
+                return _git.UNREACHABLE if page == 1 else rows
+            rows += [(c["sha"][:7], c["commit"]["committer"]["date"],
+                      c["commit"]["message"].split("\n")[0]) for c in data]
+            if len(data) < 100:
+                return rows
+            page += 1
+        # Ran out of pages rather than out of commits: say so rather than
+        # returning a number that looks complete.
+        repo.truncated = True
+        return rows
     return _git.UNREACHABLE
 
 
@@ -462,6 +483,7 @@ def audit(root, since, only_item=None):
 
     coverage = {
         "window_since": since,
+        "truncated": sorted(n for n, r in repos.items() if r.truncated),
         "expected": sorted(wanted),
         "reached": sorted(n for n, r in repos.items() if r.reachable),
         "unreachable": {n: r.reason for n, r in repos.items() if not r.reachable},
@@ -690,7 +712,8 @@ def render(findings, unattributed, coverage, model):
 
     # --- D is mandatory and printed even when empty, so its absence is a fact
     total = sum(len(v) for v in unattributed.values())
-    lines.append("## D · commits I could not attribute to any item   (%d)" % total)
+    lines.append("## D · commits I could not attribute to any item   (%d since %s)"
+                 % (total, coverage["window_since"]))
     lines.append("")
     lines.append("  These landed in the window and no item's evidence paths "
                  "claimed them.")
@@ -713,6 +736,7 @@ def render(findings, unattributed, coverage, model):
     # --- coverage, always, by name
     lines.append("## Coverage")
     lines.append("")
+    lines.append("  window:      since %s" % coverage["window_since"])
     lines.append("  expected:    " + (", ".join(coverage["expected"]) or "none"))
     lines.append("  reached:     " + (", ".join(coverage["reached"]) or "NOTHING"))
     if coverage["unreachable"]:
@@ -721,6 +745,10 @@ def render(findings, unattributed, coverage, model):
             lines.append("    %-22s %s" % (name, why))
     else:
         lines.append("  unreachable: none")
+    if coverage.get("truncated"):
+        lines.append("  TRUNCATED:   %s — hit the %d-page cap; every count above "
+                     "is a FLOOR, not a total."
+                     % (", ".join(coverage["truncated"]), MAX_COMMIT_PAGES))
     if coverage["stale_pairs_skipped"]:
         lines.append("  %d ruling/doc pair(s) could not be checked."
                      % len(coverage["stale_pairs_skipped"]))

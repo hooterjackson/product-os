@@ -778,6 +778,56 @@ case on its own — `bom-checklist.md` is a real, committed file — so it repor
 the honest thing instead: *"has not fired" and "cannot fire" look identical from
 here.* Only a person can tell them apart, which is what a person did.
 
+## R-057 · Treating an item ID as unique across seed generations
+**keywords:** id · citation · indexer · threads · generation · collision · seed · rebuild · attachment · q-004
+**source:** measured against `~/.claude/projects` on 2026-08-19 · grade: measured
+
+The thread indexer's first run bound a real transcript to `Q-004`. It was wrong.
+That transcript's `Q-004` sits in this line:
+
+> Blocks: EL-040, EL-042 · Answers: Q-004
+
+`EL-040` and `EL-042` do not exist. They are from the **33-item v1 seed**, which
+was discarded and rebuilt — and the rebuild reused the numbers for unrelated
+work. Today's `Q-004` is *"where do 300 liveness taps a second come from"*.
+
+**An ID is unique only within a seed generation.** A citation is evidence of a
+conversation about *whatever that ID meant at the time*, which is not
+recoverable from the ID alone.
+
+The fix is a date, not a heuristic: a conversation cannot cite an item that did
+not exist when it happened, so `index.py` drops any citation whose thread
+predates the item's `created`, counts it, and reports it as a collision.
+
+**Why this one is dangerous:** it produces a *plausible* attachment. A wrong
+thread bound to a real item looks exactly like a right one, and it would have
+sat in the shard being cited as provenance.
+
+## R-058 · A coverage number that silently caps
+**keywords:** pagination · api · per-page · group-d · coverage · truncation · audit · window · floor
+**source:** measured against the GitHub API on 2026-08-19 · grade: measured
+
+`audit.py`'s commit query used `per_page=100` with no pagination. For
+`gimbal-bench` it returned **exactly 100** commits and reported that as the
+answer; the true count in the same window was **245**.
+
+Group D — the number whose entire job is to say *"I recognised nothing here"* —
+was capped. Two figures were quoted on the same day, **108** and **156**, and
+both were wrong for two compounding reasons: different `--since` windows, and
+truncation underneath both. Paginated and labelled, the default window is
+**301**.
+
+**The tell was the roundness.** A count that lands exactly on a page boundary is
+a page boundary, not a count.
+
+Two rules from this:
+
+- **A coverage figure must carry its window.** Without one it is not comparable
+  to itself between runs, which is how 108 and 156 both looked right.
+- **A capped result must say it is a floor.** `audit.py` now stops on a short
+  page, and if it exhausts its page budget it prints `TRUNCATED` and says every
+  count above it is a floor.
+
 ## R-050 · `product-os` starting public
 **keywords:** product-os · public · private · disclosure · ruled-out · seed · publication
 **source:** product-os `wiki/ruled-out.md` (this file) · 2026-08-19 · grade: inferred

@@ -5,9 +5,9 @@ cold, with no chat history.
 
 ## STAND — updated 2026-08-19, after the first real `/audit`
 
-**9 local commits, nothing pushed, no remote.** `validate.py` exits 0 · 28 items
-(3 done) · 5 questions · 8 rulings · 56 register entries · **5-hop** confirmed chain ·
-29 gated tests · byte-deterministic build.
+**10 local commits, nothing pushed, no remote.** `validate.py` exits 0 · 29 items
+(5 done) · 5 questions · 8 rulings · 58 register entries · **5-hop** confirmed chain ·
+**40 gated tests** · byte-deterministic build · one thread shard, 3 threads bound.
 
 **Built and verified before this session (slice 1a-minus):** the item model, scoring,
 `validate.py` / `rank.py` / `build.py` / `new.py` / `stale.py`, the evidence-backed
@@ -99,6 +99,30 @@ Origin lives in the flag name, not in `--said` — an agent can populate `--said
 said it and requires `--said` (exit 2 without). Every applied line is stamped
 `on his word` or `inferred` in the audit record, permanently. 29 tests, gate green.
 
+**POS-005 — the thread indexer. DONE.** `tools/index.py` reads 1,108 Codex rollouts
+and 6 Claude Code transcripts in **2.0 s** (line 1 + a 64 KiB tail; never a full read)
+and writes `state/threads/by-machine/work-laptop.json`. 13 threads, **3 bound to items**
+(POS-001…POS-005). Metadata only, enforced twice: `index.py` filters to a 14-key
+allowlist, and `validate.py` re-checks independently — injecting a `message` key gives
+`E-SHARD-LEAK`.
+
+**The finding that matters more than the tool.** v6 read the citation counts as the
+convention working. It is — but **97.3% of every anchor on this machine (4,072 of
+4,186) is inside this repo's own planning transcripts**, and every one of the 114
+external citations names an ID that no longer exists (`EL-014`, `EL-020`, `EL-040` —
+the discarded v1 seed). Outside this repo's own sessions the corpus holds **zero valid
+anchors**. A cold start, not a defect; use is what fixes it.
+
+**An ID is unique only within a seed generation.** The first run bound a transcript to
+`Q-004` — wrongly. That `Q-004` sits beside `EL-040`/`EL-042` from the v1 seed; today's
+is a different question. `gate_by_age()` now drops any citation predating the item and
+reports the collision. `R-057`.
+
+**Group D reconciled, and both numbers were wrong.** 108 was `--since 2026-08-10`, 156
+was the default window — and *both were silently truncated* at the API's 100-row page.
+`gimbal-bench` alone had 245. Paginated, the default window is **301**. Coverage lines
+now carry their window and flag truncation as a floor. `R-058`.
+
 ## How to talk about state — I kept getting this wrong
 
 **PROP-0001 and PROP-0002 are not blockers and never were.** v4 said so and my recaps
@@ -126,8 +150,11 @@ block software.
 - **The tests cover six defect classes, not the tools.** 3,098 lines of Python against
   328 of test. Everything off that list is still checked only by somebody running it
   and looking.
-- **Group D is 108 commits.** The honest finding, not a bug: the seed under-covers
-  `gimbal-bench`.
+- **Group D is 301 commits** at the default window (was reported 108 and 156; both
+  truncated). The honest finding, not a bug: the seed under-covers `gimbal-bench`, and
+  clustering D into proposed items is a better use of it than watching it grow.
+- **The indexer has no valid external anchors yet**, because the corpus predates the
+  seed. It backfills on its own as sessions accumulate — transcripts persist on disk.
 - **30 group-B findings outstanding**, mostly evidence rules that are too broad or
   cannot fire. Fluid — a sentence each, no ceremony.
 - **No remote. `gimbal-bench` still private (`R-049`).**

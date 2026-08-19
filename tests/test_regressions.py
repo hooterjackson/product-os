@@ -14,6 +14,8 @@ and nothing about the answer looked wrong.** That is the class CLAUDE.md now
 opens on, and it is why these four are worth more than coverage.
 """
 
+import glob
+import json
 import os
 import subprocess
 import sys
@@ -267,6 +269,107 @@ class AuthorityGuardFiresAtTheAgentNotTheOwner(unittest.TestCase):
         applier.set_field("EL-001", "cost_usd", 486, origin=apply_mod.HUMAN)
         _path, text = applier.record("the tape is the Valent X", None, None)
         self.assertIn("on his word", text)
+
+
+class CoverageNumbersMustNotSilentlyCap(unittest.TestCase):
+    """Group D — the number that says "I recognised nothing here" — was
+    silently truncated at the API's 100-commit page. gimbal-bench had 245
+    commits in the window and the audit reported exactly 100 as the answer.
+    Two different figures (108 and 156) were quoted on the same day, both
+    truncated, neither labelled with its window. A capped coverage number is
+    worse than none, because it looks precise."""
+
+    def test_pagination_exists(self):
+        with open(os.path.join(ROOT, "tools", "audit.py"), encoding="utf-8") as fh:
+            source = fh.read()
+        self.assertIn("page=%d", source, "commit query is not paginated")
+        self.assertIn("if len(data) < 100:", source,
+                      "no short-page stop condition, so it cannot know it is done")
+
+    def test_a_page_cap_is_declared_and_reported(self):
+        self.assertGreaterEqual(audit.MAX_COMMIT_PAGES, 10)
+        with open(os.path.join(ROOT, "tools", "audit.py"), encoding="utf-8") as fh:
+            source = fh.read()
+        self.assertIn("truncated", source)
+        self.assertIn("FLOOR", source, "truncation must be announced, not implied")
+
+    def test_group_d_heading_carries_its_window(self):
+        """A coverage figure without its window drifts between reports."""
+        with open(os.path.join(ROOT, "tools", "audit.py"), encoding="utf-8") as fh:
+            source = fh.read()
+        self.assertIn('(%d since %s)', source)
+
+
+class ThreadIndexIsMetadataOnly(unittest.TestCase):
+    """The shard is derived from 405 GiB of unredacted working conversation and
+    this repo may go public. Two independent gates, and the CI one must not
+    share a constant with the writer."""
+
+    def test_the_two_allowlists_are_independent_copies(self):
+        import index as index_mod
+        import validate as validate_mod
+        self.assertEqual(index_mod.THREAD_KEYS, validate_mod.SHARD_THREAD_KEYS)
+        with open(os.path.join(ROOT, "tools", "validate.py"), encoding="utf-8") as fh:
+            source = fh.read()
+        self.assertNotIn("import index", source,
+                         "validate.py must not import the tool it is checking")
+
+    def test_forbidden_keys_are_rejected_by_both(self):
+        import index as index_mod
+        import validate as validate_mod
+        for key in ("message", "content", "text", "body", "Summary", "excerpt"):
+            self.assertNotIn(key, index_mod.THREAD_KEYS)
+            self.assertTrue(validate_mod.FORBIDDEN_SHARD_KEY.search(key),
+                            "%r would pass the CI gate" % key)
+
+    def test_clean_drops_anything_off_the_allowlist(self):
+        import index as index_mod
+        out = index_mod.clean({"id": "x", "tool": "codex",
+                               "message": "secret", "content": "secret"})
+        self.assertEqual(set(out), {"id", "tool"})
+
+    def test_paths_are_relativised_to_home(self):
+        import index as index_mod
+        self.assertTrue(index_mod.tilde(os.path.expanduser("~/x")).startswith("~/"))
+
+    def test_written_shard_carries_only_allowlisted_keys(self):
+        path = os.path.join(ROOT, "state", "threads", "by-machine")
+        shards = glob.glob(os.path.join(path, "*.json"))
+        if not shards:
+            self.skipTest("no shard written yet")
+        import validate as validate_mod
+        for shard_path in shards:
+            with open(shard_path, encoding="utf-8") as fh:
+                shard = json.load(fh)
+            for thread in shard.get("threads") or []:
+                extra = set(thread) - validate_mod.SHARD_THREAD_KEYS
+                self.assertEqual(extra, set(), "%s leaked %s" % (shard_path, extra))
+
+
+class ItemIdsAreUniqueOnlyWithinASeedGeneration(unittest.TestCase):
+    """A transcript from 2026-08-15 cited `Q-004` beside `EL-040` and `EL-042`,
+    IDs from a seed that was later discarded. Today's `Q-004` is an unrelated
+    question. The indexer bound them, confidently and wrongly — a conversation
+    cannot cite an item that did not exist when it happened."""
+
+    def test_a_citation_predating_the_item_is_not_bound(self):
+        import index as index_mod
+        thread = {"last_active": "2026-08-15T10:00:00Z", "items": {"Q-004"}}
+        kept, stale = index_mod.gate_by_age(thread, {"Q-004": "2026-08-19"})
+        self.assertEqual(kept, set())
+        self.assertEqual(stale, {"Q-004"})
+
+    def test_a_citation_after_the_item_exists_is_bound(self):
+        import index as index_mod
+        thread = {"last_active": "2026-08-19T22:00:00Z", "items": {"POS-001"}}
+        kept, stale = index_mod.gate_by_age(thread, {"POS-001": "2026-08-19"})
+        self.assertEqual(kept, {"POS-001"})
+        self.assertEqual(stale, set())
+
+    def test_a_collision_is_reported_not_dropped_silently(self):
+        with open(os.path.join(ROOT, "tools", "index.py"), encoding="utf-8") as fh:
+            source = fh.read()
+        self.assertIn("generation_collisions", source)
 
 
 class ApplyRefusals(unittest.TestCase):
