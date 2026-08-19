@@ -222,6 +222,35 @@ line embedded `+N commits since the last audit`, computed from local HEAD: `+9` 
 the commit, `+10` after. No ordering of regenerate-then-commit converges. Split into a
 durable half (`public/`) and a volatile half (`build/`).
 
+**POS-011 — the four missing action artifacts. DONE.** Measured before starting:
+kickoff 26, reconcile 0, attach 0, connect-repo 0, capture 0 — one of five actions had
+an artifact. All five now generate into `public/`, each stating its own destination in
+its own text, because pasting the right text into the wrong place is this design's main
+failure mode.
+
+**Three cold tests, four real defects.** Each artifact went to a subagent with nothing
+but the artifact. All three did the right thing with no follow-up questions, and all
+three found something:
+
+- **`PROP-0003`'s headline number was false (`R-064`)** — twenty `done` items drop
+  group D by **zero**, not 301→13, because `audit_item()` returns early for done items
+  and group D only excludes SHAs a *finding* reports. I had measured glob-matching
+  instead of the tool's output: a proxy for the signal, inside the evidence for a
+  proposal awaiting a yes. Corrected at the top of the file; **do not answer it as
+  written.**
+- **A chat URL published itself (`R-063`)** — `manual.yaml` was designed while this
+  repo was private. First use put a URL in two more tracked files, and the screen had
+  no pattern for one. Added; `publish.py` no longer republishes them.
+- **Two `apply.py` bugs** — `--field`/`--decided` shared `--evidence`'s comma splitter
+  and shredded JSON values silently; and confirming a closure re-dated it, eating the
+  very fact `POS-008` surfaces.
+
+**Also found, and it matters for scaling:** a *live* item shrinks group D by at most
+`BROAD_GLOB_COMMITS` = 12, so twenty cap near 240. And in a repo committing ~6.5×/day,
+68 individual files each exceed 12 commits — **no honest glob reaches the threshold.**
+The coverage mechanism does not scale to an active codebase without rethinking that
+number.
+
 ## How to talk about state — I kept getting this wrong
 
 **PROP-0001 and PROP-0002 are not blockers and never were.** v4 said so and my recaps
