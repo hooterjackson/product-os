@@ -20,7 +20,7 @@ filesystem cannot do either.
 }
 ```
 
-Already registered: `HomeApp`, `engineered-lighting-site`, `gimbal-bench`, `home-ai-infra`, `product-os`.
+Already registered: `HomeApp`, `engineered-lighting-site`, `genio`, `gimbal-bench`, `home-ai-infra`, `product-os`.
 
 No code changes anywhere. `audit.py` iterates whatever is configured.
 
@@ -31,7 +31,7 @@ items that name its paths does one thing: it grows group D — the
 commits no item claims — until the one honest signal in the audit
 becomes a number that gets scrolled past.
 
-That number is currently **322**.
+That number is currently **323**.
  Adding a repo without items makes it bigger, not smaller.
 
 So, in the same sitting:

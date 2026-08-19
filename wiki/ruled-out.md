@@ -935,6 +935,15 @@ publishing it changes its own inputs. Anything counting commits, file sizes, or
 **keywords:** product-os · public · private · disclosure · ruled-out · seed · publication
 **source:** product-os `wiki/ruled-out.md` (this file) · 2026-08-19 · grade: inferred
 
+**SUPERSEDED 2026-08-19 by `DEC-201` — product-os is PUBLIC.** This paragraph
+leads deliberately: `brief.py` and `kickoff.py` excerpt the *first* paragraph of
+an entry, so a marker at the foot of this block would never reach the agents that
+read R-050 through the published surface. The recommendation below is overtaken;
+its description of the content is still accurate. `gimbal-bench` stays private
+(`R-049`).
+
+The original entry, left standing:
+
 This repository starts **private**, against the original preference, because this
 very file seeds ~50 findings from an unpublished engineering repo — including
 security-design detail of the authority model of a brakeless ceiling-mounted
@@ -942,15 +951,13 @@ machine (R-027, R-032, R-034).
 
 Flipping to public later is one command. Unflipping is not.
 
-**SUPERSEDED 2026-08-19.** `DEC-201` makes product-os **public** and names R-050
-in its `supersedes` field. The content description above is still accurate — this
-file does carry that material — but `validate.py`'s disclosure screen finds no
-credential, email, tailnet identifier or MAC in any of it, and Marcelo created and
-pushed the public remote himself. What survives is the asymmetry, unchanged:
-unflipping is still not one command. So `DEC-201` carries a `revisit_if` that
-reopens the decision when a future register entry would publish a credential, an
-identifier, or a third party's information — *before* that entry is committed,
-not after. `gimbal-bench` stays private (`R-049`).
+**What survives.** `validate.py`'s disclosure screen finds no credential, email,
+tailnet identifier or MAC in any of it, and Marcelo created and pushed the public
+remote himself — so this was a judgement call about engineering disclosure, not a
+leak. But the asymmetry is unchanged: unflipping is still not one command. So
+`DEC-201` carries a `revisit_if` that reopens the decision when a future register
+entry would publish a credential, an identifier, or a third party's information —
+*before* that entry is committed, not after.
 
 Left standing rather than rewritten, per the rule at the top of this file: the
 recommendation was sound for the content it was reasoning about, and seeing what

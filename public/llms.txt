@@ -50,7 +50,7 @@ The list is a conversation starter, not a contract.
 `GB-001` — Finish the M5 fault ring: a real fault storm, and the brownout case
 score 25.0 · leverage 8 · 480 min · gate bench · machine formd-t1
 
-_Last audited 2026-08-19. 322 commits were unattributed then._
+_Last audited 2026-08-19. 323 commits were unattributed then._
 
 _5 item(s) are marked done on a machine's judgement, unconfirmed by him: EL-004, EL-005, POS-003, POS-004, POS-005._
 
