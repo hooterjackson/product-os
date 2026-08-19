@@ -68,6 +68,7 @@ class Repo(object):
         self.reason = None
         self.commits = None       # [(sha, iso, subject)] within the window
         self.files = None         # sha -> [changed paths]
+        self.tree = None          # every path at HEAD
         self.unread_files = set()  # shas whose file list could not be read
         self.claimed = set()      # shas some item claimed
 
@@ -252,6 +253,60 @@ class FileCache(object):
                 json.dump(self.data, fh)
         except OSError:
             pass
+
+
+def load_tree(repo):
+    """Every path in the repo at HEAD. One call, used to decide satisfiability.
+
+    "This rule matched nothing" and "this rule CAN NEVER match" were the same
+    code path, and an item whose rule cannot fire sat silently at `next`
+    forever. That is how EL-001 -- a purchase whose parts are photographed on
+    the bench -- stayed the top-ranked item in the portfolio.
+    """
+    if repo.tree is not None:
+        return repo.tree
+    repo.tree = []
+    if repo.mode in ("local", "local-only"):
+        ref = "origin/%s" % repo.branch if repo.mode == "local" else "HEAD"
+        out = (_git.fetch_then_query(repo.local, ["ls-tree", "-r", "--name-only", ref])
+               if repo.mode == "local"
+               else _git._run(["git", "-C", repo.local, "ls-tree", "-r",
+                               "--name-only", ref]))
+        if out and out is not _git.UNREACHABLE:
+            repo.tree = out.splitlines()
+        return repo.tree
+    if repo.mode == "api":
+        data = _gh("repos/%s/%s/git/trees/%s?recursive=1"
+                   % (repo.spec["owner"], repo.name, repo.branch))
+        if data and isinstance(data.get("tree"), list):
+            repo.tree = [e.get("path", "") for e in data["tree"]
+                         if e.get("type") == "blob"]
+    return repo.tree
+
+
+# How a rule relates to reality. The distinction this enum exists to make is
+# the whole point: only one of these means "nothing has happened".
+SATISFIABLE = "satisfiable"        # matches real files that do get committed
+NEVER_FIRED = "never-fired"        # matches real files nothing has ever touched
+UNSATISFIABLE = "unsatisfiable"    # matches no path in the repo at all
+
+
+def classify_rule(repo, pattern):
+    """Can a commit to this glob ever demonstrate anything?"""
+    tree = load_tree(repo)
+    if not tree:
+        return None                      # could not read the tree; say nothing
+    matcher = glob_re(pattern)
+    hits = [p for p in tree if matcher.match(p)]
+    if not hits:
+        return UNSATISFIABLE
+    # `is not None`, not truthiness: an EMPTY dict means "this repo produced no
+    # commits", which is a fact worth classifying, not missing data.
+    if repo.files is not None:
+        touched = {p for paths in repo.files.values() for p in paths}
+        if not any(matcher.match(p) for p in touched):
+            return NEVER_FIRED
+    return SATISFIABLE
 
 
 def load_files(repo, since, progress=True):
@@ -445,6 +500,10 @@ def audit_item(node, repos, since):
             could_not_look.append(
                 (name, "reachable, but no commits in the window%s"
                        % (" — %s" % note if note else "")))
+            # Satisfiability is a property of the TREE, not of the window, so
+            # it is still decidable here -- and this is exactly where an
+            # unsatisfiable rule hides best, behind a repo that says nothing.
+            dead_globs.extend((name, p) for p in evidence_globs(node, name))
             continue
 
         globs = evidence_globs(node, name)
@@ -498,16 +557,41 @@ def audit_item(node, repos, since):
              "This item's status is unaudited, which is not the same as "
              "unchanged."]))
 
-    # An evidence rule that matches nothing can never fire. That is a silent
-    # failure of exactly the kind this system exists to remove: the item would
-    # sit at `next` forever while its work landed somewhere the rule cannot see.
+    # An evidence rule that cannot fire leaves an item at `next` forever while
+    # its work lands somewhere the rule cannot see. Until now "matched nothing"
+    # and "can never match" were the same finding, which is how EL-001 stayed
+    # top-ranked with its parts photographed on the bench.
     for name, pattern in dead_globs:
-        out.append(Finding(
-            "B", node.id,
-            "evidence glob `%s` matched no file in %s" % (pattern, name),
-            ["Either nothing has happened here, or the rule points at a path "
-             "that does not exist. The rule is human-authority, so this is a "
-             "proposal to look, not a change."]))
+        repo = repos.get(name)
+        verdict = classify_rule(repo, pattern) if repo else None
+        if verdict == UNSATISFIABLE:
+            out.append(Finding(
+                "B", node.id,
+                "no path in %s matches `%s`" % (name, pattern),
+                ["Two readings, and only a person can pick: **(a) the rule is "
+                 "wrong** and the item can never close no matter what work is "
+                 "done, or **(b) the rule is right and the file does not exist "
+                 "yet** — correct for an item whose completion CREATES it.",
+                 "(b) is the good case. It stops being good the day the work "
+                 "lands somewhere else.",
+                 "The `evidence` rule is human-authority. Proposed, not changed."],
+                change={"evidence": "repoint"}))
+        elif verdict == NEVER_FIRED:
+            out.append(Finding(
+                "B", node.id,
+                "rule `%s` matches real files that nothing has touched" % pattern,
+                ["The paths exist in %s; no commit in the window changed them."
+                 % name,
+                 "**\"has not fired\" and \"cannot fire\" look identical from "
+                 "here.** If completing this item would not change these files "
+                 "— a purchase, a phone call, a browser-local checkbox — the "
+                 "rule is unsatisfiable and only a person can tell."]))
+        else:
+            out.append(Finding(
+                "B", node.id,
+                "rule `%s` matched nothing in the window" % pattern,
+                ["The paths exist and do get committed; nothing touched them "
+                 "since %s. Most likely nothing has happened." % since]))
 
     known = {str(e.get("sha") or "")[:7]
              for e in (node.get("evidence_found") or [])}

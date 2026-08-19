@@ -41,7 +41,36 @@
       "note": "A dated note that the order was placed, plus arrival. Ordering is the completion here; arrival is the downstream item's."
     }
   ],
-  "evidence_found": [],
+  "evidence_found": [
+    {
+      "kind": "commit",
+      "repo": "engineered-lighting-site",
+      "sha": "762afdd",
+      "date": "2026-08-19",
+      "note": "attributed by tools/audit.py on 2026-08-19"
+    },
+    {
+      "kind": "commit",
+      "repo": "engineered-lighting-site",
+      "sha": "d8f092b",
+      "date": "2026-08-19",
+      "note": "attributed by tools/audit.py on 2026-08-19"
+    },
+    {
+      "kind": "commit",
+      "repo": "engineered-lighting-site",
+      "sha": "2c1233f",
+      "date": "2026-08-19",
+      "note": "attributed by tools/audit.py on 2026-08-19"
+    },
+    {
+      "kind": "commit",
+      "repo": "engineered-lighting-site",
+      "sha": "52c5048",
+      "date": "2026-08-19",
+      "note": "attributed by tools/audit.py on 2026-08-19"
+    }
+  ],
   "repos": [
     "engineered-lighting-site"
   ],
@@ -88,3 +117,39 @@ tape row without reading Q-005 first.
 exact inversion this score's urgency term exists to prevent. The waiting belongs
 to GB-012, downstream. Standing order: *"Ordering is not spending… Rank the
 click, not the arrival."*
+
+---
+
+## Handoffs
+
+### 2026-08-19 · work-laptop — found wrong by the cold-start test
+**Did:** nothing was ordered by me. What changed is what this item is understood
+to be.
+
+**This item's evidence rule could never fire.** It named only
+`docs/bom-checklist.md`, which says of itself *"state persists in your browser
+(nothing leaves your device)"*. Ticking every box writes nothing to the repo, so
+no purchase could ever satisfy the rule — and this item has been ranked #1 in
+the portfolio since the seed, on a rule that was structurally incapable of
+closing it.
+
+Meanwhile `docs/04a-wire-the-zones.md` photographs the parts on the bench: the
+PSU, the PCA9685, the ULN2803, the buck, the fuse kit, the WAGOs, the wire, the
+tape pads. And line 179 reads the PicoBuck's chips off the unit itself —
+*"this unit's chips read AL8860"*. You cannot read a part number off a part you
+have not bought.
+
+**Next:** `PROP-0002` proposes repointing the rule at Doc 4a and reducing this
+item to its residual. **The residual is the Carclo 10507 optics trio**, which is
+unphotographed and unmentioned — Doc 4a says *"Set it aside until spotlight
+day."* Not closed, and deliberately not retitled: narrowing scope is a decision
+with taste in it.
+
+**Not verified, and not mine:** which tape was bought. The 1800 K channel
+implies Valent X, but that is an inference from a spec rather than a photograph
+— which is precisely the reasoning `CLAUDE.md` opens by warning about. Q-005
+stays open.
+
+**Ruled out:** browser-local state as a repo evidence rule — `R-056`.
+
+**Reached:** engineered-lighting-site, gimbal-bench · **Could not reach:** —

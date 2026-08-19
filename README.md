@@ -27,28 +27,43 @@ evidence and routing human-authority fields to `state/proposals/`.
 
 ## What makes it different from a board
 
-**Lead time is in the ranking.** Not asserted — here are the two rows and the
-arithmetic, from `rank.py --show`, on the real seed:
+**Lead time is in the ranking.** Not asserted — here are two rows and the
+arithmetic, from `rank.py --show`, on the real state:
 
 ```
-EL-001  Order the Doc 4 LED BoM                     EL-003  Print the tolerance coupon, then the fit coupon
+EL-002  The bench meter has no current range        EL-003  Print the tolerance coupon, then the fit coupon
 
   effort_bucket(20 min)  = 2                          effort_bucket(120 min) = 3
-  base = (4 x 4) / 2     = 8.000                      base = (3 x 4) / 3     = 4.000
-  leverage               = 1  (GB-012)                leverage               = 0
-  lift = 1 + 0.25 x 1    = 1.250                      lift = 1 + 0.25 x 0    = 1.000
-  urgency = 1 + 14/7     = 3.000                      urgency = 1 + 0/7      = 1.000
-  score = 8 x 1.25 x 3   = 30.00                      score = 4 x 1 x 1      = 4.00
+  base = (3 x 4) / 2     = 6.000                      base = (3 x 4) / 3     = 4.000
+  leverage               = 0                          leverage               = 0
+  lift = 1 + 0.25 x 0    = 1.000                      lift = 1 + 0.25 x 0    = 1.000
+  urgency = 1 + 5/7      = 1.714                      urgency = 1 + 0/7      = 1.000
+  score = 6 x 1 x 1.714  = 10.29                      score = 4 x 1 x 1      = 4.00
 ```
 
-**30.00 against 4.00, and 3.000 of that 7.5× is the urgency term alone.** Twenty
-minutes of clicking outranks two hours of real work, because the fourteen days
-start when you click and not when you are ready — and `GB-012`, the gate the whole
-Zigbee phase converges on, cannot be demonstrated without the part.
+Twenty minutes of ordering outranks two hours of real work, because the five days
+start when you click and not when you are ready. A conventional board ranks by
+importance and gets that backwards. Run `rank.py --show EL-002` and check the
+operands rather than believing the ratio; a bare ratio is not falsifiable.
 
-A conventional board ranks by importance and gets that exactly backwards. Run
-`python3 tools/rank.py --show EL-001` and check the operands rather than
-believing the ratio; a bare ratio is not falsifiable.
+### The example this section used to use was wrong, and that is the better story
+
+Until 2026-08-19 this paragraph starred `EL-001` — *order the Doc 4 LED BoM*, 20
+minutes, $205, 14 days of lead, ranked #1 at `8.000 × 1.250 × 3.000 = 30.00`. A
+cold-start test found the parts **already photographed on the bench**, and the
+reason nobody noticed is the point of this whole repo:
+
+> `EL-001`'s evidence rule named `docs/bom-checklist.md` — a checklist whose own
+> second line reads *"state persists in your browser (nothing leaves your
+> device)."* Ticking every box writes nothing to the repo. **The rule was
+> structurally unsatisfiable: the item could never close, no matter what was
+> bought.**
+
+The arithmetic was never wrong. The item under it was, for weeks, at rank #1, in
+this README and in every summary given about it. **A number that cannot be
+checked against reality is decoration**, and the fix is not a better guess at the
+outset — it is `/audit`, run repeatedly, by somebody willing to be told the
+flagship is wrong. See `wiki/ruled-out.md` `R-056`.
 
 **Leverage is transitive.** An item's score reflects everything downstream through
 confirmed edges, not its direct children. `GB-001` unblocks one item directly and

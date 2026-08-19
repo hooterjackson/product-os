@@ -116,16 +116,77 @@ class BroadGlobsAreReportedNeverAbsorbed(unittest.TestCase):
 
     def test_a_broad_glob_produces_a_finding_rather_than_silence(self):
         self.assertLessEqual(audit.BROAD_GLOB_COMMITS, 20)
-        source = open(os.path.join(ROOT, "tools", "audit.py"), encoding="utf-8").read()
+        with open(os.path.join(ROOT, "tools", "audit.py"), encoding="utf-8") as fh:
+            source = fh.read()
         self.assertIn("too broad to attribute anything", source)
 
     def test_group_d_is_built_from_reported_shas_not_from_claims(self):
         """The fix: a commit leaves group D only when a FINDING named it."""
-        source = open(os.path.join(ROOT, "tools", "audit.py"), encoding="utf-8").read()
+        with open(os.path.join(ROOT, "tools", "audit.py"), encoding="utf-8") as fh:
+            source = fh.read()
         self.assertIn("for sha in f.shas", source)
         self.assertIn("if c[0] not in reported", source)
         self.assertNotIn("if c[0] not in repo.claimed", source,
                          "group D is back to trusting the attribution scan")
+
+
+class UnsatisfiableRulesAreNotSilence(unittest.TestCase):
+    """`EL-001`'s evidence rule named only `docs/bom-checklist.md`, a checklist
+    whose state "persists in your browser". Ticking it writes nothing to the
+    repo, so the rule could never fire and the item could never close — while
+    ranked #1 in the portfolio, with its parts photographed on the bench.
+
+    The tool committed this even though CLAUDE.md already carried the rule,
+    because "this glob matched nothing" and "this item is not done" were the
+    same code path. A rule in the contract is not a rule in the machinery."""
+
+    def test_the_three_verdicts_are_distinct(self):
+        self.assertEqual(len({audit.SATISFIABLE, audit.NEVER_FIRED,
+                              audit.UNSATISFIABLE}), 3)
+
+    def test_a_path_absent_from_the_tree_is_unsatisfiable(self):
+        repo = audit.Repo("fake", {"owner": "x"})
+        repo.mode = "api"
+        repo.tree = ["docs/04a-wire-the-zones.md", "docs/bom-checklist.md"]
+        repo.files = {"aaaaaaa": ["docs/04a-wire-the-zones.md"]}
+        self.assertEqual(audit.classify_rule(repo, "partitions*"),
+                         audit.UNSATISFIABLE)
+        self.assertEqual(audit.classify_rule(repo, "docs/*DECISION*"),
+                         audit.UNSATISFIABLE)
+
+    def test_a_real_but_untouched_path_is_never_fired_not_satisfiable(self):
+        """The EL-001 shape: the file exists and is committed, but nothing a
+        completion does would change it."""
+        repo = audit.Repo("fake", {"owner": "x"})
+        repo.mode = "api"
+        repo.tree = ["docs/04a-wire-the-zones.md", "docs/bom-checklist.md"]
+        repo.files = {"aaaaaaa": ["docs/04a-wire-the-zones.md"]}
+        self.assertEqual(audit.classify_rule(repo, "docs/bom-checklist.md"),
+                         audit.NEVER_FIRED)
+        self.assertEqual(audit.classify_rule(repo, "docs/04a-wire-the-zones.md"),
+                         audit.SATISFIABLE)
+
+    def test_an_empty_commit_set_still_classifies(self):
+        """A repo that produced no commits is a FACT to classify, not missing
+        data. `if repo.files:` on an empty dict silently skipped this."""
+        repo = audit.Repo("fake", {"owner": "x"})
+        repo.mode = "api"
+        repo.tree = ["CHANGELOG.md"]
+        repo.files = {}
+        self.assertEqual(audit.classify_rule(repo, "CHANGELOG.md"),
+                         audit.NEVER_FIRED)
+
+    def test_an_unreadable_tree_returns_none_rather_than_guessing(self):
+        repo = audit.Repo("fake", {"owner": "x"})
+        repo.mode = "api"
+        repo.tree = []
+        self.assertIsNone(audit.classify_rule(repo, "anything"))
+
+    def test_the_finding_says_cannot_fire_not_merely_nothing_happened(self):
+        with open(os.path.join(ROOT, "tools", "audit.py"), encoding="utf-8") as fh:
+            source = fh.read()
+        self.assertIn("cannot fire", source)
+        self.assertIn("no path in %s matches", source)
 
 
 class ApplyRefusals(unittest.TestCase):

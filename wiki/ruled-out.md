@@ -742,6 +742,42 @@ exactly the claim that has to be right.
 Found by the first real `/audit` run, in group D, from a commit no path rule
 claimed.
 
+## R-056 · Browser-local state as a repo evidence rule
+**keywords:** evidence · rule · unsatisfiable · checklist · bom · localstorage · browser · audit · el-001 · closure
+**source:** engineered-lighting-site `docs/bom-checklist.md:10` @ `88a3a58` · found 2026-08-19 · grade: measured
+
+`EL-001`'s evidence rule named `docs/bom-checklist.md` and nothing else. That
+file says of itself:
+
+> state persists in your browser (nothing leaves your device)
+
+Ticking every box writes **nothing** to the repository. The rule was
+**structurally unsatisfiable** — no purchase, delivery or installation could
+ever cause the path to change in a way that recorded the purchase — so the item
+could never close, and it sat at rank #1 in the portfolio from the seed onward
+while its parts were photographed on the bench in `docs/04a-wire-the-zones.md`.
+
+**An evidence rule must name a path that COMPLETING THE ITEM WOULD CHANGE.**
+Not a path about the same subject. Three shapes that fail this and look fine:
+
+- a UI whose state lives in the browser (this one),
+- a rendered artifact regenerated from elsewhere,
+- a checklist, table or index that a human edits on a different schedule than
+  the work.
+
+**Why this is the fourth instance of the root cause, and the worst:** the rule
+was already in `CLAUDE.md` — *a mechanical signal is not the primary source* —
+and `audit.py` committed the error anyway, because *"this rule matched nothing"*
+and *"this item is not done"* were **the same code path**. Writing a rule into
+the contract does not wire it into the machinery.
+
+`audit.py` now classifies every rule as `satisfiable` / `never-fired` /
+`unsatisfiable` against the repo tree, and reports the last two in group B
+rather than leaving the item silently `next`. That check cannot catch this exact
+case on its own — `bom-checklist.md` is a real, committed file — so it reports
+the honest thing instead: *"has not fired" and "cannot fire" look identical from
+here.* Only a person can tell them apart, which is what a person did.
+
 ## R-050 · `product-os` starting public
 **keywords:** product-os · public · private · disclosure · ruled-out · seed · publication
 **source:** product-os `wiki/ruled-out.md` (this file) · 2026-08-19 · grade: inferred

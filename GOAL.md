@@ -53,8 +53,36 @@ its three instances: v1 trusted a header date over `git log`; v2 trusted a word 
 over `spot-bench.yaml`'s STILL LIVE block; v3 trusted an empty code search over
 `grep`. *A mechanical signal is not the primary source. Verify against the file.*
 
-**`docs/cold-start-test.md` is written and NOT run.** I cannot run it — I know the
-answers and would score myself generously. It is yours.
+**`docs/cold-start-test.md` — RUN, partially, and it found the flagship item wrong.**
+6/7, all three mandatory criteria passed. Criterion 4 (ruled-out injected by the hook)
+stays unmeasured; a subagent never receives `SessionStart`.
+
+**EL-001's evidence rule could never fire.** It named only `docs/bom-checklist.md`,
+which says of itself *"state persists in your browser (nothing leaves your device)"*.
+Ticking it writes nothing to the repo — structurally unsatisfiable — so the item could
+never close, while ranked #1 since the seed and with its parts photographed in
+`docs/04a-wire-the-zones.md`. **Fourth instance of the root cause and the worst: the
+rule was already in `CLAUDE.md` and `audit.py` committed the error anyway**, because
+"matched nothing" and "not done" were the same code path.
+
+- **Class fixed first.** `audit.py` classifies every rule `satisfiable` /
+  `never-fired` / `unsatisfiable` against the repo tree. Over the 14 flagged globs:
+  **4 unsatisfiable** (`GB-002`/`GB-014` `docs/*DECISION*`, `GB-003`'s 08-12 capture,
+  `GB-005`'s `partitions*` — two of which are the GOOD case, a file the work will
+  create), **8 never-fired**, 2 merely quiet.
+- **EL-001 not closed.** Evidence recorded (`762afdd`, `d8f092b`, `2c1233f`,
+  `52c5048`); `PROP-0002` proposes repointing the rule and reducing the item to its
+  residual — the **Carclo optics trio**, unphotographed and unmentioned. Not
+  retitled: narrowing scope is a decision with taste in it.
+- **README flagship replaced** with `EL-002` (live, 5-day lead) plus an honest section
+  on why the old example was wrong. `R-056` records the class.
+- **Regression test added**, 6 assertions. 21 tests total, gate green.
+
+**Also found: `APP-001` is obsolete.** HomeApp already has `CHANGELOG.md` and a
+`docs/` tree — the item proposes creating what exists.
+
+**Which tape was bought is NOT verified and stays Marcelo's.** The 1800 K channel
+implies Valent X; that is an inference from a spec, not a photograph. Q-005 open.
 
 ## Not done
 
