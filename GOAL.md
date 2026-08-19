@@ -43,10 +43,28 @@ records the method failure. `EL-002` is rescoped: the bench **has** a volt meter
 was not reached and **cannot** be by that method (`R-055`). `done` refused twice, for
 two different correct reasons.
 
+**Regression tests — DONE.** `tests/test_regressions.py`, 15 assertions over the four
+defect classes that have actually shipped here, wired into `validate.py` as
+`E-REGRESSION` (skip with `--no-tests`). Proven both ways: reintroducing the
+`_fm.canonicalize` bug turns the gate red, restoring it turns it green.
+
+**The root cause is now in `CLAUDE.md`,** next to "Local git lies", as one rule with
+its three instances: v1 trusted a header date over `git log`; v2 trusted a word count
+over `spot-bench.yaml`'s STILL LIVE block; v3 trusted an empty code search over
+`grep`. *A mechanical signal is not the primary source. Verify against the file.*
+
+**`docs/cold-start-test.md` is written and NOT run.** I cannot run it — I know the
+answers and would score myself generously. It is yours.
+
 ## Not done
 
+- **The cold-start test has never been run.** That is the largest untested claim
+  this repo makes about itself, and it needs an observer who is not me.
 - **`state/audits/` has one entry.** The second run is the one that proves the
   window-since-last-audit path, and it needs a day to pass.
+- **The tests cover four defect classes, not the tools.** 2,706 lines of Python
+  and ~180 lines of test. Everything not on that list is still only checked by
+  somebody running it and looking.
 - **Group D is 99 commits.** Most are genuinely outside the seed's 27 items. That is
   the honest finding, not a bug — but it means the seed under-covers `gimbal-bench`.
 - **Nine evidence globs are too broad or match nothing**, reported in group B.

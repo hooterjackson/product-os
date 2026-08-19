@@ -62,6 +62,10 @@ class Applier(object):
         self.applied = []
         self.refused = []
         self.proposed = []
+        # What THIS run appended, tracked in memory rather than re-read from
+        # disk -- otherwise --dry-run reports a weaker refusal than the real
+        # run, and the dry run is the one people trust before committing.
+        self.added_this_run = {}
         # Evidence as it stood BEFORE this run. Closing an item is checked
         # against this snapshot, never against what the same command just
         # appended -- otherwise "no done without evidence" quietly degrades
@@ -108,6 +112,7 @@ class Applier(object):
         fm["evidence_found"] = found
         fm["updated"] = today()
         self.write(node.path, fm, body, "item")
+        self.added_this_run.setdefault(item_id, []).extend(added)
         self.applied.append((item_id, "evidence_found += %s" % ", ".join(added)))
 
     def set_status(self, item_id, status):
@@ -123,7 +128,7 @@ class Applier(object):
             return
         fm, body = _fm.load(node.path)
         if status == "done" and not self.prior_evidence.get(item_id):
-            fresh = len(fm.get("evidence_found") or [])
+            fresh = len(self.added_this_run.get(item_id) or [])
             self.refused.append(
                 (item_id,
                  "REFUSED status=done: no evidence_found existed before this "

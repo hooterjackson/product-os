@@ -141,10 +141,29 @@ Most work happens in *other* repos — `engineered-lighting-site`, `gimbal-bench
 `HomeApp`. product-os tracks; it does not host. When you pick up an item, work in the
 repo the item names, and come back here only to `/handoff`.
 
-**Local git lies.** `git rev-list --count HEAD..origin/main` returned `0` in
-`engineered-lighting` while the remote was 54 commits ahead, because the tracking ref
-had not been fetched since July. Always `git fetch` before asking git what landed. If
-the fetch fails, report `⚠ unreachable` — never fall back to the local ref.
+**A mechanical signal is not the primary source.** An empty search result is not
+absence. A word count is not a decision. A file's header date is not what git says.
+**Verify against the file.**
+
+This is one root cause, not three bugs. It has now produced a confident wrong answer
+three times in this project's short history:
+
+| | trusted | over | result |
+|---|---|---|---|
+| v1 | a header date | `git log` | built a 33-item seed from a file 54 commits stale |
+| v2 | a word count | `spot-bench.yaml`'s STILL LIVE block | tried to retire a live contract |
+| v3 | an empty code search | `grep` | published that two real quotes did not exist |
+
+Each time the signal was cheap, plausible, and pointed the same direction as the
+answer already in mind. That is what makes the class dangerous rather than merely
+possible. `wiki/ruled-out.md` `R-054` has the third instance in full, but it is
+keyword-scoped to code search — **the rule applies to every verification act.**
+
+**Local git lies** is the same lesson wearing work clothes. `git rev-list --count
+HEAD..origin/main` returned `0` in `engineered-lighting` while the remote was 54
+commits ahead, because the tracking ref had not been fetched since July. Always `git
+fetch` before asking git what landed. If the fetch fails, report `⚠ unreachable` —
+never fall back to the local ref.
 
 **One repo outranks the others.** `gimbal-bench` holds the decision ledger (D/R/F/G/Z
 rulings). Published documentation on the site is narrative and can be stale; it never

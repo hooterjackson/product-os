@@ -345,13 +345,38 @@ class Validator(object):
 
     # -- driver -------------------------------------------------------------
 
-    def run(self, base_ref=None):
+    def check_regressions(self):
+        """Run tests/test_regressions.py as part of the gate.
+
+        Each test there pins a defect that shipped in this repo and was found
+        by running the code and reading the output -- a method that works once
+        per defect, by luck, possibly after somebody has acted on the wrong
+        answer. Wiring them into the gate is what converts that into a check.
+        """
+        path = os.path.join(self.root, "tests", "test_regressions.py")
+        if not os.path.exists(path):
+            self.warn("W-NO-REGRESSION-TESTS", "tests/",
+                      "tests/test_regressions.py is missing")
+            return
+        proc = subprocess.run([sys.executable, path],
+                              stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        if proc.returncode == 0:
+            return
+        output = proc.stdout.decode("utf-8", "replace")
+        failures = [ln for ln in output.splitlines()
+                    if ln.startswith(("FAIL:", "ERROR:"))]
+        for line in failures or ["see `python3 tests/test_regressions.py`"]:
+            self.error("E-REGRESSION", "tests/test_regressions.py", line.strip())
+
+    def run(self, base_ref=None, with_tests=True):
         self.check_format()
         self.check_contract_docs()
         model = _model.Model.load(self.root)
         self.check_model(model)
         self.check_secrets()
         self.check_authority(base_ref)
+        if with_tests:
+            self.check_regressions()
         return model
 
 
@@ -373,11 +398,13 @@ def main(argv=None):
     parser.add_argument("--strict", action="store_true",
                         help="treat warnings as errors")
     parser.add_argument("--base", help="git ref for the authority audit")
+    parser.add_argument("--no-tests", action="store_true",
+                        help="skip tests/test_regressions.py")
     args = parser.parse_args(argv)
 
     root = _model.find_root()
     validator = Validator(root, fix_format=args.fix_format)
-    validator.run(base_ref=args.base)
+    validator.run(base_ref=args.base, with_tests=not args.no_tests)
 
     errors = [f for f in validator.findings if f.level == "error"]
     warnings = [f for f in validator.findings if f.level == "warning"]
