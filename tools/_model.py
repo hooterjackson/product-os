@@ -1,62 +1,33 @@
 #!/usr/bin/env python3
-"""Load the authored state and compute everything derived from it.
+"""Load the authored state. Compute almost nothing.
 
-Nothing in here is ever written back to `state/`. Scores, leverage, effective
-status and rank are computed on every run and live only in memory or `build/`.
-That is the computed/decided boundary, and it is why there is no ordered list
-anywhere in this repository.
+This module used to derive an order: `impact x confidence / effort_bucket`,
+lifted by transitive reachability through a dependency graph, recomputed on
+every run so that no ordered list existed anywhere. That was the repository's
+founding claim and it is reversed -- `DEC-202`, `R-068`, `R-069`.
+
+**Measured before removing it.** Across the 18 offerable nodes, 9 of the 17
+adjacent pairs sat within 10% of each other -- the exact band `CLAUDE.md` says
+to *escalate* on. Eighteen items produced ten distinct scores, the largest tie
+was four items, and `pin` (the human override, described in the plan as moving
+"from exception to ordinary use") had never been set on a single item. The
+graph was 12 edges over 41 nodes, 10 of them inside one repo, from a phase plan
+Marcelo wrote by hand before this tool existed.
+
+So the order is authored: `state/backlog.md`, one id per line, top is next.
+Nothing here computes it, and no agent writes it.
 """
 
 import glob
-import graphlib
 import os
 
 import _fm
 
-# --- scoring constants ------------------------------------------------------
-# These are knobs, not truths. Changing one is a decision about how the system
-# weighs your time, and should be recorded as such.
+BACKLOG = "state/backlog.md"
 
-# Dependency depth is what orders software work. The portfolio is 30 items
-# across four codebases with a 5-hop chain in it, and what decides "do this
-# first" is how much of that chain is waiting -- not a clock.
-#
-# Raised 0.25 -> 0.5 on 2026-08-19 with the lead-time term's removal. At 0.25 an
-# 8-deep item got a 3.0x lift and still lost to a 20-minute chore; at 0.5 it gets
-# 5.0x and surfaces, which is the behaviour the chain was drawn for.
-LEVERAGE_WEIGHT = 0.5
-
-# effort_minutes -> the 1-5 denominator. `effort` is derived, never authored:
-# a human estimates minutes far more reliably than an abstract 1-5, and one
-# source of truth removes a whole class of cross-machine drift.
-EFFORT_BUCKETS = [(15, 1), (60, 2), (240, 3), (960, 4)]
-
+# `dropped` and `parked` are scope decisions with taste in them; `done` is
+# finished. None of the three can be picked up, so none belongs in the backlog.
 ACTIVE_EXCLUDED = {"done", "dropped", "parked"}
-OFFERABLE_GATES = {"none"}
-
-
-def effort_bucket(minutes):
-    for threshold, bucket in EFFORT_BUCKETS:
-        if minutes <= threshold:
-            return bucket
-    return 5
-
-
-# `urgency` is GONE, by Marcelo's decision on 2026-08-19.
-#
-# It was built for a procurement problem that is finished. Measured before
-# removal: 2 of 30 items carried any `lead_time_days` and both were purchases,
-# so the term was inert on 28 items and tripled the score on the two that no
-# longer matter. `EL-001` ranked #1 in this portfolio for weeks on a 3.0x
-# multiplier for shipping time on parts that were already photographed on the
-# bench.
-#
-# The hardware is bought. This tool plans SOFTWARE -- firmware, the
-# commissioning console, HomeApp, the perception stack, and itself -- and a
-# calendar term answers a question nobody is asking any more.
-#
-# `lead_time_days` stays in the schema and is still displayed. It is a real
-# fact about an item; it just no longer moves the order.
 
 
 class Entity(object):
@@ -69,12 +40,6 @@ class Entity(object):
         self.title = fm.get("title", "")
         self.project = fm.get("project", "")
         self.status = fm.get("status", "next")
-        # computed
-        self.leverage = 0
-        self.reach = frozenset()
-        self.score = 0.0
-        self.effective_status = self.status
-        self.blockers = []
 
     def get(self, key, default=None):
         return self.fm.get(key, default)
@@ -82,10 +47,6 @@ class Entity(object):
     @property
     def is_active(self):
         return self.status not in ACTIVE_EXCLUDED
-
-    @property
-    def effort_minutes(self):
-        return self.fm.get("effort_minutes") or 1
 
     def __repr__(self):
         return "<%s %s>" % (self.kind, self.id)
@@ -95,12 +56,9 @@ class Model(object):
     def __init__(self, root):
         self.root = root
         self.items = {}
-        self.questions = {}
         self.decisions = {}
         self.projects = {}
         self.errors = []
-
-    # -- loading ------------------------------------------------------------
 
     @classmethod
     def load(cls, root):
@@ -111,14 +69,10 @@ class Model(object):
         for path in sorted(glob.glob(os.path.join(
                 root, "state", "projects", "*", "items", "*.md"))):
             model._add(model.items, "item", path)
-        for path in sorted(glob.glob(os.path.join(
-                root, "state", "questions", "*.md"))):
-            model._add(model.questions, "question", path)
         for pattern in (("state", "decisions", "*.md"),
                         ("state", "projects", "*", "decisions", "*.md")):
             for path in sorted(glob.glob(os.path.join(root, *pattern))):
                 model._add(model.decisions, "decision", path)
-        model.compute()
         return model
 
     def _add(self, target, kind, path, key="id"):
@@ -138,137 +92,46 @@ class Model(object):
             return
         target[identifier] = entity
 
-    # -- graph --------------------------------------------------------------
-
     @property
     def nodes(self):
-        merged = dict(self.items)
-        merged.update(self.questions)
-        return merged
+        """Every task. Questions used to be a second kind here; with the graph
+        and the score inputs gone, a question was a task whose title ends in a
+        question mark, living outside any project -- which the "every task
+        belongs to a project" rule forbids. They are ordinary tasks now."""
+        return dict(self.items)
 
-    def edges(self, confirmed_only=True):
-        """id -> set of ids it unblocks.
+    # -- the authored order --------------------------------------------------
 
-        Inferred edges are excluded from leverage and never force `blocked`.
-        A wrong guessed edge should not be able to make real work invisible --
-        that failure is expensive and silent, because you cannot tell
-        "correctly blocked" from "wrongly blocked" without re-deriving the
-        graph by hand, which is the labour this tool exists to remove.
-        """
-        out = {}
-        nodes = self.nodes
-        for node_id, node in nodes.items():
-            targets = set(node.get("unblocks") or [])
-            if not confirmed_only:
-                targets |= set(node.get("unblocks_inferred") or [])
-            # questions gate items; same edge direction for scoring purposes
-            targets |= set(node.get("gates") or [])
-            out[node_id] = {t for t in targets if t in nodes}
+    def backlog_ids(self):
+        """`state/backlog.md`, in file order. Ids only; resolution is separate
+        so `validate.py` can report a dangling id as a dangling id."""
+        path = os.path.join(self.root, BACKLOG)
+        out = []
+        if not os.path.exists(path):
+            return out
+        with open(path, "r", encoding="utf-8") as fh:
+            for line in fh:
+                line = line.split("#", 1)[0].strip()
+                if line:
+                    out.append(line)
         return out
 
-    def compute(self):
+    def backlog(self):
+        """The tasks he has ordered, top first. Unknown ids are skipped here
+        and reported by `validate.py`'s `E-BACKLOG-DRIFT` -- rendering must not
+        be the thing that tells you the file is wrong."""
         nodes = self.nodes
-        edges = self.edges(confirmed_only=True)
+        return [nodes[i] for i in self.backlog_ids() if i in nodes]
 
-        # blockers: X is blocked by A when X is in A.unblocks (confirmed only)
-        blockers = {node_id: [] for node_id in nodes}
-        for source, targets in edges.items():
-            for target in targets:
-                blockers[target].append(source)
-
-        for node_id, node in nodes.items():
-            node.blockers = sorted(blockers[node_id], key=_fm.sort_key)
-            unmet = [b for b in node.blockers if nodes[b].status != "done"]
-            if node.status not in ACTIVE_EXCLUDED and unmet:
-                node.effective_status = "blocked"
-            else:
-                node.effective_status = node.status
-
-        # transitive leverage over the ACTIVE subgraph.
-        #
-        # Excluding done/dropped/parked matters twice over: reachability
-        # through a finished node overstates what an item still gates (a lie
-        # rank.py would then print in a sentence), and because `dropped` and
-        # `parked` are human-authority, leverage stays a pure function of
-        # human-authority fields -- which is what makes the authority
-        # guarantee true rather than merely stated.
-        active = {n for n, node in nodes.items() if node.is_active}
-        sorter = graphlib.TopologicalSorter(
-            {n: {s for s in edges if n in edges[s] and s in active}
-             for n in active}
-        )
-        try:
-            order = list(sorter.static_order())
-        except graphlib.CycleError as exc:
-            self.errors.append("dependency cycle: %s"
-                               % " -> ".join(exc.args[1]))
-            order = list(active)
-
-        reach = {}
-        for node_id in reversed(order):
-            downstream = set()
-            for target in edges.get(node_id, ()):
-                if target in active:
-                    downstream.add(target)
-                    downstream |= reach.get(target, set())
-            reach[node_id] = downstream
-
-        for node_id, node in nodes.items():
-            node.reach = frozenset(reach.get(node_id, ()))
-            node.leverage = len(node.reach)
-            node.score = self.score(node)
-
-    def score(self, node):
-        impact = node.get("impact") or 0
-        confidence = node.get("confidence") or 0
-        bucket = effort_bucket(node.effort_minutes)
-        base = (impact * confidence) / float(bucket)
-        lift = 1.0 + LEVERAGE_WEIGHT * node.leverage
-        return base * lift
-
-    # -- ranking ------------------------------------------------------------
-
-    def ranked(self, time_limit=None, energy=None, gate=None,
-               machine=None, include_blocked=False):
-        candidates = []
-        for node in self.nodes.values():
-            if not node.is_active:
-                continue
-            if not include_blocked and node.effective_status == "blocked":
-                continue
-            if gate is not None and (node.get("gate") or "none") != gate:
-                continue
-            if time_limit is not None and node.effort_minutes > time_limit:
-                continue
-            if energy is not None:
-                load = node.get("cognitive_load") or "medium"
-                if energy == "low" and load != "low":
-                    continue
-                if energy == "medium" and load == "high":
-                    continue
-            if machine is not None:
-                affinity = node.get("machine_affinity")
-                if affinity and affinity != machine:
-                    continue
-            candidates.append(node)
-
-        # Total order, identical on any machine: score, then leverage, then
-        # lead time, then the cheapest, then oldest, then id.
-        candidates.sort(key=lambda n: (
-            -round(n.score, 6), -n.leverage, -(n.get("lead_time_days") or 0),
-            n.effort_minutes, n.get("created") or "", _fm.sort_key(n.id),
-        ))
-
-        pinned = [n for n in candidates if n.get("pin")]
-        if pinned:
-            rest = [n for n in candidates if not n.get("pin")]
-            pinned.sort(key=lambda n: n.get("pin"))
-            ordered = rest[:]
-            for node in pinned:
-                position = max(0, min(len(ordered), node.get("pin") - 1))
-                ordered.insert(position, node)
-            candidates = ordered
-        return candidates
+    def unlisted(self):
+        """Active tasks the backlog does not mention. Not an error on its own:
+        a task created since the last reorder is unlisted and fine. It is
+        `validate.py`'s job to decide, and the dashboard's job to show them
+        rather than let them be invisible."""
+        listed = set(self.backlog_ids())
+        return [n for n in sorted(self.nodes.values(),
+                                  key=lambda n: _fm.sort_key(n.id))
+                if n.is_active and n.id not in listed]
 
 
 def find_root(start=None):

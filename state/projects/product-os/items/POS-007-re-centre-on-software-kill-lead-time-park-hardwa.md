@@ -7,13 +7,6 @@
   "lane": "infra",
   "gate": "none",
   "machine_affinity": null,
-  "impact": 5,
-  "confidence": 4,
-  "effort_minutes": 480,
-  "cognitive_load": "high",
-  "lead_time_days": 0,
-  "cost_usd": null,
-  "unblocks": [],
   "keywords": [
     "software",
     "re-centre",
@@ -28,7 +21,7 @@
   ],
   "evidence": [],
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

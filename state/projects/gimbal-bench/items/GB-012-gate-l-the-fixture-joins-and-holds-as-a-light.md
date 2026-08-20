@@ -5,17 +5,8 @@
   "project": "gimbal-bench",
   "status": "next",
   "lane": "firmware",
-  "gate": "bench",
+  "gate": "none",
   "machine_affinity": "formd-t1",
-  "impact": 5,
-  "confidence": 3,
-  "effort_minutes": 480,
-  "cognitive_load": "high",
-  "lead_time_days": 0,
-  "cost_usd": null,
-  "unblocks": [],
-  "unblocks_inferred": [],
-  "answers": [],
   "keywords": [
     "gate-l",
     "zigbee",
@@ -42,7 +33,7 @@
   ],
   "parent_ruling": "DEC-015",
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

@@ -4,12 +4,9 @@
   "title": "Where do 300 liveness taps a second come from?",
   "project": "gimbal-bench",
   "status": "next",
-  "gates": [],
-  "impact": 3,
-  "confidence": 3,
-  "effort_minutes": 120,
-  "cognitive_load": "high",
-  "lead_time_days": 0,
+  "lane": "firmware",
+  "gate": "none",
+  "machine_affinity": null,
   "keywords": [
     "serial-flood",
     "57",
@@ -30,8 +27,13 @@
       "note": "D14, 'The honest wrinkle, carried forward'."
     }
   ],
+  "evidence_found": [],
+  "repos": [
+    "gimbal-bench"
+  ],
+  "parent_ruling": null,
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

@@ -4,12 +4,9 @@
   "title": "Does Doc 4's $170-240 range assume the $30 substitute, not the $486 spool?",
   "project": "engineering-site",
   "status": "parked",
-  "gates": [],
-  "impact": 3,
-  "confidence": 4,
-  "effort_minutes": 30,
-  "cognitive_load": "low",
-  "lead_time_days": 0,
+  "lane": "content",
+  "gate": "none",
+  "machine_affinity": null,
   "keywords": [
     "bom",
     "doc4",
@@ -31,8 +28,13 @@
       "note": "The Doc 4 header and row 4 of the same table."
     }
   ],
+  "evidence_found": [],
+  "repos": [
+    "engineered-lighting-site"
+  ],
+  "parent_ruling": null,
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

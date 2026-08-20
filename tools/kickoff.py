@@ -27,9 +27,8 @@ import json
 import os
 import sys
 
-import _fm
 import _model
-import brief as brief_mod
+import _context
 
 MAX_RULED_OUT = 4
 MANUAL = "state/threads/manual.yaml"
@@ -106,7 +105,7 @@ def threads_for(root, item_id, manual):
 
 def render(node, model, entries, stamp, repos_spec, root, manual,
            volatile=True):
-    ruled = brief_mod.ruled_out_for(node, entries)[:MAX_RULED_OUT]
+    ruled = _context.ruled_out_for(node, entries)[:MAX_RULED_OUT]
     repos = node.get("repos") or []
     machine = node.get("machine_affinity")
     gate = node.get("gate") or "none"
@@ -117,13 +116,26 @@ def render(node, model, entries, stamp, repos_spec, root, manual,
         "",
         "# %s — %s" % (node.id, node.title),
         "",
-        "%s · %s · %d min · gate %s%s"
-        % (node.project, node.effective_status, node.effort_minutes, gate,
+        "%s · %s · gate %s%s"
+        % (node.project, node.status, gate,
            " · machine %s" % machine if machine else ""),
         "Freshness: %s"
-        % brief_mod.freshness(root, node, stamp, repos_spec, volatile),
+        % _context.freshness(root, node, stamp, repos_spec, volatile),
         "",
     ]
+
+    # Inherited from the brief along with `decisions_in_force` below -- the two
+    # sections kickoff did not already cover (`R-071`). Placed high on purpose:
+    # a correction is only real where it is read, and the foot of a prompt is
+    # not where a session looks before starting.
+    if node.status == "done" and node.get("closed_origin") != "his-word":
+        lines += [
+            "> ## ⚠ CLOSED ON MY JUDGEMENT, NOT CONFIRMED",
+            ">",
+            "> A machine decided this was finished. Marcelo has not said so.",
+            "> Confirm from a terminal: `python3 tools/backlog.py --unconfirmed`",
+            "",
+        ]
 
     # --- what this is, from the body, first paragraph only
     lines += ["## What this is", ""]
@@ -144,12 +156,8 @@ def render(node, model, entries, stamp, repos_spec, root, manual,
 
     # --- where it stands
     lines += ["## Where it stands", ""]
-    if node.effective_status == "blocked":
-        lines.append("BLOCKED by %s. Do not start it." % ", ".join(node.blockers))
-    if node.leverage:
-        lines.append("Unblocks %d item(s): %s."
-                     % (node.leverage,
-                        ", ".join(sorted(node.reach, key=_fm.sort_key))))
+    if node.status == "blocked":
+        lines.append("Marked BLOCKED by him. Do not start it without asking why.")
     found = node.get("evidence_found") or []
     if found:
         lines.append("Evidence on file: %s."
@@ -158,7 +166,7 @@ def render(node, model, entries, stamp, repos_spec, root, manual,
     else:
         lines.append("No evidence recorded. It cannot be closed until "
                      "something can be clicked.")
-    nxt = brief_mod.whats_next(node)
+    nxt = _context.whats_next(node)
     lines.append("Next, from the last handoff: %s"
                  % (nxt if nxt else "NO HANDOFF RECORDED — nobody wrote down "
                     "where this was left."))
@@ -216,6 +224,15 @@ def render(node, model, entries, stamp, repos_spec, root, manual,
                      "`%s` so it is reachable next time." % MANUAL)
     lines.append("")
 
+    # --- decisions in force, inherited from the brief (R-071)
+    rulings = _context.decisions_in_force(node, model)
+    if rulings:
+        lines += ["## Decisions in force", ""]
+        for dec_id, ruling, title in rulings:
+            lines.append("- **%s**%s — %s"
+                         % (dec_id, " (%s)" % ruling if ruling else "", title))
+        lines.append("")
+
     # --- rules
     lines += [
         "## Rules",
@@ -224,19 +241,20 @@ def render(node, model, entries, stamp, repos_spec, root, manual,
         "  dated note. If you cannot produce one, it is not done. Say so.",
         "- Say \"I couldn't look\", never \"no changes\". An empty result and an",
         "  unreachable repo are different facts.",
-        "- Do not write his decided fields: impact, confidence, effort_minutes,",
-        "  cost_usd, unblocks, pin, gate, project, parked/dropped, or the",
-        "  evidence rule. Propose instead.",
-        "- The score is a label, not a verdict. Disagree once, with a reason,",
-        "  then do what he says.",
+        "- Do not write his decided fields: project, gate, machine_affinity,",
+        "  parked/dropped, or the evidence rule. Draft into state/drafts/",
+        "  instead — never straight into the task.",
+        "- Do not reorder state/backlog.md. That file is his judgement, and it",
+        "  is the only order there is. Say so once if you disagree, then work",
+        "  on what he put at the top.",
         "",
     ]
     return "\n".join(lines)
 
 
 def generate(root, model, target, volatile=True, manual=None):
-    entries = brief_mod.parse_register(root)
-    stamp = brief_mod.read_stamp(root)
+    entries = _context.parse_register(root)
+    stamp = _context.read_stamp(root)
     manual = load_manual(root) if manual is None else manual
     with open(os.path.join(root, "state", "repos.json"), "r",
               encoding="utf-8") as fh:
@@ -269,8 +287,8 @@ def main(argv=None):
         if node is None:
             sys.stderr.write("no such item: %s\n" % args.item)
             return 2
-        entries = brief_mod.parse_register(root)
-        stamp = brief_mod.read_stamp(root)
+        entries = _context.parse_register(root)
+        stamp = _context.read_stamp(root)
         with open(os.path.join(root, "state", "repos.json"), "r",
                   encoding="utf-8") as fh:
             repos_spec = {k: v for k, v in json.load(fh).items()

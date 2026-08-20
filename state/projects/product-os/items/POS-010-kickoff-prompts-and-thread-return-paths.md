@@ -7,13 +7,6 @@
   "lane": "infra",
   "gate": "none",
   "machine_affinity": null,
-  "impact": 5,
-  "confidence": 4,
-  "effort_minutes": 300,
-  "cognitive_load": "medium",
-  "lead_time_days": 0,
-  "cost_usd": null,
-  "unblocks": [],
   "keywords": [
     "kickoff",
     "prompt",
@@ -28,7 +21,7 @@
   ],
   "evidence": [],
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

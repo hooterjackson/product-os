@@ -6,13 +6,9 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "doing",
-    "blocked_by": [],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-001.md",
+    "backlog_position": 20,
     "closed_origin": null,
-    "cognitive_load": "high",
     "completed": null,
-    "effort_minutes": 960,
     "evidence_found": [
       {
         "kind": "commit",
@@ -46,17 +42,14 @@
       "slice-1a",
       "validate"
     ],
+    "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/POS-001.md",
     "lane": "infra",
-    "leverage": 0,
     "machine_affinity": "work-laptop",
     "project": "product-os",
-    "reach": [],
     "repos": [
       "product-os"
     ],
-    "score": 4.0,
     "status": "doing",
-    "title": "Build product-os slice 1a-minus",
-    "unblocks": []
+    "title": "Build product-os slice 1a-minus"
   }
 }

@@ -8,7 +8,6 @@
 
 import argparse
 import glob
-import graphlib
 import json
 import os
 import re
@@ -67,8 +66,13 @@ FORBIDDEN_SHARD_KEY = re.compile(
 
 VALID_STATUS = {"next", "doing", "done", "blocked", "dropped", "parked"}
 VALID_LANE = {"hardware", "firmware", "app", "infra", "content"}
-VALID_GATE = {"none", "awaiting-parts", "bench", "printer", "gpu", "external"}
-VALID_LOAD = {"low", "medium", "high"}
+# `bench`/`gpu` folded into `machine_affinity` on 2026-08-20 -- verified
+# lossless: every item carrying `gate: bench` already named `formd-t1`.
+# `printer` survives ONLY because its one item (EL-003, parked, hardware,
+# leaving at the cutover) names no machine and this session could not verify
+# which machine the printer is attached to. Guessing one would have destroyed
+# the fact. It goes when that item does.
+VALID_GATE = {"none", "awaiting-parts", "printer", "external"}
 
 
 class Finding(object):
@@ -155,10 +159,7 @@ class Validator(object):
 
     def check_model(self, model):
         for err in model.errors:
-            if "cycle" in err:
-                self.error("E-GRAPH-CYCLE", "state/", err)
-            else:
-                self.error("E-MODEL", "state/", err)
+            self.error("E-MODEL", "state/", err)
 
         nodes = model.nodes
         seen = {}
@@ -182,45 +183,26 @@ class Validator(object):
                                "prefix %s implies project %s, frontmatter says %s"
                                % (prefix, expected, node.project))
 
-            if node.kind in ("item", "question"):
-                self.check_scored(node)
+            if node.kind == "item":
+                self.check_task(node)
 
-        for node in nodes.values():
-            for field in ("unblocks", "unblocks_inferred", "answers", "gates"):
-                for ref in node.get(field) or []:
-                    if ref not in nodes:
-                        self.error("E-REF-UNRESOLVED", node.path,
-                                   "%s references %s, which does not exist"
-                                   % (field, ref))
-                    elif ref == node.id:
-                        self.error("E-REF-SELF", node.path,
-                                   "%s references itself" % field)
+        self.check_backlog(model)
 
-        pins = {}
-        for node in nodes.values():
-            pin = node.get("pin")
-            if pin is None:
-                continue
-            if pin in pins:
-                self.error("E-PIN-DUPLICATE", node.path,
-                           "pin %d also used by %s" % (pin, pins[pin]))
-            pins[pin] = node.id
+    def check_task(self, node):
+        """Schema for one task.
 
-    def check_scored(self, node):
+        This was `check_scored`, and it enforced ranges on `impact`,
+        `confidence`, `effort_minutes` and `lead_time_days`. Those fields no
+        longer exist (`DEC-202`), and validating a number is not the same as
+        the number meaning anything -- all four passed every check while
+        producing 10 distinct scores across 18 items.
+        """
         path = node.path
-        for field in ("impact", "confidence"):
-            value = node.get(field)
-            if not isinstance(value, int) or not 1 <= value <= 5:
-                self.error("E-SCHEMA-RANGE", path,
-                           "%s must be an integer 1-5, got %r" % (field, value))
-        minutes = node.get("effort_minutes")
-        if not isinstance(minutes, int) or minutes < 1:
-            self.error("E-SCHEMA-RANGE", path,
-                       "effort_minutes must be a positive integer, got %r" % minutes)
-        lead = node.get("lead_time_days")
-        if lead is not None and (not isinstance(lead, int) or lead < 0):
-            self.error("E-SCHEMA-RANGE", path,
-                       "lead_time_days must be >= 0, got %r" % lead)
+        if not node.project:
+            self.error("E-TASK-NO-PROJECT", path,
+                       "every task must belong to a project -- a task with no "
+                       "project gets no context injected into its kickoff "
+                       "prompt, and no card to appear on")
         if node.status not in VALID_STATUS:
             self.error("E-SCHEMA-ENUM", path,
                        "status %r not in %s" % (node.status, sorted(VALID_STATUS)))
@@ -232,11 +214,6 @@ class Validator(object):
         if gate is not None and gate not in VALID_GATE:
             self.error("E-SCHEMA-ENUM", path,
                        "gate %r not in %s" % (gate, sorted(VALID_GATE)))
-        load = node.get("cognitive_load")
-        if load is not None and load not in VALID_LOAD:
-            self.error("E-SCHEMA-ENUM", path,
-                       "cognitive_load %r not in %s" % (load, sorted(VALID_LOAD)))
-
         # The rule the whole system rests on: nothing is done without evidence.
         if node.status == "done":
             if not node.get("evidence_found"):
@@ -250,10 +227,43 @@ class Validator(object):
         # A derived value must never be written back into authored state,
         # or it quietly becomes authoritative.
         for derived in ("score", "leverage", "rank", "blocked_by", "effort",
-                        "threads"):
+                        "threads", "impact", "confidence", "effort_minutes",
+                        "lead_time_days", "cost_usd", "cognitive" + "_load",
+                        "unblocks", "unblocks" + "_inferred", "pin",
+                        "position"):
             if derived in node.fm:
                 self.error("E-DERIVED-PRESENT", path,
-                           "%r is computed and must not be stored" % derived)
+                           "%r was removed on 2026-08-20 (DEC-202) and must "
+                           "not come back" % derived)
+
+    def check_backlog(self, model):
+        """`state/backlog.md` is the only order there is, so a task missing
+        from it is invisible and a line pointing at nothing is a dead entry.
+
+        This replaces `E-REF-UNRESOLVED` over `unblocks`/`gates`/`answers` and
+        `E-PIN-DUPLICATE`, which resolved a graph and a pin field that no
+        longer exist. One ordered file needs exactly two guarantees, and this
+        is both of them.
+        """
+        listed = model.backlog_ids()
+        seen = {}
+        for position, item_id in enumerate(listed, 1):
+            if item_id not in model.nodes:
+                self.error("E-BACKLOG-DRIFT", _model.BACKLOG,
+                           "line %d names %s, which is not a task"
+                           % (position, item_id))
+            elif item_id in seen:
+                self.error("E-BACKLOG-DRIFT", _model.BACKLOG,
+                           "%s appears twice, at lines %d and %d -- one task "
+                           "cannot hold two positions"
+                           % (item_id, seen[item_id], position))
+            else:
+                seen[item_id] = position
+        for item_id, node in sorted(model.nodes.items()):
+            if node.is_active and item_id not in seen:
+                self.warn("W-BACKLOG-UNLISTED", _model.BACKLOG,
+                          "%s is active and not in the backlog, so nothing "
+                          "shows it. Add a line or park it." % item_id)
 
     def check_register_ids(self):
         """A register ID must appear once.
@@ -301,9 +311,17 @@ class Validator(object):
         citation there is a symptom of one in `state/`, and reporting it twice
         points at the generated copy instead of the file to edit.
         """
-        prop_dir = os.path.join(self.root, "state", "proposals")
+        # BOTH directories. The proposal mechanism is retired (`R-074`) and
+        # the four open files move to the archive at the cutover -- but eleven
+        # `PROP-` citations across eight files are real and must keep
+        # resolving through the move. A check that breaks halfway through its
+        # own migration teaches people to disable it.
         known = set()
-        if os.path.isdir(prop_dir):
+        for prop_dir in (os.path.join(self.root, "state", "proposals"),
+                         os.path.join(self.root, "state", "archive",
+                                      "proposals")):
+            if not os.path.isdir(prop_dir):
+                continue
             for name in os.listdir(prop_dir):
                 found = PROPOSAL_REF.search(name)
                 if found:
@@ -326,8 +344,9 @@ class Validator(object):
                 for ref in PROPOSAL_REF.finditer(line):
                     if ref.group(1) not in known:
                         self.error("E-REF-PROPOSAL", rel,
-                                   "cites %s, which does not exist in "
-                                   "state/proposals/" % ref.group(0),
+                                   "cites %s, which is in neither "
+                                   "state/proposals/ nor state/archive/"
+                                   "proposals/" % ref.group(0),
                                    line=number)
 
     def check_secrets(self):

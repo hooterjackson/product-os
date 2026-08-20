@@ -7,17 +7,6 @@
   "lane": "infra",
   "gate": "none",
   "machine_affinity": null,
-  "impact": 3,
-  "confidence": 3,
-  "effort_minutes": 480,
-  "cognitive_load": "medium",
-  "lead_time_days": 0,
-  "cost_usd": null,
-  "unblocks": [
-    "GB-012"
-  ],
-  "unblocks_inferred": [],
-  "answers": [],
   "keywords": [
     "ota",
     "zigbee",
@@ -44,7 +33,7 @@
   ],
   "parent_ruling": "DEC-015",
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

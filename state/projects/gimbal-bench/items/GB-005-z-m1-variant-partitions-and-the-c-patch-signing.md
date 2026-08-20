@@ -7,18 +7,6 @@
   "lane": "firmware",
   "gate": "none",
   "machine_affinity": "formd-t1",
-  "impact": 4,
-  "confidence": 3,
-  "effort_minutes": 480,
-  "cognitive_load": "high",
-  "lead_time_days": 0,
-  "cost_usd": null,
-  "unblocks": [
-    "GB-006",
-    "GB-007"
-  ],
-  "unblocks_inferred": [],
-  "answers": [],
   "keywords": [
     "zigbee",
     "z-m1",
@@ -46,7 +34,7 @@
   ],
   "parent_ruling": "DEC-015",
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

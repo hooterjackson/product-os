@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
-"""Create a capture, an item, or a question.
+"""Create a capture or a task.
 
     python3 tools/new.py capture "zigbee thing weird at high brightness"
-    python3 tools/new.py item --project robotic-spotlight --title "..."
-    python3 tools/new.py question --title "..."
+    python3 tools/new.py item --project gimbal-bench --title "..."
+
+**The system never creates a task.** This is the command Marcelo runs, or that
+an agent runs on his instruction -- the terminal counterpart of filing the
+GitHub issue. What an agent derives on its own goes to
+`state/recommendations/`, outside the backlog, until he adopts it (`R-072`).
 
 Capture takes no options beyond the text on purpose. There is no project flag,
 no priority flag, nothing to ask about. If capture ever asks a question,
@@ -114,15 +118,11 @@ def cmd_item(root, args):
         "lane": args.lane,
         "gate": args.gate,
         "machine_affinity": args.machine,
-        "impact": args.impact,
-        "confidence": args.confidence,
-        "effort_minutes": args.minutes,
-        "cognitive_load": args.load,
-        "lead_time_days": args.lead,
-        "cost_usd": args.cost,
-        "unblocks": [],
         "keywords": [k.strip() for k in (args.keywords or "").split(",") if k.strip()],
         "evidence": [],
+        "evidence_found": [],
+        "repos": [r.strip() for r in (args.repos or "").split(",") if r.strip()],
+        "parent_ruling": None,
         "created": today(),
         "updated": today(),
     }
@@ -130,34 +130,14 @@ def cmd_item(root, args):
                         "%s-%s.md" % (item_id, slugify(args.title)))
     body = args.body or "<!-- Why this matters. Then ## Acceptance, then ## Handoffs. -->\n"
     _fm.write(path, fm, body, "item")
-    print(os.path.relpath(path, root))
-    return 0
 
-
-def cmd_question(root, args):
-    question_id = next_id(root, "Q")
-    fm = {
-        "id": question_id,
-        "title": args.title,
-        "project": args.project,
-        # "next", not "open": questions share the item status vocabulary because
-        # they share the ranking pipeline. A second vocabulary would fail
-        # validate.py's enum check on the first question ever created.
-        "status": "next",
-        "gates": [],
-        "impact": args.impact,
-        "confidence": args.confidence,
-        "effort_minutes": args.minutes,
-        "cognitive_load": args.load,
-        "lead_time_days": 0,
-        "keywords": [k.strip() for k in (args.keywords or "").split(",") if k.strip()],
-        "evidence": [],
-        "created": today(),
-        "updated": today(),
-    }
-    path = os.path.join(root, "state", "questions",
-                        "%s-%s.md" % (question_id, slugify(args.title)))
-    _fm.write(path, fm, args.body or "", "question")
+    # A task nothing points at is invisible: `state/backlog.md` IS the order,
+    # so a task absent from it appears nowhere. Appended at the BOTTOM, never
+    # inserted -- where it belongs is his call, not this command's.
+    backlog = os.path.join(root, "state", "backlog.md")
+    if os.path.exists(backlog):
+        with open(backlog, "a", encoding="utf-8") as fh:
+            fh.write("%s  # %s\n" % (item_id, args.title))
     print(os.path.relpath(path, root))
     return 0
 
@@ -175,29 +155,13 @@ def main(argv=None):
     item.add_argument("--lane", default="infra")
     item.add_argument("--gate", default="none")
     item.add_argument("--machine", default=None)
-    item.add_argument("--impact", type=int, default=3)
-    item.add_argument("--confidence", type=int, default=3)
-    item.add_argument("--minutes", type=int, default=60)
-    item.add_argument("--load", default="medium")
-    item.add_argument("--lead", type=int, default=0)
-    item.add_argument("--cost", type=float, default=None)
+    item.add_argument("--repos", default="")
     item.add_argument("--keywords", default="")
     item.add_argument("--body", default=None)
 
-    question = sub.add_parser("question")
-    question.add_argument("--title", required=True)
-    question.add_argument("--project", default=None)
-    question.add_argument("--impact", type=int, default=3)
-    question.add_argument("--confidence", type=int, default=3)
-    question.add_argument("--minutes", type=int, default=60)
-    question.add_argument("--load", default="medium")
-    question.add_argument("--keywords", default="")
-    question.add_argument("--body", default=None)
-
     args = parser.parse_args(argv)
     root = _model.find_root()
-    return {"capture": cmd_capture, "item": cmd_item,
-            "question": cmd_question}[args.cmd](root, args)
+    return {"capture": cmd_capture, "item": cmd_item}[args.cmd](root, args)
 
 
 if __name__ == "__main__":

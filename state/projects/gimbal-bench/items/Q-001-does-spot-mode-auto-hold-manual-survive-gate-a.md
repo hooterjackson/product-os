@@ -4,14 +4,9 @@
   "title": "Does Spot Mode (Auto/Hold/Manual) survive gate A?",
   "project": "gimbal-bench",
   "status": "next",
-  "gates": [
-    "GB-010"
-  ],
-  "impact": 4,
-  "confidence": 3,
-  "effort_minutes": 120,
-  "cognitive_load": "high",
-  "lead_time_days": 0,
+  "lane": "firmware",
+  "gate": "none",
+  "machine_affinity": null,
   "keywords": [
     "spot-mode",
     "auto",
@@ -33,8 +28,13 @@
       "note": "§8, the esphome parity checklist."
     }
   ],
+  "evidence_found": [],
+  "repos": [
+    "gimbal-bench"
+  ],
+  "parent_ruling": null,
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

@@ -6,13 +6,9 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "doing",
-    "blocked_by": [],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-008.md",
+    "backlog_position": 10,
     "closed_origin": null,
-    "cognitive_load": "medium",
     "completed": null,
-    "effort_minutes": 180,
     "evidence_found": [],
     "gate": "none",
     "id": "POS-008",
@@ -28,15 +24,12 @@
       "stamp",
       "visibility"
     ],
+    "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/POS-008.md",
     "lane": "infra",
-    "leverage": 0,
     "machine_affinity": null,
     "project": "product-os",
-    "reach": [],
     "repos": [],
-    "score": 5.333,
     "status": "doing",
-    "title": "Surface inferred closures, record the public decision",
-    "unblocks": []
+    "title": "Surface inferred closures, record the public decision"
   }
 }

@@ -7,15 +7,6 @@
   "lane": "content",
   "gate": "none",
   "machine_affinity": null,
-  "impact": 3,
-  "confidence": 5,
-  "effort_minutes": 25,
-  "cognitive_load": "low",
-  "lead_time_days": 0,
-  "cost_usd": null,
-  "unblocks": [],
-  "unblocks_inferred": [],
-  "answers": [],
   "keywords": [
     "project-state",
     "pointer",
@@ -49,7 +40,7 @@
   ],
   "parent_ruling": null,
   "created": "2026-08-19",
-  "updated": "2026-08-19",
+  "updated": "2026-08-20",
   "completed": "2026-08-19",
   "closed_origin": "inferred"
 }

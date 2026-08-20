@@ -6,13 +6,9 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "next",
-    "blocked_by": [],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-013.md",
+    "backlog_position": 23,
     "closed_origin": null,
-    "cognitive_load": "medium",
     "completed": null,
-    "effort_minutes": 480,
     "evidence_found": [],
     "gate": "none",
     "id": "GB-013",
@@ -27,21 +23,14 @@
       "zha",
       "zigbee"
     ],
+    "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/GB-013.md",
     "lane": "infra",
-    "leverage": 1,
     "machine_affinity": null,
     "project": "gimbal-bench",
-    "reach": [
-      "GB-012"
-    ],
     "repos": [
       "gimbal-bench"
     ],
-    "score": 3.375,
     "status": "next",
-    "title": "Stand up the HA-side Zigbee OTA server",
-    "unblocks": [
-      "GB-012"
-    ]
+    "title": "Stand up the HA-side Zigbee OTA server"
   }
 }

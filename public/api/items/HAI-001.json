@@ -6,13 +6,9 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "next",
-    "blocked_by": [],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/HAI-001.md",
+    "backlog_position": 2,
     "closed_origin": null,
-    "cognitive_load": "low",
     "completed": null,
-    "effort_minutes": 15,
     "evidence_found": [],
     "gate": "none",
     "id": "HAI-001",
@@ -26,15 +22,12 @@
       "secret",
       "ssh"
     ],
+    "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/HAI-001.md",
     "lane": "infra",
-    "leverage": 0,
     "machine_affinity": null,
     "project": "home-ai-infra",
-    "reach": [],
     "repos": [],
-    "score": 20.0,
     "status": "next",
-    "title": "Rotate the GPU box's Linux password",
-    "unblocks": []
+    "title": "Rotate the GPU box's Linux password"
   }
 }

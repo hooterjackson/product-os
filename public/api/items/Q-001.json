@@ -6,13 +6,9 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "next",
-    "blocked_by": [],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/Q-001.md",
+    "backlog_position": 8,
     "closed_origin": null,
-    "cognitive_load": "high",
     "completed": null,
-    "effort_minutes": 120,
     "evidence_found": [],
     "gate": "none",
     "id": "Q-001",
@@ -28,17 +24,14 @@
       "retire",
       "spot-mode"
     ],
-    "lane": null,
-    "leverage": 1,
+    "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/Q-001.md",
+    "lane": "firmware",
     "machine_affinity": null,
     "project": "gimbal-bench",
-    "reach": [
-      "GB-010"
+    "repos": [
+      "gimbal-bench"
     ],
-    "repos": [],
-    "score": 6.0,
     "status": "next",
-    "title": "Does Spot Mode (Auto/Hold/Manual) survive gate A?",
-    "unblocks": []
+    "title": "Does Spot Mode (Auto/Hold/Manual) survive gate A?"
   }
 }

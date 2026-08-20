@@ -7,17 +7,6 @@
   "lane": "firmware",
   "gate": "external",
   "machine_affinity": null,
-  "impact": 4,
-  "confidence": 2,
-  "effort_minutes": 60,
-  "cognitive_load": "high",
-  "lead_time_days": 0,
-  "cost_usd": null,
-  "unblocks": [
-    "GB-005"
-  ],
-  "unblocks_inferred": [],
-  "answers": [],
   "keywords": [
     "zigbee",
     "un-park",
@@ -46,7 +35,7 @@
   ],
   "parent_ruling": "DEC-015",
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

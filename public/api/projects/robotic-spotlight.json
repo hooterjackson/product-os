@@ -7,13 +7,9 @@
   },
   "items": [
     {
-      "authored_status": "parked",
-      "blocked_by": [],
-      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/EL-001.md",
+      "backlog_position": null,
       "closed_origin": null,
-      "cognitive_load": "low",
       "completed": null,
-      "effort_minutes": 20,
       "evidence_found": [
         {
           "kind": "commit",
@@ -56,123 +52,20 @@
         "star",
         "valent-x"
       ],
+      "kickoff": null,
       "lane": "hardware",
-      "leverage": 0,
       "machine_affinity": null,
       "project": "robotic-spotlight",
-      "reach": [],
       "repos": [
         "engineered-lighting-site"
       ],
-      "score": 8.0,
       "status": "parked",
-      "title": "Order the Doc 4 LED BoM",
-      "unblocks": [
-        "GB-012"
-      ]
+      "title": "Order the Doc 4 LED BoM"
     },
     {
-      "authored_status": "done",
-      "blocked_by": [],
-      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/EL-004.md",
-      "closed_origin": "inferred",
-      "cognitive_load": "medium",
-      "completed": "2026-07-21",
-      "effort_minutes": 240,
-      "evidence_found": [
-        {
-          "kind": "commit",
-          "path": "docs/",
-          "repo": "engineered-lighting-site",
-          "sha": "8fb39bf"
-        },
-        {
-          "kind": "commit",
-          "path": "docs/03b-print-the-frame.md",
-          "repo": "engineered-lighting-site",
-          "sha": "db41f3f"
-        }
-      ],
-      "gate": "none",
-      "id": "EL-004",
-      "keywords": [
-        "bom",
-        "motor",
-        "propagation",
-        "rmd-l-4005",
-        "rmd-l-5005",
-        "swap"
-      ],
-      "lane": "hardware",
-      "leverage": 0,
-      "machine_affinity": null,
-      "project": "robotic-spotlight",
-      "reach": [],
-      "repos": [
-        "engineered-lighting-site"
-      ],
-      "score": 6.667,
-      "status": "done",
-      "title": "Propagate the RMD-L-4005 to RMD-L-5005 motor swap sitewide",
-      "unblocks": []
-    },
-    {
-      "authored_status": "done",
-      "blocked_by": [],
-      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/EL-005.md",
-      "closed_origin": "his-word",
-      "cognitive_load": "high",
-      "completed": "2026-08-15",
-      "effort_minutes": 480,
-      "evidence_found": [
-        {
-          "kind": "commit",
-          "path": "captures/gimbal10/fixture/bench-session-20260815.md",
-          "repo": "gimbal-bench",
-          "sha": "34b9f7c"
-        },
-        {
-          "kind": "commit",
-          "path": "captures/gimbal10/fixture/bench-session2-20260815.md",
-          "repo": "gimbal-bench",
-          "sha": "19dd790"
-        }
-      ],
-      "gate": "bench",
-      "id": "EL-005",
-      "keywords": [
-        "0x241",
-        "0x242",
-        "arm",
-        "bench",
-        "bring-up",
-        "can",
-        "health",
-        "motors",
-        "pose",
-        "ready"
-      ],
-      "lane": "hardware",
-      "leverage": 0,
-      "machine_affinity": "formd-t1",
-      "project": "robotic-spotlight",
-      "reach": [],
-      "repos": [
-        "gimbal-bench"
-      ],
-      "score": 6.25,
-      "status": "done",
-      "title": "CAN bring-up: both motors answering, and the first READY r=1",
-      "unblocks": []
-    },
-    {
-      "authored_status": "parked",
-      "blocked_by": [],
-      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/EL-002.md",
+      "backlog_position": null,
       "closed_origin": null,
-      "cognitive_load": "low",
       "completed": null,
-      "effort_minutes": 20,
       "evidence_found": [
         {
           "kind": "commit",
@@ -197,28 +90,21 @@
         "undervoltage",
         "watch-and-expect"
       ],
+      "kickoff": null,
       "lane": "hardware",
-      "leverage": 0,
       "machine_affinity": null,
       "project": "robotic-spotlight",
-      "reach": [],
       "repos": [
         "gimbal-bench",
         "engineered-lighting-site"
       ],
-      "score": 6.0,
       "status": "parked",
-      "title": "The bench meter has no current range",
-      "unblocks": []
+      "title": "The bench meter has no current range"
     },
     {
-      "authored_status": "parked",
-      "blocked_by": [],
-      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/EL-003.md",
+      "backlog_position": null,
       "closed_origin": null,
-      "cognitive_load": "low",
       "completed": null,
-      "effort_minutes": 120,
       "evidence_found": [],
       "gate": "printer",
       "id": "EL-003",
@@ -233,18 +119,95 @@
         "tol-coupon",
         "tolerance"
       ],
+      "kickoff": null,
       "lane": "hardware",
-      "leverage": 0,
       "machine_affinity": null,
       "project": "robotic-spotlight",
-      "reach": [],
       "repos": [
         "engineered-lighting-site"
       ],
-      "score": 4.0,
       "status": "parked",
-      "title": "Print the tolerance coupon, then the fit coupon",
-      "unblocks": []
+      "title": "Print the tolerance coupon, then the fit coupon"
+    },
+    {
+      "backlog_position": null,
+      "closed_origin": "inferred",
+      "completed": "2026-07-21",
+      "evidence_found": [
+        {
+          "kind": "commit",
+          "path": "docs/",
+          "repo": "engineered-lighting-site",
+          "sha": "8fb39bf"
+        },
+        {
+          "kind": "commit",
+          "path": "docs/03b-print-the-frame.md",
+          "repo": "engineered-lighting-site",
+          "sha": "db41f3f"
+        }
+      ],
+      "gate": "none",
+      "id": "EL-004",
+      "keywords": [
+        "bom",
+        "motor",
+        "propagation",
+        "rmd-l-4005",
+        "rmd-l-5005",
+        "swap"
+      ],
+      "kickoff": null,
+      "lane": "hardware",
+      "machine_affinity": null,
+      "project": "robotic-spotlight",
+      "repos": [
+        "engineered-lighting-site"
+      ],
+      "status": "done",
+      "title": "Propagate the RMD-L-4005 to RMD-L-5005 motor swap sitewide"
+    },
+    {
+      "backlog_position": null,
+      "closed_origin": "his-word",
+      "completed": "2026-08-15",
+      "evidence_found": [
+        {
+          "kind": "commit",
+          "path": "captures/gimbal10/fixture/bench-session-20260815.md",
+          "repo": "gimbal-bench",
+          "sha": "34b9f7c"
+        },
+        {
+          "kind": "commit",
+          "path": "captures/gimbal10/fixture/bench-session2-20260815.md",
+          "repo": "gimbal-bench",
+          "sha": "19dd790"
+        }
+      ],
+      "gate": "none",
+      "id": "EL-005",
+      "keywords": [
+        "0x241",
+        "0x242",
+        "arm",
+        "bench",
+        "bring-up",
+        "can",
+        "health",
+        "motors",
+        "pose",
+        "ready"
+      ],
+      "kickoff": null,
+      "lane": "hardware",
+      "machine_affinity": "formd-t1",
+      "project": "robotic-spotlight",
+      "repos": [
+        "gimbal-bench"
+      ],
+      "status": "done",
+      "title": "CAN bring-up: both motors answering, and the first READY r=1"
     }
   ],
   "project": {

@@ -7,15 +7,6 @@
   "lane": "hardware",
   "gate": "none",
   "machine_affinity": null,
-  "impact": 3,
-  "confidence": 4,
-  "effort_minutes": 20,
-  "cognitive_load": "low",
-  "lead_time_days": 5,
-  "cost_usd": 60.0,
-  "unblocks": [],
-  "unblocks_inferred": [],
-  "answers": [],
   "keywords": [
     "meter",
     "multimeter",
@@ -54,7 +45,7 @@
   ],
   "parent_ruling": null,
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

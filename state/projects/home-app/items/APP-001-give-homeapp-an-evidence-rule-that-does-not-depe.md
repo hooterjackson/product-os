@@ -7,15 +7,6 @@
   "lane": "app",
   "gate": "none",
   "machine_affinity": null,
-  "impact": 2,
-  "confidence": 4,
-  "effort_minutes": 45,
-  "cognitive_load": "low",
-  "lead_time_days": 0,
-  "cost_usd": null,
-  "unblocks": [],
-  "unblocks_inferred": [],
-  "answers": [],
   "keywords": [
     "homeapp",
     "evidence",
@@ -41,7 +32,7 @@
   ],
   "parent_ruling": null,
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

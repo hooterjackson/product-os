@@ -41,18 +41,8 @@ FENCE = "---"
 FIELD_ORDER = {
     "item": [
         "id", "title", "project", "status", "lane", "gate", "machine_affinity",
-        "impact", "confidence", "effort_minutes", "cognitive_load",
-        "lead_time_days", "cost_usd",
-        "unblocks", "unblocks_inferred", "answers", "pin",
         "keywords", "evidence", "evidence_found", "repos", "parent_ruling",
         "created", "updated", "completed", "closed_origin",
-    ],
-    "question": [
-        "id", "title", "project", "status", "gates",
-        "impact", "confidence", "effort_minutes", "cognitive_load",
-        "lead_time_days", "cost_usd", "pin",
-        "keywords", "evidence", "answer", "parent_ruling",
-        "created", "updated", "answered",
     ],
     "decision": [
         "id", "title", "project", "status", "ruling_id", "decided",
@@ -66,27 +56,33 @@ FIELD_ORDER = {
     "capture": ["captured", "machine", "source", "cwd"],
 }
 
-# Per-field authority. The guarantee this table exists to support:
-# no agent-authority field appears in the score formula, so an agent acting
-# within its authority cannot change score ordering.
+# Per-field authority.
 #
-# Note the honest limit: `status` is agent-authority and a blocked item is not
-# offered by rank.py, so an agent CAN change what the system offers -- just not
-# how the offered set is ordered. Said plainly rather than papered over.
+# This table used to support a guarantee about SCORE ORDERING: no agent-authority
+# field appeared in the score formula, so an agent could not change the order.
+# There is no formula now (DEC-202) and the order is `state/backlog.md`, which no
+# agent writes -- so the guarantee is simpler and stronger than the arithmetic
+# one it replaces: **the order is a file only he edits.**
+#
+# The honest limit that remains: `status` is agent-authority, so an agent marking
+# something `done` removes it from the backlog. That is bounded by the evidence
+# rule, not by this table.
 HUMAN = "human"
 AGENT = "agent"
 
 AUTHORITY = {
-    # decided -- the score inputs. Agents propose; they never write.
-    "impact": HUMAN, "confidence": HUMAN, "effort_minutes": HUMAN,
-    "lead_time_days": HUMAN, "cost_usd": HUMAN, "unblocks": HUMAN,
-    "gates": HUMAN, "pin": HUMAN, "project": HUMAN, "gate": HUMAN,
-    "machine_affinity": HUMAN, "answers": HUMAN, "evidence": HUMAN,
-    # automatable -- none of these enter the score.
+    # decided -- his. Agents draft into state/drafts/; they never write here.
+    "project": HUMAN, "gate": HUMAN, "machine_affinity": HUMAN,
+    "evidence": HUMAN,
+    # automatable.
     "status": AGENT, "keywords": AGENT, "lane": AGENT, "title": AGENT,
     "repos": AGENT, "updated": AGENT, "completed": AGENT,
-    "evidence_found": AGENT, "cognitive_load": AGENT,
+    "evidence_found": AGENT,
 }
+
+# FIELD_ORDER and AUTHORITY must stay in lockstep for `item`: a field that
+# exists in one and not the other is how an authority rule goes silently
+# unenforced. `test_field_order_and_authority_agree` pins it.
 
 # `dropped` and `parked` are human-authority even though `status` is not: they
 # are scope decisions with taste in them, and leverage excludes them, so an

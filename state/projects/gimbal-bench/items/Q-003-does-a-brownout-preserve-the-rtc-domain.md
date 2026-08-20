@@ -4,12 +4,9 @@
   "title": "Does a brownout preserve the RTC domain?",
   "project": "gimbal-bench",
   "status": "next",
-  "gates": [],
-  "impact": 3,
-  "confidence": 4,
-  "effort_minutes": 90,
-  "cognitive_load": "medium",
-  "lead_time_days": 0,
+  "lane": "firmware",
+  "gate": "none",
+  "machine_affinity": null,
   "keywords": [
     "brownout",
     "rtc",
@@ -29,8 +26,13 @@
       "note": "'What is still not verified', first bullet."
     }
   ],
+  "evidence_found": [],
+  "repos": [
+    "gimbal-bench"
+  ],
+  "parent_ruling": null,
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

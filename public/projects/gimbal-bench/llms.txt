@@ -10,7 +10,7 @@ portfolio into context.
 ## Bootstrap
 
 1. `BASE/api/projects/gimbal-bench.json` — this project's items.
-2. `BASE/api/items/<ID>.json`, then `BASE/briefs/<ID>.md`.
+2. `BASE/api/items/<ID>.json`, then `BASE/kickoff/<ID>.md`.
 3. The whole portfolio, if you need it: `BASE/llms.txt`.
 
 ## Rules
@@ -19,18 +19,18 @@ portfolio into context.
 - Work in `gimbal-bench`, not in product-os.
 - Nothing is done without evidence. Say "I couldn't look", never
   "no changes".
-- The score is a label, not a verdict. Disagree once, with a reason,
-  then do what he says.
+- The order is his. Do not re-derive one. Disagree once, with a
+  reason, then work on what he put at the top.
 
 ## Open here
 
-- `GB-001` Finish the M5 fault ring: a real fault storm, and the brownout case — score 25.0, gate bench
-- `GB-002` Rescue D1-D11 off formd-t1 and commit them — score 6.7
-- `Q-001` Does Spot Mode (Auto/Hold/Manual) survive gate A? — score 6.0
-- `GB-004` M6 on hardware: the motor-silent limb, MUTE-CLEAR, and the armed lane — score 5.3, gate bench
-- `Q-002` Does a mid-move retarget re-plan smoothly, or stop and restart? — score 5.3
-- `Q-003` Does a brownout preserve the RTC domain? — score 4.0
-- `GB-013` Stand up the HA-side Zigbee OTA server — score 3.4
-- `Q-004` Where do 300 liveness taps a second come from? — score 3.0
+- `GB-001` Finish the M5 fault ring: a real fault storm, and the brownout case
+- `GB-014` Un-park Zigbee — the decision D15 leaves open · gate external
+- `GB-005` Z-M1 — variant, partitions and the c-patch signing scaffold
+- `GB-006` Z-M0 — the §9.1 mailbox primitive
+- `GB-008` Z-M3 — Zigbee bring-up as a light
+- `GB-002` Rescue D1-D11 off formd-t1 and commit them
+- `Q-001` Does Spot Mode (Auto/Hold/Manual) survive gate A?
+- `GB-004` M6 on hardware: the motor-silent limb, MUTE-CLEAR, and the armed lane
 
 _Last audited 2026-08-19._

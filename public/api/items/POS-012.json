@@ -6,13 +6,9 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "doing",
-    "blocked_by": [],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-012.md",
+    "backlog_position": 16,
     "closed_origin": null,
-    "cognitive_load": "medium",
     "completed": null,
-    "effort_minutes": 60,
     "evidence_found": [
       {
         "kind": "commit",
@@ -45,15 +41,12 @@
       "validate",
       "visibility"
     ],
+    "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/POS-012.md",
     "lane": "infra",
-    "leverage": 0,
     "machine_affinity": null,
     "project": "product-os",
-    "reach": [],
     "repos": [],
-    "score": 4.5,
     "status": "doing",
-    "title": "A correction is only real where it is read",
-    "unblocks": []
+    "title": "A correction is only real where it is read"
   }
 }

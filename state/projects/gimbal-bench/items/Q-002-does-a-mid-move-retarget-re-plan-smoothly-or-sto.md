@@ -4,12 +4,9 @@
   "title": "Does a mid-move retarget re-plan smoothly, or stop and restart?",
   "project": "gimbal-bench",
   "status": "next",
-  "gates": [],
-  "impact": 4,
-  "confidence": 4,
-  "effort_minutes": 180,
-  "cognitive_load": "high",
-  "lead_time_days": 0,
+  "lane": "firmware",
+  "gate": "none",
+  "machine_affinity": null,
   "keywords": [
     "retarget",
     "follow",
@@ -29,8 +26,13 @@
       "note": "D12's open sub-question."
     }
   ],
+  "evidence_found": [],
+  "repos": [
+    "gimbal-bench"
+  ],
+  "parent_ruling": null,
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

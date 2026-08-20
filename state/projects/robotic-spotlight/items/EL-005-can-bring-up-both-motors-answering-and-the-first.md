@@ -5,17 +5,8 @@
   "project": "robotic-spotlight",
   "status": "done",
   "lane": "hardware",
-  "gate": "bench",
+  "gate": "none",
   "machine_affinity": "formd-t1",
-  "impact": 5,
-  "confidence": 5,
-  "effort_minutes": 480,
-  "cognitive_load": "high",
-  "lead_time_days": 0,
-  "cost_usd": null,
-  "unblocks": [],
-  "unblocks_inferred": [],
-  "answers": [],
   "keywords": [
     "can",
     "motors",
@@ -60,7 +51,7 @@
   ],
   "parent_ruling": null,
   "created": "2026-08-19",
-  "updated": "2026-08-19",
+  "updated": "2026-08-20",
   "completed": "2026-08-15",
   "closed_origin": "his-word"
 }

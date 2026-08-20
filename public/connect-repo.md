@@ -43,10 +43,10 @@ So, in the same sitting:
    them past the classifier: a glob matching a whole directory
    identifies the subsystem, not the item's work. A glob matching no
    file in the tree can never fire at all.
-3. **Propose, do not create.** An item needs `impact`, `confidence`
-   and `effort_minutes` to validate and all three are mine. Write
-   `state/proposals/PROP-NNNN-<slug>.md` with the full set so I can
-   answer in one sentence.
+3. **Recommend, do not create.** The system never creates a task —
+   that is mine alone. Write candidates into
+   `state/recommendations/`, one sentence plus the commits and paths
+   that made you think of it, so I can adopt or dismiss in a word.
 4. **Report the coverage you achieved as a fraction** — commits
    attributable before versus after. And name what you could not
    model rather than inventing items to drive it to zero. A coverage

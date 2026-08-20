@@ -53,7 +53,7 @@ def _shard_dates(root):
 
 # ------------------------------------------------------------------ reconcile
 
-def reconcile(root, model, stamp, ranked):
+def reconcile(root, model, stamp, ordered):
     """Paste into a NEW chat. The counterpart to kickoff.
 
     Kickoff starts work on a known item. This one handles "reality moved and
@@ -82,14 +82,16 @@ def reconcile(root, model, stamp, ranked):
         "",
         "---",
         "",
-        "## What product-os currently believes",
+        "## The top of my backlog, in the order I put it in",
         "",
-        "This is a set of guesses, not a record of reality. Check it.",
+        "This is my judgement about what matters, not a record of what is",
+        "true. The order is not yours to change; whether each line is still",
+        "accurate is exactly what I am asking.",
         "",
     ]
-    for index, node in enumerate(ranked[:8], 1):
-        lines.append("%d. `%s` %.1f — %s%s"
-                     % (index, node.id, node.score, node.title,
+    for index, node in enumerate(ordered[:8], 1):
+        lines.append("%d. `%s` — %s%s"
+                     % (index, node.id, node.title,
                         " · gate %s" % node.get("gate")
                         if (node.get("gate") or "none") != "none" else ""))
     lines += ["", "## What is NOT confirmed", ""]
@@ -137,15 +139,15 @@ def reconcile(root, model, stamp, ranked):
         "   - **new items** for work that exists and nothing models, with",
         "     `evidence` paths specific enough to fire. A glob matching a",
         "     whole directory is a claim on everything that happens there.",
-        "   - **a proposed order, with the arithmetic shown.** Operands, not a",
-        "     conclusion. `python3 tools/rank.py --show <ID>` prints them.",
+        "   - **nothing about the order.** `state/backlog.md` is mine. If",
+        "     something new belongs near the top, say so in a sentence and",
+        "     leave the file alone.",
         "",
         "## Rules",
         "",
-        "- **Decided fields are proposed, never written**: `impact`,",
-        "  `confidence`, `effort_minutes`, `cost_usd`, `unblocks`, `pin`,",
-        "  `gate`, `project`, `parked`/`dropped`, and the `evidence` rule.",
-        "  Write them into `state/proposals/`.",
+        "- **Decided fields are drafted, never written**: `project`, `gate`,",
+        "  `machine_affinity`, `parked`/`dropped`, and the `evidence` rule.",
+        "  Write them into `state/drafts/`, with a diff against what is there.",
         "- **What I say applies immediately.** If I state a fact about my own",
         "  project, use `tools/apply.py --decided <ID>=<field>:<value> --said",
         "  \"<my words>\"`. Do not file a proposal addressed to me for",
@@ -207,9 +209,9 @@ def attach(node, root):
         "  overwritten without warning. `%s` is the hand-written one." % MANUAL,
         "- **Do not mark anything `done`** without an `evidence_found` entry —",
         "  a commit SHA, a file path, or a dated note.",
-        "- **Do not write decided fields** (`impact`, `confidence`,",
-        "  `effort_minutes`, `cost_usd`, `unblocks`, `pin`, `gate`, `project`,",
-        "  `parked`/`dropped`, the `evidence` rule). Propose instead.",
+        "- **Do not write decided fields** (`project`, `gate`,",
+        "  `machine_affinity`, `parked`/`dropped`, the `evidence` rule), and do",
+        "  not reorder `state/backlog.md`. Draft into `state/drafts/` instead.",
         "",
         "## Syncing",
         "",
@@ -289,10 +291,10 @@ def connect_repo(root, model, stamp):
         "   them past the classifier: a glob matching a whole directory",
         "   identifies the subsystem, not the item's work. A glob matching no",
         "   file in the tree can never fire at all.",
-        "3. **Propose, do not create.** An item needs `impact`, `confidence`",
-        "   and `effort_minutes` to validate and all three are mine. Write",
-        "   `state/proposals/PROP-NNNN-<slug>.md` with the full set so I can",
-        "   answer in one sentence.",
+        "3. **Recommend, do not create.** The system never creates a task —",
+        "   that is mine alone. Write candidates into",
+        "   `state/recommendations/`, one sentence plus the commits and paths",
+        "   that made you think of it, so I can adopt or dismiss in a word.",
         "4. **Report the coverage you achieved as a fraction** — commits",
         "   attributable before versus after. And name what you could not",
         "   model rather than inventing items to drive it to zero. A coverage",

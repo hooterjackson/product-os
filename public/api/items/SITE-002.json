@@ -6,13 +6,9 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "parked",
-    "blocked_by": [],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/SITE-002.md",
+    "backlog_position": null,
     "closed_origin": null,
-    "cognitive_load": "low",
     "completed": null,
-    "effort_minutes": 30,
     "evidence_found": [
       {
         "kind": "commit",
@@ -34,18 +30,15 @@
       "propagation",
       "zigbee"
     ],
+    "kickoff": null,
     "lane": "content",
-    "leverage": 0,
     "machine_affinity": null,
     "project": "engineering-site",
-    "reach": [],
     "repos": [
       "engineered-lighting-site",
       "gimbal-bench"
     ],
-    "score": 10.0,
     "status": "parked",
-    "title": "Doc 4's banner over-claims: the firmware has no Zigbee stack",
-    "unblocks": []
+    "title": "Doc 4's banner over-claims: the firmware has no Zigbee stack"
   }
 }

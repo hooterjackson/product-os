@@ -5,17 +5,8 @@
   "project": "gimbal-bench",
   "status": "parked",
   "lane": "content",
-  "gate": "bench",
+  "gate": "none",
   "machine_affinity": "formd-t1",
-  "impact": 3,
-  "confidence": 3,
-  "effort_minutes": 60,
-  "cognitive_load": "medium",
-  "lead_time_days": 0,
-  "cost_usd": null,
-  "unblocks": [],
-  "unblocks_inferred": [],
-  "answers": [],
   "keywords": [
     "d16",
     "d11",
@@ -58,7 +49,7 @@
   ],
   "parent_ruling": "DEC-016",
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

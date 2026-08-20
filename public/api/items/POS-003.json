@@ -6,13 +6,9 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "done",
-    "blocked_by": [],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-003.md",
+    "backlog_position": null,
     "closed_origin": "inferred",
-    "cognitive_load": "high",
     "completed": "2026-08-19",
-    "effort_minutes": 480,
     "evidence_found": [
       {
         "kind": "file",
@@ -53,15 +49,12 @@
       "re-audit",
       "unattributed"
     ],
+    "kickoff": null,
     "lane": "infra",
-    "leverage": 0,
     "machine_affinity": null,
     "project": "product-os",
-    "reach": [],
     "repos": [],
-    "score": 5.0,
     "status": "done",
-    "title": "Build /audit: re-check priorities against reality",
-    "unblocks": []
+    "title": "Build /audit: re-check priorities against reality"
   }
 }

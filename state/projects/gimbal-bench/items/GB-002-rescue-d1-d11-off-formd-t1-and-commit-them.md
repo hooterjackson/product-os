@@ -7,15 +7,6 @@
   "lane": "content",
   "gate": "none",
   "machine_affinity": "formd-t1",
-  "impact": 4,
-  "confidence": 5,
-  "effort_minutes": 90,
-  "cognitive_load": "medium",
-  "lead_time_days": 0,
-  "cost_usd": null,
-  "unblocks": [],
-  "unblocks_inferred": [],
-  "answers": [],
   "keywords": [
     "ledger",
     "d1",
@@ -42,7 +33,7 @@
   ],
   "parent_ruling": null,
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

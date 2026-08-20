@@ -6,15 +6,9 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "next",
-    "blocked_by": [
-      "GB-005"
-    ],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-006.md",
+    "backlog_position": 5,
     "closed_origin": null,
-    "cognitive_load": "high",
     "completed": null,
-    "effort_minutes": 480,
     "evidence_found": [],
     "gate": "none",
     "id": "GB-006",
@@ -28,24 +22,14 @@
       "z-m0",
       "zigbee"
     ],
+    "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/GB-006.md",
     "lane": "firmware",
-    "leverage": 4,
     "machine_affinity": "formd-t1",
     "project": "gimbal-bench",
-    "reach": [
-      "GB-008",
-      "GB-009",
-      "GB-010",
-      "GB-011"
-    ],
     "repos": [
       "gimbal-bench"
     ],
-    "score": 9.0,
-    "status": "blocked",
-    "title": "Z-M0 \u2014 the \u00a79.1 mailbox primitive",
-    "unblocks": [
-      "GB-008"
-    ]
+    "status": "next",
+    "title": "Z-M0 \u2014 the \u00a79.1 mailbox primitive"
   }
 }

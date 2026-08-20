@@ -7,13 +7,6 @@
   "lane": "infra",
   "gate": "none",
   "machine_affinity": null,
-  "impact": 4,
-  "confidence": 3,
-  "effort_minutes": 240,
-  "cognitive_load": "high",
-  "lead_time_days": 0,
-  "cost_usd": null,
-  "unblocks": [],
   "keywords": [
     "coverage",
     "group-d",
@@ -36,7 +29,7 @@
     }
   ],
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

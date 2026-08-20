@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The agent-facing surface: llms.txt, the JSON API, and paste-able briefs.
+"""The agent-facing surface: llms.txt, the JSON API, and kickoff prompts.
 
     python3 tools/publish.py            write public/ and build/
     python3 tools/publish.py --out DIR  write one target
@@ -42,7 +42,7 @@ import sys
 import _fm
 import _model
 import actions as actions_mod
-import brief as brief_mod
+import _context
 import kickoff as kickoff_mod
 
 RAW = "https://raw.githubusercontent.com/hooterjackson/product-os/main/public"
@@ -72,23 +72,23 @@ def freshness_block(root, stamp):
     return block
 
 
-def item_json(node, model):
+def item_json(node, model, position=None):
+    """One task. No score, no leverage, no edges -- `DEC-202`.
+
+    `position` is its 1-based place in `state/backlog.md`, or null if he has
+    not ordered it yet. That is a fact about a file he wrote, not a computed
+    rank, and the distinction is the whole point: a consumer that sorts on
+    `position` is reading his judgement rather than re-deriving one.
+    """
     return {
         "id": node.id,
         "title": node.title,
         "project": node.project,
-        "status": node.effective_status,
-        "authored_status": node.status,
+        "status": node.status,
+        "backlog_position": position,
         "lane": node.get("lane"),
         "gate": node.get("gate") or "none",
         "machine_affinity": node.get("machine_affinity"),
-        "score": round(node.score, 3),
-        "leverage": node.leverage,
-        "unblocks": sorted(node.get("unblocks") or [], key=_fm.sort_key),
-        "reach": sorted(node.reach, key=_fm.sort_key),
-        "blocked_by": sorted(node.blockers, key=_fm.sort_key),
-        "effort_minutes": node.effort_minutes,
-        "cognitive_load": node.get("cognitive_load"),
         "repos": node.get("repos") or [],
         "keywords": sorted(str(k) for k in (node.get("keywords") or [])),
         "evidence_found": [
@@ -97,7 +97,8 @@ def item_json(node, model):
             for e in (node.get("evidence_found") or [])],
         "closed_origin": node.get("closed_origin"),
         "completed": node.get("completed"),
-        "brief": "%s/briefs/%s.md" % (RAW, node.id),
+        "kickoff": ("%s/kickoff/%s.md" % (RAW, node.id)
+                    if node.is_active else None),
     }
 
 
@@ -114,8 +115,8 @@ def dump(obj):
 
 # ------------------------------------------------------------------ llms.txt
 
-def root_llms(model, stamp, ranked):
-    top = ranked[0] if ranked else None
+def root_llms(model, stamp, ordered):
+    top = ordered[0] if ordered else None
     unconfirmed = [n for n in model.nodes.values()
                    if n.status == "done" and n.get("closed_origin") != "his-word"]
     lines = [
@@ -131,13 +132,13 @@ def root_llms(model, stamp, ranked):
         "## 1 · Bootstrap, in this order",
         "",
         "1. This file. You are done with it after step 4.",
-        "2. `BASE/api/now.json` — the ranked list, and how fresh it is.",
+        "2. `BASE/api/now.json` — his backlog IN HIS ORDER, and how fresh it is.",
         "3. Pick the top item, or the one he names.",
         "   Fetch `BASE/api/items/<ID>.json`.",
         "4. Fetch `BASE/kickoff/<ID>.md` — a paste-ready prompt with what is",
         "   known, what is ALREADY RULED OUT, which repo to work in, and the",
-        "   rules. `BASE/briefs/<ID>.md` is the same content without the",
-        "   framing, if you only want the state.",
+        "   rules. That prompt is the product; everything else is a way of",
+        "   reaching it.",
         "",
         "Then work. If a step 404s, say so; do not guess the shape.",
         "",
@@ -156,25 +157,32 @@ def root_llms(model, stamp, ranked):
         "  `cost_usd`, `unblocks`, `pin`, `gate`, `project`, `parked`/`dropped`",
         "  and the `evidence` rule are his. Propose instead.",
         "",
-        "## 3 · You may disagree with the ranking",
+        "## 3 · The order is his, and it is not negotiable by you",
         "",
-        "**The score is a label, not a verdict.** It is one arithmetic reading of",
-        "guesses he has not reviewed. If what he tells you about his situation —",
-        "his time, his energy, where he is sitting, what he actually cares about",
-        "today — points somewhere else, **say so once with the reason, then do",
-        "what he says.** Once. Not as a preamble to doing it anyway.",
+        "**`state/backlog.md` is a file Marcelo wrote. Top is next.** There is no",
+        "score, no leverage and no dependency graph — they were removed on",
+        "2026-08-20 because 9 of 17 adjacent pairs sat inside the 10% band this",
+        "repo's own rules say to escalate on (`DEC-202`).",
         "",
-        "The list is a conversation starter, not a contract.",
+        "So do not re-derive an order, do not weigh two tasks against each other,",
+        "and do not reorder the file. If you think he has the order wrong, **say",
+        "so once with the reason, then work on what he put at the top.** Once.",
+        "Not as a preamble to doing it anyway.",
         "",
     ]
     if top:
         lines += ["## 4 · Right now", "",
                   "`%s` — %s" % (top.id, top.title),
-                  "score %.1f · leverage %d · %d min · gate %s%s"
-                  % (top.score, top.leverage, top.effort_minutes,
-                     top.get("gate") or "none",
+                  "%s · gate %s%s"
+                  % (top.project, top.get("gate") or "none",
                      " · machine %s" % top.get("machine_affinity")
                      if top.get("machine_affinity") else ""),
+                  ""]
+    else:
+        lines += ["## 4 · Right now", "",
+                  "**The backlog is empty.** That is a real state, not an error:",
+                  "he authors every task, and the system never creates one. There",
+                  "is nothing to start until he adds something.",
                   ""]
     if stamp:
         lines += ["_Last audited %s. %s commits were unattributed then._"
@@ -206,10 +214,9 @@ def root_llms(model, stamp, ranked):
               "## 6 · Endpoints", ""]
     for rel, what in [
             ("api/index.json", "every endpoint, with freshness"),
-            ("api/now.json", "the ranked list"),
+            ("api/now.json", "the backlog, in his order"),
             ("api/items/<ID>.json", "one item"),
             ("api/projects/<slug>.json", "one project and its items"),
-            ("api/graph.json", "the dependency graph"),
             ("api/threads.json", "indexed chats, with resume-or-restart"),
             ("api/unconfirmed.json", "closed by a machine, not confirmed"),
             ("kickoff/<ID>.md", "START A TASK — paste into a NEW chat"),
@@ -217,7 +224,6 @@ def root_llms(model, stamp, ranked):
             ("attach/<ID>.md", "LINK A WEB CHAT — paste into THAT chat"),
             ("connect-repo.md", "ADD A REPO — paste into an existing chat"),
             ("capture.md", "CAPTURE A THOUGHT — type anywhere"),
-            ("briefs/<ID>.md", "the paste-able brief"),
             ("projects/<slug>/llms.txt", "this file, scoped to one project")]:
         lines.append("- `BASE/%s` — %s" % (rel, what))
     lines += ["",
@@ -226,8 +232,8 @@ def root_llms(model, stamp, ranked):
     return "\n".join(lines)
 
 
-def project_llms(slug, project, model, stamp, ranked):
-    mine = [n for n in ranked if n.project == slug]
+def project_llms(slug, project, model, stamp, ordered):
+    mine = [n for n in ordered if n.project == slug]
     lines = [
         "# product-os — %s" % slug,
         "",
@@ -241,7 +247,7 @@ def project_llms(slug, project, model, stamp, ranked):
         "## Bootstrap",
         "",
         "1. `BASE/api/projects/%s.json` — this project's items." % slug,
-        "2. `BASE/api/items/<ID>.json`, then `BASE/briefs/<ID>.md`.",
+        "2. `BASE/api/items/<ID>.json`, then `BASE/kickoff/<ID>.md`.",
         "3. The whole portfolio, if you need it: `BASE/llms.txt`.",
         "",
         "## Rules",
@@ -252,8 +258,8 @@ def project_llms(slug, project, model, stamp, ranked):
            or "the repo the item names"),
         "- Nothing is done without evidence. Say \"I couldn't look\", never",
         "  \"no changes\".",
-        "- The score is a label, not a verdict. Disagree once, with a reason,",
-        "  then do what he says.",
+        "- The order is his. Do not re-derive one. Disagree once, with a",
+        "  reason, then work on what he put at the top.",
         "",
     ]
     if not project.get("may_rule"):
@@ -264,12 +270,12 @@ def project_llms(slug, project, model, stamp, ranked):
     lines += ["## Open here", ""]
     if mine:
         for node in mine[:8]:
-            lines.append("- `%s` %s — score %.1f%s"
-                         % (node.id, node.title, node.score,
-                            ", gate %s" % node.get("gate")
+            lines.append("- `%s` %s%s"
+                         % (node.id, node.title,
+                            " · gate %s" % node.get("gate")
                             if (node.get("gate") or "none") != "none" else ""))
     else:
-        lines.append("Nothing is startable in this project right now.")
+        lines.append("Nothing from this project is in the backlog right now.")
     lines += [""]
     if stamp:
         lines += ["_Last audited %s._" % stamp.get("date"), ""]
@@ -281,13 +287,14 @@ def project_llms(slug, project, model, stamp, ranked):
 # ---------------------------------------------------------------- the surface
 
 def generate(root, model, target, volatile=False):
-    stamp = brief_mod.read_stamp(root)
-    entries = brief_mod.parse_register(root)
+    stamp = _context.read_stamp(root)
+    entries = _context.parse_register(root)
     with open(os.path.join(root, "state", "repos.json"), "r",
               encoding="utf-8") as fh:
         repos_spec = {k: v for k, v in json.load(fh).items()
                       if not k.startswith("_")}
-    ranked = model.ranked()
+    ordered = model.backlog()
+    position = {n.id: i for i, n in enumerate(ordered, 1)}
     fresh = freshness_block(root, stamp)
 
     # A chat URL is a private conversation identifier and this repo is PUBLIC
@@ -300,46 +307,43 @@ def generate(root, model, target, volatile=False):
     redacted = {k: ["(recorded in %s — not republished)" % kickoff_mod.MANUAL]
                 for k in manual}
 
-    write(target, "llms.txt", root_llms(model, stamp, ranked))
+    write(target, "llms.txt", root_llms(model, stamp, ordered))
     for slug, project in sorted(model.projects.items()):
         write(target, os.path.join("projects", slug, "llms.txt"),
-              project_llms(slug, project, model, stamp, ranked))
-
-    # --- briefs: self-contained, paste-able, no link required to make sense
-    for node in model.nodes.values():
-        write(target, os.path.join("briefs", "%s.md" % node.id),
-              brief_mod.render(node, model, entries, stamp, repos_spec, root,
-                               volatile))
+              project_llms(slug, project, model, stamp, ordered))
 
     # --- the five actions. Everything this tool does is one of these.
     kickoff_mod.generate(root, model, target, volatile,
                          manual=redacted if not volatile else manual)
-    actions_mod.generate(root, model, target, stamp, ranked)
+    actions_mod.generate(root, model, target, stamp, ordered)
 
     # --- api
     write(target, os.path.join("api", "now.json"), dump({
         "freshness": fresh,
-        "item": None if not ranked else {
-            "id": ranked[0].id, "title": ranked[0].title,
-            "project": ranked[0].project,
+        "item": None if not ordered else {
+            "id": ordered[0].id, "title": ordered[0].title,
+            "project": ordered[0].project,
         },
-        "ranked": [item_json(n, model) for n in ranked],
+        "backlog": [item_json(n, model, position.get(n.id)) for n in ordered],
+        "unlisted": [item_json(n, model) for n in model.unlisted()],
         "counts": {
             "items": len(model.items),
             "active": sum(1 for n in model.items.values() if n.is_active),
             "parked": sum(1 for n in model.items.values()
                           if n.status == "parked"),
             "done": sum(1 for n in model.items.values() if n.status == "done"),
-            "questions": len(model.questions),
             "decisions": len(model.decisions),
             "blocked": sum(1 for n in model.nodes.values()
-                           if n.is_active and n.effective_status == "blocked"),
+                           if n.status == "blocked"),
+            "backlog": len(ordered),
+            "unlisted": len(model.unlisted()),
         },
     }))
 
     for node in model.nodes.values():
         write(target, os.path.join("api", "items", "%s.json" % node.id),
-              dump({"freshness": fresh, "item": item_json(node, model)}))
+              dump({"freshness": fresh,
+                    "item": item_json(node, model, position.get(node.id))}))
 
     for slug, project in sorted(model.projects.items()):
         mine = [n for n in model.nodes.values() if n.project == slug]
@@ -354,26 +358,11 @@ def generate(root, model, target, volatile=False):
                       "may_rule": project.get("may_rule"),
                       "decision_authority": project.get("decision_authority"),
                   },
-                  "items": [item_json(n, model) for n in
-                            sorted(mine, key=lambda n: -n.score)],
+                  "items": [item_json(n, model, position.get(n.id)) for n in
+                            sorted(mine, key=lambda n: (
+                                position.get(n.id, 10 ** 6),
+                                _fm.sort_key(n.id)))],
               }))
-
-    confirmed = model.edges(confirmed_only=True)
-    inferred = model.edges(confirmed_only=False)
-    write(target, os.path.join("api", "graph.json"), dump({
-        "freshness": fresh,
-        "nodes": [{"id": n.id, "title": n.title, "project": n.project,
-                   "status": n.effective_status, "leverage": n.leverage}
-                  for n in sorted(model.nodes.values(),
-                                  key=lambda n: _fm.sort_key(n.id))],
-        "edges": sorted(
-            [{"from": a, "to": b, "kind": "confirmed"}
-             for a, targets in confirmed.items() for b in targets] +
-            [{"from": a, "to": b, "kind": "inferred"}
-             for a, targets in inferred.items() for b in targets
-             if b not in confirmed.get(a, set())],
-            key=lambda e: (e["from"], e["to"])),
-    }))
 
     shard_dir = os.path.join(root, "state", "threads", "by-machine")
     shards = {}
@@ -402,7 +391,7 @@ def generate(root, model, target, volatile=False):
         "note": ("Items a machine marked done. Marcelo has confirmed none of "
                  "these. Confirming one is a sentence: "
                  "apply.py --decided <ID>=status:done --said \"...\""),
-        "items": [item_json(n, model) for n in
+        "items": [item_json(n, model, position.get(n.id)) for n in
                   sorted(unconfirmed, key=lambda n: _fm.sort_key(n.id))],
     }))
 
@@ -415,7 +404,7 @@ def generate(root, model, target, volatile=False):
 
 def advertised(model):
     """Every path this surface promises. Used by the CI link check."""
-    paths = ["llms.txt", "api/index.json", "api/now.json", "api/graph.json",
+    paths = ["llms.txt", "api/index.json", "api/now.json",
              "api/threads.json", "api/unconfirmed.json",
              "reconcile.md", "connect-repo.md", "capture.md"]
     for slug in model.projects:
@@ -423,7 +412,6 @@ def advertised(model):
         paths.append("api/projects/%s.json" % slug)
     for node_id in model.nodes:
         paths.append("api/items/%s.json" % node_id)
-        paths.append("briefs/%s.md" % node_id)
     for node_id, node in model.nodes.items():
         if node.is_active:
             paths.append("kickoff/%s.md" % node_id)

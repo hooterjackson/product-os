@@ -6,13 +6,9 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "parked",
-    "blocked_by": [],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/EL-001.md",
+    "backlog_position": null,
     "closed_origin": null,
-    "cognitive_load": "low",
     "completed": null,
-    "effort_minutes": 20,
     "evidence_found": [
       {
         "kind": "commit",
@@ -55,19 +51,14 @@
       "star",
       "valent-x"
     ],
+    "kickoff": null,
     "lane": "hardware",
-    "leverage": 0,
     "machine_affinity": null,
     "project": "robotic-spotlight",
-    "reach": [],
     "repos": [
       "engineered-lighting-site"
     ],
-    "score": 8.0,
     "status": "parked",
-    "title": "Order the Doc 4 LED BoM",
-    "unblocks": [
-      "GB-012"
-    ]
+    "title": "Order the Doc 4 LED BoM"
   }
 }

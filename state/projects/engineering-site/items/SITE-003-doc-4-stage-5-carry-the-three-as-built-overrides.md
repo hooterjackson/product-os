@@ -7,15 +7,6 @@
   "lane": "content",
   "gate": "none",
   "machine_affinity": null,
-  "impact": 3,
-  "confidence": 4,
-  "effort_minutes": 60,
-  "cognitive_load": "medium",
-  "lead_time_days": 0,
-  "cost_usd": null,
-  "unblocks": [],
-  "unblocks_inferred": [],
-  "answers": [],
   "keywords": [
     "doc4",
     "stage5",
@@ -54,7 +45,7 @@
   ],
   "parent_ruling": "DEC-102",
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

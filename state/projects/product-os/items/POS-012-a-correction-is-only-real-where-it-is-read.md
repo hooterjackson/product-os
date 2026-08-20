@@ -7,13 +7,6 @@
   "lane": "infra",
   "gate": "none",
   "machine_affinity": null,
-  "impact": 3,
-  "confidence": 3,
-  "effort_minutes": 60,
-  "cognitive_load": "medium",
-  "lead_time_days": 0,
-  "cost_usd": null,
-  "unblocks": [],
   "keywords": [
     "correction",
     "excerpt",
@@ -48,7 +41,7 @@
     }
   ],
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

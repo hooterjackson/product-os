@@ -6,13 +6,9 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "next",
-    "blocked_by": [],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-004.md",
+    "backlog_position": 9,
     "closed_origin": null,
-    "cognitive_load": "high",
     "completed": null,
-    "effort_minutes": 180,
     "evidence_found": [
       {
         "kind": "commit",
@@ -39,7 +35,7 @@
         "sha": "7f5b060"
       }
     ],
-    "gate": "bench",
+    "gate": "none",
     "id": "GB-004",
     "keywords": [
       "armed",
@@ -51,17 +47,14 @@
       "mute",
       "mute-clear"
     ],
+    "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/GB-004.md",
     "lane": "firmware",
-    "leverage": 0,
     "machine_affinity": "formd-t1",
     "project": "gimbal-bench",
-    "reach": [],
     "repos": [
       "gimbal-bench"
     ],
-    "score": 5.333,
     "status": "next",
-    "title": "M6 on hardware: the motor-silent limb, MUTE-CLEAR, and the armed lane",
-    "unblocks": []
+    "title": "M6 on hardware: the motor-silent limb, MUTE-CLEAR, and the armed lane"
   }
 }

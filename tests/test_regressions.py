@@ -208,26 +208,33 @@ class AuthorityGuardFiresAtTheAgentNotTheOwner(unittest.TestCase):
         return next(n.id for n in applier.model.items.values()
                     if n.status != "done" and not n.get("evidence_found"))
 
+    # `cost_usd` was the field in the original report. It no longer exists,
+    # so these run on `machine_affinity` -- still human-authority, still a
+    # fact about his own bench that he is entitled to state in one sentence.
+    FIELD, VALUE = "machine_affinity", "formd-t1"
+
     def test_human_stated_decided_field_applies(self):
         applier = apply_mod.Applier(ROOT, dry_run=True)
-        applier.set_field("EL-001", "cost_usd", 486, origin=apply_mod.HUMAN)
+        applier.set_field("EL-001", self.FIELD, self.VALUE,
+                          origin=apply_mod.HUMAN)
         self.assertEqual(applier.proposed, [], "his own decision was queued for him")
         self.assertEqual(len(applier.applied), 1)
         item_id, what, origin = applier.applied[0]
         self.assertEqual((item_id, origin), ("EL-001", apply_mod.HUMAN))
-        self.assertIn("cost_usd", what)
+        self.assertIn(self.FIELD, what)
 
     def test_agent_inferred_decided_field_still_proposes(self):
         applier = apply_mod.Applier(ROOT, dry_run=True)
-        applier.set_field("EL-001", "cost_usd", 486, origin=apply_mod.AGENT)
+        applier.set_field("EL-001", self.FIELD, self.VALUE,
+                          origin=apply_mod.AGENT)
         self.assertEqual(applier.applied, [], "agent wrote a decided field")
         self.assertEqual(len(applier.proposed), 1)
-        self.assertEqual(applier.proposed[0][1], "cost_usd")
+        self.assertEqual(applier.proposed[0][1], self.FIELD)
 
     def test_agent_is_the_default_origin(self):
         """Forgetting to say who decided must fail SAFE, toward proposing."""
         applier = apply_mod.Applier(ROOT, dry_run=True)
-        applier.set_field("EL-001", "impact", 5)
+        applier.set_field("EL-001", "gate", "external")
         self.assertEqual(applier.applied, [])
         self.assertTrue(applier.proposed)
 
@@ -374,58 +381,74 @@ class ItemIdsAreUniqueOnlyWithinASeedGeneration(unittest.TestCase):
         self.assertIn("generation_collisions", source)
 
 
-class QuestionsAreNotItems(unittest.TestCase):
-    """apply.py wrote every entity with kind="item". `_fm` orders a question's
-    keys differently, so parking Q-005 produced a valid file that failed the
-    canonical check -- a corruption introduced by the tool whose job is to keep
-    state consistent."""
+class QuestionsCollapsedIntoTasks(unittest.TestCase):
+    """Was `QuestionsAreNotItems`, which pinned that `apply.py` resolved the
+    entity kind per entity rather than hardcoding `item` -- a real corruption
+    where parking `Q-005` produced a valid file that failed the canonical
+    check.
 
-    def test_kind_is_resolved_per_entity(self):
+    There is one kind now. A `Q-*` node was defined by `gates` edges and by
+    `impact`/`confidence`/`effort_minutes`; with both deleted it was a task
+    whose title ends in a question mark, living outside any project, which the
+    "every task belongs to a project" rule forbids. The old defect cannot
+    recur because the second key order no longer exists -- so what is pinned
+    here is the collapse itself."""
+
+    def test_there_is_one_entity_kind_for_tasks(self):
         applier = apply_mod.Applier(ROOT, dry_run=True)
-        self.assertEqual(applier.kind_of("Q-001"), "question")
+        self.assertEqual(applier.kind_of("Q-001"), "item")
         self.assertEqual(applier.kind_of("GB-001"), "item")
+        self.assertNotIn("question", _fm.FIELD_ORDER)
 
-    def test_no_hardcoded_item_kind_remains(self):
-        with open(os.path.join(ROOT, "tools", "apply.py"), encoding="utf-8") as fh:
-            source = fh.read()
-        self.assertNotIn('body, "item")', source,
-                         "a write still hardcodes kind=item")
+    def test_the_questions_directory_is_gone(self):
+        self.assertFalse(os.path.isdir(os.path.join(ROOT, "state", "questions")))
 
-    def test_every_question_file_is_canonical(self):
-        import _fm as fm_mod
-        for path in glob.glob(os.path.join(ROOT, "state", "questions", "*.md")):
-            with open(path, encoding="utf-8") as fh:
+    def test_every_former_question_is_a_task_in_a_project(self):
+        import _model as model_mod
+        model = model_mod.Model.load(ROOT)
+        movers = [n for n in model.items.values() if n.id.startswith("Q-")]
+        self.assertEqual(len(movers), 5, "expected the 5 questions")   # R-075
+        for node in movers:
+            self.assertTrue(node.project, "%s has no project" % node.id)
+            self.assertIn(os.sep + "items" + os.sep, node.path)
+            with open(node.path, encoding="utf-8") as fh:
                 original = fh.read()
-            self.assertEqual(fm_mod.canonicalize(original, "question", path),
-                             original, "%s is not canonical" % path)
+            self.assertEqual(_fm.canonicalize(original, "item", node.path),
+                             original, "%s is not canonical" % node.id)
 
 
-class BriefsAlwaysCarryFreshness(unittest.TestCase):
-    """A brief without a freshness stamp reads as current. That is the same
+class EveryPromptCarriesFreshness(unittest.TestCase):
+    """A prompt without a freshness stamp reads as current. That is the same
     shape as PROJECT-STATE.md listing two prompts as pending that had already
-    shipped -- so the stamp prints even when the answer is "I don't know"."""
+    shipped -- so the stamp prints even when the answer is "I don't know".
+
+    Was `BriefsAlwaysCarryFreshness`. Briefs are gone (`R-071`); the kickoff
+    prompt is the artifact that carries the stamp, and it is the one that was
+    ever actually pasted anywhere."""
 
     def test_stamp_has_an_honest_form_when_no_audit_has_run(self):
-        import brief as brief_mod
+        import _context as _ctx
         node = type("N", (), {"get": lambda self, k, d=None: None})()
-        line = brief_mod.freshness(ROOT, node, None, {})
+        line = _ctx.freshness(ROOT, node, None, {})
         self.assertIn("no audit has ever run", line)
 
     def test_unreachable_repos_are_named_not_assumed_unchanged(self):
-        import brief as brief_mod
+        import _context as _ctx
         node = type("N", (), {"get": lambda self, k, d=None:
                               ["gimbal-bench"] if k == "repos" else None})()
-        line = brief_mod.freshness(ROOT, node, {"date": "2026-08-19",
+        line = _ctx.freshness(ROOT, node, {"date": "2026-08-19",
                                                 "heads": {}}, {})
         self.assertIn("could not check", line)
 
-    def test_every_generated_brief_has_a_stamp(self):
-        briefs = glob.glob(os.path.join(ROOT, "build", "briefs", "*.md"))
-        if not briefs:
-            self.skipTest("no briefs built yet")
-        for path in briefs:
+    def test_every_generated_prompt_has_a_stamp(self):
+        prompts = glob.glob(os.path.join(ROOT, "public", "kickoff", "*.md"))
+        # R-075: a scan of nothing passes every assertion after it.
+        self.assertGreater(len(prompts), 10,
+                           "found %d kickoff prompts -- the scan did not run"
+                           % len(prompts))
+        for path in prompts:
             with open(path, encoding="utf-8") as fh:
-                self.assertIn("**Freshness:**", fh.read(),
+                self.assertIn("Freshness:", fh.read(),
                               "%s has no freshness stamp" % path)
 
 
@@ -464,28 +487,66 @@ class ResumeCommandsAreVerifiedBeforePrinting(unittest.TestCase):
                         "codex must be a full path; it is not on PATH")
 
 
-class LeadTimeNoLongerMovesTheOrder(unittest.TestCase):
-    """Measured before removal: 2 of 30 items carried any lead_time_days and
-    both were purchases. The term was inert on 28 items and tripled the score
-    on the two that no longer matter."""
+class NoScoringSurvives(unittest.TestCase):
+    """`DEC-202` / `R-068`. The order is `state/backlog.md`, authored by hand.
 
-    def test_score_ignores_lead_time(self):
-        import _model as model_mod
-        model = model_mod.Model.load(ROOT)
-        node = next(iter(model.items.values()))
-        before = model.score(node)
-        original = node.fm.get("lead_time_days")
-        node.fm["lead_time_days"] = 999
-        try:
-            self.assertEqual(model.score(node), before,
-                             "lead_time_days still moves the score")
-        finally:
-            node.fm["lead_time_days"] = original
+    This replaces `LeadTimeNoLongerMovesTheOrder`, which pinned a weaker
+    property -- that ONE term had stopped moving the order. The whole formula
+    is gone now, so the assertion is that it stays gone.
 
-    def test_urgency_is_gone(self):
-        import _model as model_mod
-        self.assertFalse(hasattr(model_mod, "urgency"))
-        self.assertFalse(hasattr(model_mod, "LEAD_DIVISOR"))
+    Measured before removal: 9 of 17 adjacent pairs sat within the 10% band
+    `CLAUDE.md` says to escalate on; 18 items produced 10 distinct scores; and
+    `pin`, the human override, had never once been set.
+    """
+
+    # Code shapes, not prose -- `impact` appears legitimately in register
+    # entries and docstrings explaining why it went, and a guard that trips on
+    # its own explanation gets deleted rather than obeyed.
+    TOKENS = ["effort_bucket(", "LEVERAGE_WEIGHT", "node.score", "n.score",
+              "node.leverage", "n.leverage", ".ranked(", "cognitive_load"]
+
+    def _sources(self):
+        found = []
+        for base in ("tools", "plugin"):
+            for root, _dirs, files in os.walk(os.path.join(ROOT, base)):
+                found += [os.path.join(root, f) for f in files
+                          if f.endswith(".py")]
+        return found
+
+    def test_no_scoring_survives(self):
+        sources = self._sources()
+        # R-075: assert the denominator. A guard that walks zero files and
+        # reports clean is worse than no guard, because it is green.
+        self.assertGreaterEqual(len(sources), 8,
+                                "walked %d source files -- the scan did not "
+                                "run" % len(sources))
+        offenders = []
+        for path in sources:
+            with open(path, encoding="utf-8") as fh:
+                text = fh.read()
+            for token in self.TOKENS:
+                if token in text:
+                    offenders.append("%s: %s"
+                                     % (os.path.relpath(path, ROOT), token))
+        self.assertEqual(offenders, [], "scoring came back")
+
+    def test_the_deleted_tools_are_gone(self):
+        for name in ("rank.py", "brief.py", "build.py"):
+            self.assertFalse(
+                os.path.exists(os.path.join(ROOT, "tools", name)),
+                "tools/%s is back" % name)
+
+    def test_no_task_file_carries_a_score_input(self):
+        paths = glob.glob(os.path.join(
+            ROOT, "state", "projects", "*", "items", "*.md"))
+        self.assertGreater(len(paths), 20, "the scan did not run")   # R-075
+        dead = {"impact", "confidence", "effort_minutes", "lead_time_days",
+                "cost_usd", "cognitive_load", "pin"}
+        for path in paths:
+            fm, _body = _fm.load(path)
+            self.assertEqual(sorted(dead & set(fm)), [],
+                             "%s still carries score inputs"
+                             % os.path.basename(path))
 
 
 class TheDoneGuardIsASpeedBumpNotAWall(unittest.TestCase):
@@ -598,41 +659,61 @@ class SettledDecisionsAreWrittenDown(unittest.TestCase):
                         "a decision with no revisit trigger is a gag order")
 
 
-class GateNoneIsNotTheSameAsFromThisChair(unittest.TestCase):
-    """CLAUDE.md documented `--gate none` as "only what can start from this
-    chair" and it never was: gate and machine_affinity are independent filters.
-    Measured on this Mac, 1 of 14 leaked -- GB-002, "Rescue D1-D11 OFF
-    formd-t1", which by its own title cannot be done here.
+class NoDependencyGraphSurvives(unittest.TestCase):
+    """`R-069`. 12 edges over 41 nodes, 10 of them inside one repo, from a
+    phase plan Marcelo wrote by hand before this tool existed.
 
-    Found by a no-context subagent following llms.txt, which is the point of
-    that test: it had no idea what the right answer was."""
+    Replaces `GateNoneIsNotTheSameAsFromThisChair`, whose subject -- the
+    interaction of `--gate` and `machine_affinity` in `rank.py` -- no longer
+    has a tool to live in. What that test protected is now structural: there
+    are no filters, because there is no derived list to filter.
+    """
 
-    def test_here_filters_by_machine_as_well_as_gate(self):
-        import _model as model_mod
-        import new as new_mod
-        root = model_mod.find_root()
-        model = model_mod.Model.load(root)
-        me = new_mod.machine_id(root)
-        rows = model.ranked(gate="none", machine=me)
-        for node in rows:
-            affinity = node.get("machine_affinity")
-            self.assertIn(affinity, (None, me),
-                          "%s is pinned to %s and was offered here"
-                          % (node.id, affinity))
+    TOKENS = ["graphlib", "unblocks_inferred", "TopologicalSorter",
+              "node.blockers", "n.blockers", "node.reach", "n.reach",
+              "effective_status"]
 
-    def test_gate_none_alone_still_does_not_filter_by_machine(self):
-        """The old behaviour is kept and simply no longer mis-described."""
-        import _model as model_mod
-        model = model_mod.Model.load(model_mod.find_root())
-        self.assertGreaterEqual(len(model.ranked(gate="none")),
-                                len(model.ranked(gate="none",
-                                                 machine="work-laptop")))
+    def test_no_dependency_graph_survives(self):
+        sources = []
+        for base in ("tools", "plugin"):
+            for root, _dirs, files in os.walk(os.path.join(ROOT, base)):
+                sources += [os.path.join(root, f) for f in files
+                            if f.endswith(".py")]
+        self.assertGreaterEqual(len(sources), 8,
+                                "walked %d source files -- the scan did not "
+                                "run" % len(sources))          # R-075
+        offenders = []
+        for path in sources:
+            with open(path, encoding="utf-8") as fh:
+                text = fh.read()
+            for token in self.TOKENS:
+                if token in text:
+                    offenders.append("%s: %s"
+                                     % (os.path.relpath(path, ROOT), token))
+        self.assertEqual(offenders, [], "the dependency graph came back")
 
-    def test_claude_md_no_longer_claims_gate_none_means_this_chair(self):
-        with open(os.path.join(ROOT, "CLAUDE.md"), encoding="utf-8") as fh:
-            for line in fh:
-                if "--gate none" in line:
-                    self.assertNotIn("from this chair", line)
+    def test_no_task_file_carries_an_edge(self):
+        paths = glob.glob(os.path.join(
+            ROOT, "state", "projects", "*", "items", "*.md"))
+        self.assertGreater(len(paths), 20, "the scan did not run")   # R-075
+        for path in paths:
+            fm, _body = _fm.load(path)
+            self.assertEqual(
+                sorted({"unblocks", "unblocks_inferred", "gates", "answers"}
+                       & set(fm)), [],
+                "%s still carries edges" % os.path.basename(path))
+
+    def test_intent_md_was_not_edited(self):
+        """The criterion stays; only the automation went.
+
+        `intent.md` names "what unblocks the most downstream work" as a
+        precedence rule, and it is human-authority. Marcelo's ruling,
+        2026-08-20: *"the criterion stays, the automation goes. intent.md
+        describes how I decide, not what the tool computes."* So the line must
+        still be there -- deleting a computation is not licence to edit his
+        description of his own judgement."""
+        with open(os.path.join(ROOT, "intent.md"), encoding="utf-8") as fh:
+            self.assertIn("unblocks the most downstream work", fh.read())
 
 
 class PublishedStampsMustSurviveBeingPublished(unittest.TestCase):
@@ -642,18 +723,18 @@ class PublishedStampsMustSurviveBeingPublished(unittest.TestCase):
     of regenerate-then-commit converges."""
 
     def test_public_drops_the_volatile_delta(self):
-        import brief as brief_mod
+        import _context as _ctx
         import _model as model_mod
         root = model_mod.find_root()
         model = model_mod.Model.load(root)
-        stamp = brief_mod.read_stamp(root)
+        stamp = _ctx.read_stamp(root)
         if not stamp:
             self.skipTest("no audit stamp")
         with open(os.path.join(root, "state", "repos.json"), encoding="utf-8") as fh:
             spec = {k: v for k, v in json.load(fh).items()
                     if not k.startswith("_")}
         node = model.nodes["POS-001"]
-        durable = brief_mod.freshness(root, node, stamp, spec, volatile=False)
+        durable = _ctx.freshness(root, node, stamp, spec, volatile=False)
         self.assertNotIn("since the last audit", durable)
         self.assertIn("last audit", durable)
 
@@ -664,8 +745,9 @@ class PublishedStampsMustSurviveBeingPublished(unittest.TestCase):
         `R-061`'s own register excerpt, which correctly quotes the bad stamp as
         an example. A check aimed at the wrong surface -- the same class it was
         written to catch, inside itself."""
-        for name in glob.glob(os.path.join(ROOT, "public", "briefs", "*.md")) + \
-                glob.glob(os.path.join(ROOT, "public", "kickoff", "*.md")):
+        names = glob.glob(os.path.join(ROOT, "public", "kickoff", "*.md"))
+        self.assertGreater(len(names), 10, "the scan did not run")   # R-075
+        for name in names:
             with open(name, encoding="utf-8") as fh:
                 for line in fh:
                     if not line.startswith(("**Freshness:**", "Freshness:")):
@@ -782,8 +864,13 @@ class ApplyRefusals(unittest.TestCase):
         self.applier = apply_mod.Applier(ROOT, dry_run=True)
 
     def test_human_authority_fields_are_proposed_not_written(self):
-        for field, value in (("impact", 5), ("cost_usd", 35), ("gate", "bench"),
-                             ("unblocks", ["GB-005"]), ("effort_minutes", 10)):
+        # The score inputs this list used to walk are deleted (`DEC-202`).
+        # Five human-authority things survive, and the guard must still hold
+        # on every one of them -- a shorter list is not a weaker rule.
+        for field, value in (("project", "gimbal-bench"), ("gate", "external"),
+                             ("machine_affinity", "formd-t1"),
+                             ("evidence", [{"repo": "x", "paths": ["y"]}]),
+                             ("status", "parked")):
             applier = apply_mod.Applier(ROOT, dry_run=True)
             applier.set_field("EL-002", field, value)
             self.assertEqual(applier.applied, [],
@@ -846,7 +933,7 @@ class PublishedBytesDoNotMoveWithTheCalendar(unittest.TestCase):
 
     def _publish_as_of(self, iso):
         import _model as model_mod
-        import brief as brief_mod
+        import _context as _ctx
         import publish as publish_mod
 
         class _Frozen(datetime.date):
@@ -863,13 +950,13 @@ class PublishedBytesDoNotMoveWithTheCalendar(unittest.TestCase):
             datetime = _module.datetime
             timedelta = _module.timedelta
 
-        real = brief_mod.datetime
+        real = _ctx.datetime
         target = tempfile.mkdtemp(prefix="po-cal-")
-        brief_mod.datetime = _Shim
+        _ctx.datetime = _Shim
         try:
             publish_mod.generate(ROOT, model_mod.Model.load(ROOT), target)
         finally:
-            brief_mod.datetime = real
+            _ctx.datetime = real
         return target
 
     def test_two_different_days_produce_identical_bytes(self):
@@ -904,15 +991,162 @@ class PublishedBytesDoNotMoveWithTheCalendar(unittest.TestCase):
 
     def test_the_durable_line_still_says_when_the_audit_ran(self):
         """Durability must not be bought by saying nothing."""
-        import brief as brief_mod
+        import _context as _ctx
         node = type("N", (), {"get": lambda self, k, d=None: None})()
-        line = brief_mod.freshness(
+        line = _ctx.freshness(
             ROOT, node, {"date": "2026-08-19", "group_d": 153}, {},
             volatile=False)
         self.assertIn("2026-08-19", line)
         self.assertIn("153 commits unattributed", line)
         self.assertNotIn("ago", line)
         self.assertNotIn("today", line)
+
+
+class TheSchemaAndTheAuthorityTableAgree(unittest.TestCase):
+    """A field in `FIELD_ORDER` with no row in `AUTHORITY` has no owner, and a
+    row in `AUTHORITY` for a field that does not exist enforces nothing. Either
+    way the failure is silent: the file validates, the guard never fires, and
+    nobody finds out until someone writes a field they should not have."""
+
+    STRUCTURAL = {"id", "created", "parent_ruling", "closed_origin"}
+
+    def test_every_authority_row_names_a_real_field(self):
+        fields = set(_fm.FIELD_ORDER["item"])
+        self.assertGreater(len(fields), 8, "the schema did not load")   # R-075
+        orphans = sorted(set(_fm.AUTHORITY) - fields)
+        self.assertEqual(orphans, [],
+                         "AUTHORITY governs fields that no longer exist")
+
+    def test_every_field_has_an_owner_or_is_named_structural(self):
+        unowned = sorted(set(_fm.FIELD_ORDER["item"])
+                         - set(_fm.AUTHORITY) - self.STRUCTURAL)
+        self.assertEqual(unowned, [],
+                         "these fields have no authority row and are not "
+                         "declared structural -- decide who owns them")
+
+
+class TheSessionStartHookStillInjects(unittest.TestCase):
+    """The hook imported `rank.py` at `session_start.py:86` and called it at
+    `:115` and `:117`. Deleting `rank.py` without rewiring it would have broken
+    the ruled-out register's only delivery mechanism **silently** -- a hook that
+    raises does not inject, and nothing reports it. `hooks.json` names that
+    failure shape in its own comment: "it looks installed."
+
+    This is the test that was missing. It runs the hook the way the harness
+    does and requires a register entry to come back."""
+
+    def test_the_hook_runs_and_emits_a_matching_entry(self):
+        env = dict(os.environ, PRODUCT_OS_ITEM="GB-001")
+        proc = subprocess.run(
+            [sys.executable,
+             os.path.join(ROOT, "plugin", "hooks", "session_start.py")],
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, cwd=ROOT)
+        self.assertEqual(proc.returncode, 0, proc.stderr.decode()[:400])
+        payload = json.loads(proc.stdout.decode("utf-8"))
+        context = payload["hookSpecificOutput"]["additionalContext"]
+        self.assertIn("GB-001", context)
+        self.assertIn("## R-", context,
+                      "the hook injected no register entry -- the guardrail is "
+                      "installed and doing nothing")
+
+    def test_the_hook_does_not_import_a_deleted_module(self):
+        with open(os.path.join(ROOT, "plugin", "hooks", "session_start.py"),
+                  encoding="utf-8") as fh:
+            source = fh.read()
+        for gone in ("import rank", "import brief", "import build"):
+            self.assertNotIn(gone, source)
+
+
+class NoAuthoredDocDescribesTheOldModel(unittest.TestCase):
+    """The document table in the rebuild plan, made mechanical. A table is a
+    promise; a test is enforcement.
+
+    `PENDING` is the honest part. These files still describe the old model and
+    are scheduled for a later phase; naming them here means a NEW offender
+    fails immediately, and the list shrinks as those phases land. An empty
+    allowlist today would only be achievable by lying."""
+
+    TOKENS = ["rank.py", "build.py", "brief.py", "effort_minutes",
+              "cognitive_load", "lead_time_days", "unblocks_inferred"]
+
+    # Scheduled, not forgotten. Phase 6 archives GOAL/BOOTSTRAP; Phase 7
+    # rewrites the contract docs and the cold-start test.
+    PENDING = {"GOAL.md", "BOOTSTRAP.md", "CLAUDE.md", "AGENTS.md",
+               "README.md", "docs/cold-start-test.md"}
+
+    # The register is the RECORD of the old model. Rewriting it would delete
+    # the reasoning these entries exist to preserve.
+    ALLOWED = {"wiki/ruled-out.md"}
+
+    # Task BODIES are records too -- a handoff saying "build.py reported a
+    # 3-hop chain" is what happened, and editing it would be rewriting
+    # history. Their FRONTMATTER is covered instead, and covered harder, by
+    # `test_no_task_file_carries_a_score_input` and
+    # `test_no_task_file_carries_an_edge`.
+    #
+    # This exclusion earned itself: it was added only after the guard flagged
+    # 18 item files, and reading them turned up one that was NOT a record --
+    # GB-008 told a future session that its edge to gate L was
+    # `unblocks_inferred`, live instruction about a deleted field, sitting in
+    # a body that `kickoff.py` excerpts. That got fixed rather than excluded.
+    # `decisions` and `proposals` are records for the same reason the register
+    # is: a ruling that records WHY a field was deleted has to name the field.
+    # `DEC-202` tripped this guard by explaining the deletion the guard exists
+    # to enforce.
+    EXCLUDE_DIRS = ("archive", "inbox", "threads", "audits", "items",
+                    "decisions", "proposals")
+
+    def _authored(self):
+        out = []
+        for name in sorted(os.listdir(ROOT)):
+            if name.endswith(".md"):
+                out.append(name)
+        for base in ("docs", "plugin", "state"):
+            for root, dirs, files in os.walk(os.path.join(ROOT, base)):
+                dirs[:] = [d for d in dirs if d not in self.EXCLUDE_DIRS]
+                out += [os.path.relpath(os.path.join(root, f), ROOT)
+                        for f in files if f.endswith((".md", ".json"))]
+        return out
+
+    def test_no_unscheduled_doc_describes_the_old_model(self):
+        docs = self._authored()
+        # R-075: assert the denominator. The scope is the 7 root `.md` files,
+        # `docs/`, the plugin's 4 skills + 2 manifests, `state/backlog.md`,
+        # `repos.json`, the 6 `project.md` and the 2 machine files -- 24
+        # today. This threshold has already earned itself once: adding the
+        # `items`/`decisions`/`proposals` exclusions dropped the walk from 33
+        # to 24 and the guard REFUSED to report clean over the smaller set,
+        # instead of quietly certifying a third of the tree it no longer read.
+        self.assertGreaterEqual(len(docs), 20,
+                                "walked %d authored docs -- the scan did not "
+                                "run, or its scope silently shrank" % len(docs))
+        offenders = []
+        for rel in docs:
+            if rel in self.PENDING or rel in self.ALLOWED:
+                continue
+            with open(os.path.join(ROOT, rel), encoding="utf-8",
+                      errors="replace") as fh:
+                text = fh.read()
+            for token in self.TOKENS:
+                if token in text:
+                    offenders.append("%s: %s" % (rel, token))
+        self.assertEqual(sorted(offenders), [],
+                         "authored docs describe a model that no longer exists")
+
+    def test_the_pending_list_does_not_rot(self):
+        """A file on the pending list that no longer offends must come off it,
+        or the list becomes a permanent exemption nobody rechecks."""
+        stale = []
+        for rel in sorted(self.PENDING):
+            path = os.path.join(ROOT, rel)
+            if not os.path.exists(path):
+                continue
+            with open(path, encoding="utf-8", errors="replace") as fh:
+                text = fh.read()
+            if not any(token in text for token in self.TOKENS):
+                stale.append(rel)
+        self.assertEqual(stale, [],
+                         "these are clean now -- remove them from PENDING")
 
 
 if __name__ == "__main__":

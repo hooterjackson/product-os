@@ -6,13 +6,9 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "next",
-    "blocked_by": [],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/Q-004.md",
+    "backlog_position": 24,
     "closed_origin": null,
-    "cognitive_load": "high",
     "completed": null,
-    "effort_minutes": 120,
     "evidence_found": [],
     "gate": "none",
     "id": "Q-004",
@@ -27,15 +23,14 @@
       "tap",
       "unknown"
     ],
-    "lane": null,
-    "leverage": 0,
+    "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/Q-004.md",
+    "lane": "firmware",
     "machine_affinity": null,
     "project": "gimbal-bench",
-    "reach": [],
-    "repos": [],
-    "score": 3.0,
+    "repos": [
+      "gimbal-bench"
+    ],
     "status": "next",
-    "title": "Where do 300 liveness taps a second come from?",
-    "unblocks": []
+    "title": "Where do 300 liveness taps a second come from?"
   }
 }

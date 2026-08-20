@@ -6,18 +6,11 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "next",
-    "blocked_by": [
-      "EL-001",
-      "GB-013"
-    ],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-012.md",
+    "backlog_position": 22,
     "closed_origin": null,
-    "cognitive_load": "high",
     "completed": null,
-    "effort_minutes": 480,
     "evidence_found": [],
-    "gate": "bench",
+    "gate": "none",
     "id": "GB-012",
     "keywords": [
       "drill",
@@ -30,17 +23,14 @@
       "soak",
       "zigbee"
     ],
+    "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/GB-012.md",
     "lane": "firmware",
-    "leverage": 0,
     "machine_affinity": "formd-t1",
     "project": "gimbal-bench",
-    "reach": [],
     "repos": [
       "gimbal-bench"
     ],
-    "score": 3.75,
-    "status": "blocked",
-    "title": "Gate L \u2014 the fixture joins and holds as a light",
-    "unblocks": []
+    "status": "next",
+    "title": "Gate L \u2014 the fixture joins and holds as a light"
   }
 }

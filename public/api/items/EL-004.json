@@ -6,13 +6,9 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "done",
-    "blocked_by": [],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/EL-004.md",
+    "backlog_position": null,
     "closed_origin": "inferred",
-    "cognitive_load": "medium",
     "completed": "2026-07-21",
-    "effort_minutes": 240,
     "evidence_found": [
       {
         "kind": "commit",
@@ -37,17 +33,14 @@
       "rmd-l-5005",
       "swap"
     ],
+    "kickoff": null,
     "lane": "hardware",
-    "leverage": 0,
     "machine_affinity": null,
     "project": "robotic-spotlight",
-    "reach": [],
     "repos": [
       "engineered-lighting-site"
     ],
-    "score": 6.667,
     "status": "done",
-    "title": "Propagate the RMD-L-4005 to RMD-L-5005 motor swap sitewide",
-    "unblocks": []
+    "title": "Propagate the RMD-L-4005 to RMD-L-5005 motor swap sitewide"
   }
 }

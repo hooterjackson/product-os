@@ -6,15 +6,11 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "next",
-    "blocked_by": [],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-001.md",
+    "backlog_position": 1,
     "closed_origin": null,
-    "cognitive_load": "high",
     "completed": null,
-    "effort_minutes": 480,
     "evidence_found": [],
-    "gate": "bench",
+    "gate": "none",
     "id": "GB-001",
     "keywords": [
       "brownout",
@@ -28,28 +24,14 @@
       "watchdog",
       "wear"
     ],
+    "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/GB-001.md",
     "lane": "firmware",
-    "leverage": 8,
     "machine_affinity": "formd-t1",
     "project": "gimbal-bench",
-    "reach": [
-      "GB-005",
-      "GB-006",
-      "GB-007",
-      "GB-008",
-      "GB-009",
-      "GB-010",
-      "GB-011",
-      "GB-014"
-    ],
     "repos": [
       "gimbal-bench"
     ],
-    "score": 25.0,
     "status": "next",
-    "title": "Finish the M5 fault ring: a real fault storm, and the brownout case",
-    "unblocks": [
-      "GB-014"
-    ]
+    "title": "Finish the M5 fault ring: a real fault storm, and the brownout case"
   }
 }

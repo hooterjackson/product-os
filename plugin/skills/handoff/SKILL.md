@@ -14,7 +14,7 @@ it cannot see.**
 The ID cited at the start of the session. If none was, find it:
 
 ```bash
-python3 tools/rank.py --json | head -40
+python3 tools/backlog.py
 ```
 
 Ask which one only if it is genuinely ambiguous. Guessing is worse than asking
@@ -80,11 +80,11 @@ path, or a dated manual note. If you cannot produce one, the item is not done.
 Say so and leave it. `validate.py` will reject it anyway, but the point is not to
 try.
 
-You may **not** set `impact`, `confidence`, `effort_minutes`, `lead_time_days`,
-`cost_usd`, `unblocks`, `pin`, `project`, `gate`, `dropped`, `parked` or the
-`evidence` rule. If one of them is wrong, write a proposal into
-`state/proposals/` — the change, the reasoning, and a citation to `intent.md` or
-a standing order — and say that you have.
+You may **not** set `project`, `gate`, `machine_affinity`, `dropped`, `parked`
+or the `evidence` rule, and you may **not** reorder `state/backlog.md`. If one of
+them is wrong, write a draft into `state/drafts/` — the change, a diff against
+what is there, the reasoning, and a citation to `intent.md` or a standing
+order — and say that you have.
 
 ## 6 · Verify and sync
 

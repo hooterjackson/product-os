@@ -7,21 +7,6 @@
   "lane": "firmware",
   "gate": "none",
   "machine_affinity": "formd-t1",
-  "impact": 4,
-  "confidence": 3,
-  "effort_minutes": 960,
-  "cognitive_load": "high",
-  "lead_time_days": 0,
-  "cost_usd": null,
-  "unblocks": [
-    "GB-009",
-    "GB-010",
-    "GB-011"
-  ],
-  "unblocks_inferred": [
-    "GB-012"
-  ],
-  "answers": [],
   "keywords": [
     "zigbee",
     "z-m3",
@@ -49,7 +34,7 @@
   ],
   "parent_ruling": "DEC-015",
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 
@@ -60,9 +45,10 @@
 The fan-out point: §6 states *"Z-M4/Z-M5/Z-M6 on Z-M3"*, which is where three of
 this chain's four leaves attach.
 
-**The edge to GB-012 (gate L) is `unblocks_inferred`, not `unblocks`.** No source
-states it. What the sources state is that gate L means *"the fixture joins and
-holds as a light"* and that Z-M3 is bring-up as a light — which makes the edge
-obvious to a reader and still an inference. Inferred edges are excluded from
-leverage and never force `blocked`, so nothing in the ranking rests on my
-reading of it.
+**The relationship to GB-012 (gate L) is an inference, and no source states
+it.** What the sources state is that gate L means *"the fixture joins and holds
+as a light"* and that Z-M3 is bring-up as a light — which makes the connection
+obvious to a reader and still an inference. It was modelled as an edge until
+2026-08-20; the edges are gone (`DEC-202`), so this is recorded here as what it
+always was: a reading, not a citation. Do not treat it as a prerequisite
+without checking.

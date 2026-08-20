@@ -6,15 +6,9 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "next",
-    "blocked_by": [
-      "GB-005"
-    ],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-007.md",
+    "backlog_position": 21,
     "closed_origin": null,
-    "cognitive_load": "high",
     "completed": null,
-    "effort_minutes": 480,
     "evidence_found": [],
     "gate": "none",
     "id": "GB-007",
@@ -29,17 +23,14 @@
       "z-m2",
       "zigbee"
     ],
+    "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/GB-007.md",
     "lane": "firmware",
-    "leverage": 0,
     "machine_affinity": "formd-t1",
     "project": "gimbal-bench",
-    "reach": [],
     "repos": [
       "gimbal-bench"
     ],
-    "score": 3.75,
-    "status": "blocked",
-    "title": "Z-M2 \u2014 the rollback ladder, D15's ruled first radio commit",
-    "unblocks": []
+    "status": "next",
+    "title": "Z-M2 \u2014 the rollback ladder, D15's ruled first radio commit"
   }
 }

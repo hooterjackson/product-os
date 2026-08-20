@@ -6,13 +6,9 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "done",
-    "blocked_by": [],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-004.md",
+    "backlog_position": null,
     "closed_origin": "inferred",
-    "cognitive_load": "high",
     "completed": "2026-08-19",
-    "effort_minutes": 90,
     "evidence_found": [
       {
         "kind": "file",
@@ -47,15 +43,12 @@
       "said",
       "truth"
     ],
+    "kickoff": null,
     "lane": "infra",
-    "leverage": 0,
     "machine_affinity": null,
     "project": "product-os",
-    "reach": [],
     "repos": [],
-    "score": 5.333,
     "status": "done",
-    "title": "apply.py: distinguish who decided, not just what changed",
-    "unblocks": []
+    "title": "apply.py: distinguish who decided, not just what changed"
   }
 }

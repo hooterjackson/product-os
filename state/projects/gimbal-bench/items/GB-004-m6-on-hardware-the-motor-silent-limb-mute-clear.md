@@ -5,17 +5,8 @@
   "project": "gimbal-bench",
   "status": "next",
   "lane": "firmware",
-  "gate": "bench",
+  "gate": "none",
   "machine_affinity": "formd-t1",
-  "impact": 4,
-  "confidence": 4,
-  "effort_minutes": 180,
-  "cognitive_load": "high",
-  "lead_time_days": 0,
-  "cost_usd": null,
-  "unblocks": [],
-  "unblocks_inferred": [],
-  "answers": [],
   "keywords": [
     "m6",
     "mute",
@@ -71,7 +62,7 @@
   ],
   "parent_ruling": "DEC-016",
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

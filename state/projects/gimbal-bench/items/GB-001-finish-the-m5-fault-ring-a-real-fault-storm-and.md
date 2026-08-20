@@ -5,19 +5,8 @@
   "project": "gimbal-bench",
   "status": "next",
   "lane": "firmware",
-  "gate": "bench",
+  "gate": "none",
   "machine_affinity": "formd-t1",
-  "impact": 5,
-  "confidence": 4,
-  "effort_minutes": 480,
-  "cognitive_load": "high",
-  "lead_time_days": 0,
-  "cost_usd": null,
-  "unblocks": [
-    "GB-014"
-  ],
-  "unblocks_inferred": [],
-  "answers": [],
   "keywords": [
     "m5",
     "fault-ring",
@@ -46,7 +35,7 @@
   ],
   "parent_ruling": null,
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

@@ -7,13 +7,9 @@
   },
   "items": [
     {
-      "authored_status": "done",
-      "blocked_by": [],
-      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/EL-004.md",
+      "backlog_position": null,
       "closed_origin": "inferred",
-      "cognitive_load": "medium",
       "completed": "2026-07-21",
-      "effort_minutes": 240,
       "evidence_found": [
         {
           "kind": "commit",
@@ -38,27 +34,20 @@
         "rmd-l-5005",
         "swap"
       ],
+      "kickoff": null,
       "lane": "hardware",
-      "leverage": 0,
       "machine_affinity": null,
       "project": "robotic-spotlight",
-      "reach": [],
       "repos": [
         "engineered-lighting-site"
       ],
-      "score": 6.667,
       "status": "done",
-      "title": "Propagate the RMD-L-4005 to RMD-L-5005 motor swap sitewide",
-      "unblocks": []
+      "title": "Propagate the RMD-L-4005 to RMD-L-5005 motor swap sitewide"
     },
     {
-      "authored_status": "done",
-      "blocked_by": [],
-      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-002.md",
+      "backlog_position": null,
       "closed_origin": "inferred",
-      "cognitive_load": "low",
       "completed": "2026-08-19",
-      "effort_minutes": 25,
       "evidence_found": [
         {
           "kind": "commit",
@@ -78,28 +67,21 @@
         "project-state",
         "state-file"
       ],
+      "kickoff": null,
       "lane": "content",
-      "leverage": 0,
       "machine_affinity": null,
       "project": "product-os",
-      "reach": [],
       "repos": [
         "engineered-lighting-site",
         "product-os"
       ],
-      "score": 7.5,
       "status": "done",
-      "title": "Point PROJECT-STATE.md at product-os",
-      "unblocks": []
+      "title": "Point PROJECT-STATE.md at product-os"
     },
     {
-      "authored_status": "done",
-      "blocked_by": [],
-      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-003.md",
+      "backlog_position": null,
       "closed_origin": "inferred",
-      "cognitive_load": "high",
       "completed": "2026-08-19",
-      "effort_minutes": 480,
       "evidence_found": [
         {
           "kind": "file",
@@ -140,25 +122,18 @@
         "re-audit",
         "unattributed"
       ],
+      "kickoff": null,
       "lane": "infra",
-      "leverage": 0,
       "machine_affinity": null,
       "project": "product-os",
-      "reach": [],
       "repos": [],
-      "score": 5.0,
       "status": "done",
-      "title": "Build /audit: re-check priorities against reality",
-      "unblocks": []
+      "title": "Build /audit: re-check priorities against reality"
     },
     {
-      "authored_status": "done",
-      "blocked_by": [],
-      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-004.md",
+      "backlog_position": null,
       "closed_origin": "inferred",
-      "cognitive_load": "high",
       "completed": "2026-08-19",
-      "effort_minutes": 90,
       "evidence_found": [
         {
           "kind": "file",
@@ -193,25 +168,18 @@
         "said",
         "truth"
       ],
+      "kickoff": null,
       "lane": "infra",
-      "leverage": 0,
       "machine_affinity": null,
       "project": "product-os",
-      "reach": [],
       "repos": [],
-      "score": 5.333,
       "status": "done",
-      "title": "apply.py: distinguish who decided, not just what changed",
-      "unblocks": []
+      "title": "apply.py: distinguish who decided, not just what changed"
     },
     {
-      "authored_status": "done",
-      "blocked_by": [],
-      "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/POS-005.md",
+      "backlog_position": null,
       "closed_origin": "inferred",
-      "cognitive_load": "high",
       "completed": "2026-08-19",
-      "effort_minutes": 480,
       "evidence_found": [
         {
           "kind": "file",
@@ -247,16 +215,13 @@
         "sharding",
         "threads"
       ],
+      "kickoff": null,
       "lane": "infra",
-      "leverage": 0,
       "machine_affinity": null,
       "project": "product-os",
-      "reach": [],
       "repos": [],
-      "score": 3.0,
       "status": "done",
-      "title": "Thread indexer: bind chats to items, metadata only",
-      "unblocks": []
+      "title": "Thread indexer: bind chats to items, metadata only"
     }
   ],
   "note": "Items a machine marked done. Marcelo has confirmed none of these. Confirming one is a sentence: apply.py --decided <ID>=status:done --said \"...\""

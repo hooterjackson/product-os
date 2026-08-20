@@ -7,17 +7,6 @@
   "lane": "hardware",
   "gate": "none",
   "machine_affinity": null,
-  "impact": 4,
-  "confidence": 4,
-  "effort_minutes": 20,
-  "cognitive_load": "low",
-  "lead_time_days": 14,
-  "cost_usd": 205.0,
-  "unblocks": [
-    "GB-012"
-  ],
-  "unblocks_inferred": [],
-  "answers": [],
   "keywords": [
     "led",
     "bom",
@@ -76,7 +65,7 @@
   ],
   "parent_ruling": null,
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

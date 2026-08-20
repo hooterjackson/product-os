@@ -6,13 +6,9 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "parked",
-    "blocked_by": [],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/SITE-001.md",
+    "backlog_position": null,
     "closed_origin": null,
-    "cognitive_load": "high",
     "completed": null,
-    "effort_minutes": 180,
     "evidence_found": [],
     "gate": "none",
     "id": "SITE-001",
@@ -28,17 +24,14 @@
       "transport",
       "zigbee"
     ],
+    "kickoff": null,
     "lane": "content",
-    "leverage": 0,
     "machine_affinity": null,
     "project": "engineering-site",
-    "reach": [],
     "repos": [
       "engineered-lighting-site"
     ],
-    "score": 5.333,
     "status": "parked",
-    "title": "Retire wifi:/api:/mqtt: as TRANSPORT in Docs 6 and 7",
-    "unblocks": []
+    "title": "Retire wifi:/api:/mqtt: as TRANSPORT in Docs 6 and 7"
   }
 }

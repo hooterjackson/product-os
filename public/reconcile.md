@@ -14,18 +14,20 @@ working on something. It needs repo access and a clean head.
 
 ---
 
-## What product-os currently believes
+## The top of my backlog, in the order I put it in
 
-This is a set of guesses, not a record of reality. Check it.
+This is my judgement about what matters, not a record of what is
+true. The order is not yours to change; whether each line is still
+accurate is exactly what I am asking.
 
-1. `GB-001` 25.0 — Finish the M5 fault ring: a real fault storm, and the brownout case · gate bench
-2. `HAI-001` 20.0 — Rotate the GPU box's Linux password
-3. `GB-002` 6.7 — Rescue D1-D11 off formd-t1 and commit them
-4. `Q-001` 6.0 — Does Spot Mode (Auto/Hold/Manual) survive gate A?
-5. `GB-004` 5.3 — M6 on hardware: the motor-silent limb, MUTE-CLEAR, and the armed lane · gate bench
-6. `POS-008` 5.3 — Surface inferred closures, record the public decision
-7. `Q-002` 5.3 — Does a mid-move retarget re-plan smoothly, or stop and restart?
-8. `POS-010` 5.0 — Kickoff prompts and thread return paths
+1. `GB-001` — Finish the M5 fault ring: a real fault storm, and the brownout case
+2. `HAI-001` — Rotate the GPU box's Linux password
+3. `GB-014` — Un-park Zigbee — the decision D15 leaves open · gate external
+4. `GB-005` — Z-M1 — variant, partitions and the c-patch signing scaffold
+5. `GB-006` — Z-M0 — the §9.1 mailbox primitive
+6. `GB-008` — Z-M3 — Zigbee bring-up as a light
+7. `GB-002` — Rescue D1-D11 off formd-t1 and commit them
+8. `Q-001` — Does Spot Mode (Auto/Hold/Manual) survive gate A?
 
 ## What is NOT confirmed
 
@@ -48,15 +50,15 @@ This is a set of guesses, not a record of reality. Check it.
    - **new items** for work that exists and nothing models, with
      `evidence` paths specific enough to fire. A glob matching a
      whole directory is a claim on everything that happens there.
-   - **a proposed order, with the arithmetic shown.** Operands, not a
-     conclusion. `python3 tools/rank.py --show <ID>` prints them.
+   - **nothing about the order.** `state/backlog.md` is mine. If
+     something new belongs near the top, say so in a sentence and
+     leave the file alone.
 
 ## Rules
 
-- **Decided fields are proposed, never written**: `impact`,
-  `confidence`, `effort_minutes`, `cost_usd`, `unblocks`, `pin`,
-  `gate`, `project`, `parked`/`dropped`, and the `evidence` rule.
-  Write them into `state/proposals/`.
+- **Decided fields are drafted, never written**: `project`, `gate`,
+  `machine_affinity`, `parked`/`dropped`, and the `evidence` rule.
+  Write them into `state/drafts/`, with a diff against what is there.
 - **What I say applies immediately.** If I state a fact about my own
   project, use `tools/apply.py --decided <ID>=<field>:<value> --said
   "<my words>"`. Do not file a proposal addressed to me for

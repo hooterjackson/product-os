@@ -7,15 +7,6 @@
   "lane": "infra",
   "gate": "none",
   "machine_affinity": "work-laptop",
-  "impact": 4,
-  "confidence": 4,
-  "effort_minutes": 960,
-  "cognitive_load": "high",
-  "lead_time_days": 0,
-  "cost_usd": null,
-  "unblocks": [],
-  "unblocks_inferred": [],
-  "answers": [],
   "keywords": [
     "product-os",
     "slice-1a",
@@ -67,7 +58,7 @@
   ],
   "parent_ruling": null,
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

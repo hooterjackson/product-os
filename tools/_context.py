@@ -1,44 +1,29 @@
 #!/usr/bin/env python3
-"""Per-item briefs. Regenerated wholesale on every build; never hand-edited.
+"""Shared context helpers: the register, the audit stamp, freshness, handoffs.
 
-    python3 tools/brief.py GB-001        one brief, to stdout
-    python3 tools/brief.py --all         every active item, into build/briefs/
+Not an artifact. This module was `brief.py`, which generated a second per-item
+document alongside the kickoff prompt -- and `kickoff.py`'s output turned out to
+be a superset of it except for two sections, both of which now live there
+(`R-071`). Two surfaces rendering the same content is how they drift apart, and
+drift inside an excerpt is `R-065`.
 
-A brief is what a session reads instead of the chat history it cannot see:
-where this stands, what is next, what is ALREADY RULED OUT, which decisions are
-in force, and how stale all of that is.
+What survived the brief is everything that was actually load-bearing:
 
-## The freshness stamp is never optional
-
-Every brief carries one, including when the answer is "I don't know". A brief
-without a stamp reads as current, and a brief that is silently three weeks
-behind is exactly the failure this repo exists to prevent -- it is the same
-shape as `PROJECT-STATE.md` listing two prompts as pending that had already
-shipped.
-
-So the stamp has three honest forms and one of them always prints:
-
-    (no audit has ever run -- freshness unknown)
-    last audit 2026-08-19 (today) - clean at 108 unattributed
-    WARNING 6 commits in gimbal-bench since the last audit
-
-## Day one names the absence
-
-An item with no handoff, no ruled-out match and no ruling in force must SAY so.
-Empty headings read as "nothing to worry about"; the absence of a record is not
-the absence of a fact, and on day one almost everything is absent.
+    parse_register      wiki/ruled-out.md -> (title, keywords, first paragraph)
+    ruled_out_for       the keyword match that decides which entries a task meets
+    read_stamp          the audit stamp
+    freshness           one honest line, always -- see its own docstring
+    whats_next          the last handoff's Next line, or a stated absence
+    decisions_in_force  the rulings a task is parented to
 """
 
-import argparse
 import datetime
 import json
 import os
 import re
-import sys
 
 import _fm
 import _git
-import _model
 
 STAMP_FILE = "build/audit-stamp.json"
 REGISTER = "wiki/ruled-out.md"
@@ -207,121 +192,3 @@ def decisions_in_force(node, model):
         if decision.project == node.project and decision.get("propagates_to"):
             out.append((decision.id, decision.get("ruling_id"), decision.title))
     return out[:4]
-
-
-def render(node, model, entries, stamp, repos_spec, root, volatile=True):
-    lines = ["# %s · %s" % (node.id, node.title), ""]
-    lines.append("`%s` · %s · lane %s · gate %s%s" % (
-        node.project, node.effective_status, node.get("lane"),
-        node.get("gate") or "none",
-        " · machine %s" % node.get("machine_affinity")
-        if node.get("machine_affinity") else ""))
-    if node.status == "done" and node.get("closed_origin") != "his-word":
-        lines += ["",
-                  "> ## ⚠ CLOSED ON MY JUDGEMENT, NOT CONFIRMED",
-                  ">",
-                  "> A machine decided this was finished. Marcelo has not said so.",
-                  "> The evidence below is what I found; nobody has agreed it is "
-                  "enough.",
-                  ">",
-                  "> Confirm in a sentence: "
-                  "`apply.py --decided %s=status:done --said \"...\"`" % node.id]
-    lines += ["", "**Freshness:** %s" % freshness(root, node, stamp, repos_spec, volatile), ""]
-
-    lines += ["## Where this stands", ""]
-    if node.effective_status == "blocked":
-        lines.append("**Blocked** by %s." % ", ".join(node.blockers))
-    lines.append("Score %.1f · leverage %d%s · %d min."
-                 % (node.score, node.leverage,
-                    " (%s)" % ", ".join(sorted(node.reach, key=_fm.sort_key))
-                    if node.reach else "",
-                    node.effort_minutes))
-    found = node.get("evidence_found") or []
-    if found:
-        lines.append("")
-        lines.append("Evidence on file: %s" % ", ".join(
-            "`%s`" % (e.get("sha") or e.get("path") or "?") for e in found[:6]))
-    else:
-        lines.append("")
-        lines.append("**No evidence recorded yet.** This item cannot be closed "
-                     "until something can be clicked.")
-
-    lines += ["", "## What's next", ""]
-    nxt = whats_next(node)
-    lines.append(nxt if nxt else
-                 "**No handoff recorded.** Nobody has written down where this "
-                 "was left, so the next session starts from the item body.")
-
-    lines += ["", "## Already ruled out", ""]
-    hits = ruled_out_for(node, entries)
-    if hits:
-        lines.append("Read these before proposing an approach:")
-        lines.append("")
-        for _n, title, first, overlap in hits:
-            lines.append("- **%s** — _matched on %s_" % (title, ", ".join(overlap)))
-            if first:
-                lines.append("  %s" % first)
-    else:
-        lines.append("**Nothing in `wiki/ruled-out.md` matches this item's "
-                     "keywords** (%s). That is not the same as nothing having "
-                     "been ruled out — skim the register."
-                     % (", ".join(sorted(str(k) for k in
-                                         (node.get("keywords") or []))) or "none"))
-
-    lines += ["", "## Decisions in force", ""]
-    rulings = decisions_in_force(node, model)
-    if rulings:
-        for dec_id, ruling, title in rulings:
-            lines.append("- **%s**%s — %s"
-                         % (dec_id, " (%s)" % ruling if ruling else "", title))
-    else:
-        lines.append("**No ruling is recorded against this item.** It is "
-                     "parented to nothing, which means nobody has decided how "
-                     "it should go.")
-
-    lines += ["", "---", "",
-              "_Generated by `tools/brief.py` on every build. Never hand-edit: "
-              "`build/` is rebuilt wholesale._"]
-    return "\n".join(lines) + "\n"
-
-
-def main(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("item", nargs="?")
-    parser.add_argument("--all", action="store_true")
-    parser.add_argument("--out")
-    args = parser.parse_args(argv)
-
-    root = _model.find_root()
-    model = _model.Model.load(root)
-    entries = parse_register(root)
-    stamp = read_stamp(root)
-    with open(os.path.join(root, "state", "repos.json"), "r",
-              encoding="utf-8") as fh:
-        repos_spec = {k: v for k, v in json.load(fh).items()
-                      if not k.startswith("_")}
-
-    if args.item:
-        node = model.nodes.get(args.item.upper())
-        if node is None:
-            sys.stderr.write("no such item: %s\n" % args.item)
-            return 2
-        sys.stdout.write(render(node, model, entries, stamp, repos_spec, root))
-        return 0
-
-    out_dir = args.out or os.path.join(root, "build", "briefs")
-    os.makedirs(out_dir, exist_ok=True)
-    written = 0
-    for node in model.nodes.values():
-        if not (args.all or node.is_active):
-            continue
-        path = os.path.join(out_dir, "%s.md" % node.id)
-        with open(path, "w", encoding="utf-8") as fh:
-            fh.write(render(node, model, entries, stamp, repos_spec, root))
-        written += 1
-    print("wrote %d brief(s) to %s" % (written, os.path.relpath(out_dir, root)))
-    return 0
-
-
-if __name__ == "__main__":
-    sys.exit(main())

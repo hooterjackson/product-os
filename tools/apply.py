@@ -118,7 +118,7 @@ class Applier(object):
         """Questions are not items. `_fm` orders their keys differently, so
         writing a question with kind="item" produces a valid file that fails
         the canonical check -- which is exactly what parking Q-005 did."""
-        return "question" if item_id in self.model.questions else "item"
+        return "item"   # the `question` kind was collapsed -- R-069, Phase 1
 
     def node(self, item_id):
         node = self.model.nodes.get(item_id)

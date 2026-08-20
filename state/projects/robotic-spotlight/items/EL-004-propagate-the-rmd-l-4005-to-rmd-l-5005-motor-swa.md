@@ -7,15 +7,6 @@
   "lane": "hardware",
   "gate": "none",
   "machine_affinity": null,
-  "impact": 4,
-  "confidence": 5,
-  "effort_minutes": 240,
-  "cognitive_load": "medium",
-  "lead_time_days": 0,
-  "cost_usd": null,
-  "unblocks": [],
-  "unblocks_inferred": [],
-  "answers": [],
   "keywords": [
     "motor",
     "rmd-l-5005",
@@ -57,7 +48,7 @@
   ],
   "parent_ruling": null,
   "created": "2026-08-19",
-  "updated": "2026-08-19",
+  "updated": "2026-08-20",
   "completed": "2026-07-21",
   "closed_origin": "inferred"
 }

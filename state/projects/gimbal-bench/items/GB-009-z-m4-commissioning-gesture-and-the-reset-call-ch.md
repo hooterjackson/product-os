@@ -7,15 +7,6 @@
   "lane": "firmware",
   "gate": "none",
   "machine_affinity": "formd-t1",
-  "impact": 3,
-  "confidence": 3,
-  "effort_minutes": 240,
-  "cognitive_load": "high",
-  "lead_time_days": 0,
-  "cost_usd": null,
-  "unblocks": [],
-  "unblocks_inferred": [],
-  "answers": [],
   "keywords": [
     "zigbee",
     "z-m4",
@@ -41,7 +32,7 @@
   ],
   "parent_ruling": "DEC-015",
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

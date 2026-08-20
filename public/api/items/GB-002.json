@@ -6,13 +6,9 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "next",
-    "blocked_by": [],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/GB-002.md",
+    "backlog_position": 7,
     "closed_origin": null,
-    "cognitive_load": "medium",
     "completed": null,
-    "effort_minutes": 90,
     "evidence_found": [],
     "gate": "none",
     "id": "GB-002",
@@ -26,17 +22,14 @@
       "rescue",
       "uncommitted"
     ],
+    "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/GB-002.md",
     "lane": "content",
-    "leverage": 0,
     "machine_affinity": "formd-t1",
     "project": "gimbal-bench",
-    "reach": [],
     "repos": [
       "gimbal-bench"
     ],
-    "score": 6.667,
     "status": "next",
-    "title": "Rescue D1-D11 off formd-t1 and commit them",
-    "unblocks": []
+    "title": "Rescue D1-D11 off formd-t1 and commit them"
   }
 }

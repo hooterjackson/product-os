@@ -66,10 +66,19 @@ def parse_entries(text):
 
 
 def pick_item(model, wanted):
+    """The named task, or the top of the authored backlog.
+
+    This used to ask the model for a computed order. Deleting `rank.py`
+    without rewiring it
+    would have broken this hook SILENTLY -- a hook that raises simply does not
+    inject, so the ruled-out register would have stopped reaching sessions with
+    no error anywhere. `hooks.json` names that failure shape already: "it looks
+    installed."
+    """
     if wanted:
         return model.nodes.get(wanted.strip().upper())
-    ranked = model.ranked()
-    return ranked[0] if ranked else None
+    ordered = model.backlog()
+    return ordered[0] if ordered else None
 
 
 def main():
@@ -83,7 +92,6 @@ def main():
     sys.path.insert(0, os.path.join(root, "tools"))
     try:
         import _model
-        import rank as rank_mod
         model = _model.Model.load(root)
     except Exception:
         return 0
@@ -110,11 +118,10 @@ def main():
         "# product-os · before you suggest anything",
         "",
         "**%s — %s**" % (node.id, node.title),
-        "%s · %s · gate %s · %s" % (
-            node.project, node.effective_status, node.get("gate") or "none",
-            rank_mod.humanize_minutes(node.effort_minutes)),
-        "",
-        rank_mod.explain(node, model),
+        "%s · %s · gate %s%s" % (
+            node.project, node.status, node.get("gate") or "none",
+            " · machine %s" % node.get("machine_affinity")
+            if node.get("machine_affinity") else ""),
         "",
     ]
     if node.get("machine_affinity"):

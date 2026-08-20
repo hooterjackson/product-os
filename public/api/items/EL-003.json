@@ -6,13 +6,9 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "parked",
-    "blocked_by": [],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/EL-003.md",
+    "backlog_position": null,
     "closed_origin": null,
-    "cognitive_load": "low",
     "completed": null,
-    "effort_minutes": 120,
     "evidence_found": [],
     "gate": "printer",
     "id": "EL-003",
@@ -27,17 +23,14 @@
       "tol-coupon",
       "tolerance"
     ],
+    "kickoff": null,
     "lane": "hardware",
-    "leverage": 0,
     "machine_affinity": null,
     "project": "robotic-spotlight",
-    "reach": [],
     "repos": [
       "engineered-lighting-site"
     ],
-    "score": 4.0,
     "status": "parked",
-    "title": "Print the tolerance coupon, then the fit coupon",
-    "unblocks": []
+    "title": "Print the tolerance coupon, then the fit coupon"
   }
 }

@@ -6,13 +6,9 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "next",
-    "blocked_by": [],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/APP-001.md",
+    "backlog_position": 17,
     "closed_origin": null,
-    "cognitive_load": "low",
     "completed": null,
-    "effort_minutes": 45,
     "evidence_found": [],
     "gate": "none",
     "id": "APP-001",
@@ -25,17 +21,14 @@
       "squashed",
       "unreachable"
     ],
+    "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/APP-001.md",
     "lane": "app",
-    "leverage": 0,
     "machine_affinity": null,
     "project": "home-app",
-    "reach": [],
     "repos": [
       "HomeApp"
     ],
-    "score": 4.0,
     "status": "next",
-    "title": "Give HomeApp an evidence rule that does not depend on git history",
-    "unblocks": []
+    "title": "Give HomeApp an evidence rule that does not depend on git history"
   }
 }

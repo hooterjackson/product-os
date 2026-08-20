@@ -6,13 +6,9 @@
     "unattributed_commits_at_last_audit": 153
   },
   "item": {
-    "authored_status": "done",
-    "blocked_by": [],
-    "brief": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/briefs/EL-005.md",
+    "backlog_position": null,
     "closed_origin": "his-word",
-    "cognitive_load": "high",
     "completed": "2026-08-15",
-    "effort_minutes": 480,
     "evidence_found": [
       {
         "kind": "commit",
@@ -27,7 +23,7 @@
         "sha": "19dd790"
       }
     ],
-    "gate": "bench",
+    "gate": "none",
     "id": "EL-005",
     "keywords": [
       "0x241",
@@ -41,17 +37,14 @@
       "pose",
       "ready"
     ],
+    "kickoff": null,
     "lane": "hardware",
-    "leverage": 0,
     "machine_affinity": "formd-t1",
     "project": "robotic-spotlight",
-    "reach": [],
     "repos": [
       "gimbal-bench"
     ],
-    "score": 6.25,
     "status": "done",
-    "title": "CAN bring-up: both motors answering, and the first READY r=1",
-    "unblocks": []
+    "title": "CAN bring-up: both motors answering, and the first READY r=1"
   }
 }
