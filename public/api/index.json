@@ -160,7 +160,6 @@
     "reconcile.md"
   ],
   "freshness": {
-    "generated": "2026-08-19",
     "last_audit": "2026-08-19",
     "last_audit_window_since": "2026-08-10",
     "source": "state/ in hooterjackson/product-os",

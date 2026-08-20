@@ -2,14 +2,13 @@
   "counts": {
     "active": 23,
     "blocked": 9,
-    "decisions": 9,
+    "decisions": 10,
     "done": 6,
     "items": 36,
     "parked": 7,
     "questions": 5
   },
   "freshness": {
-    "generated": "2026-08-19",
     "last_audit": "2026-08-19",
     "last_audit_window_since": "2026-08-10",
     "source": "state/ in hooterjackson/product-os",

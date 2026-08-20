@@ -33,7 +33,6 @@ not drag the whole portfolio in with it.
 """
 
 import argparse
-import datetime
 import difflib
 import json
 import os
@@ -51,9 +50,15 @@ RAW = "https://raw.githubusercontent.com/hooterjackson/product-os/main/public"
 
 def freshness_block(root, stamp):
     """Every endpoint says how fresh it is. A consumer must be able to tell
-    whether it is reading something current without having to ask."""
+    whether it is reading something current without having to ask.
+
+    There is deliberately no `generated` date. It moved every day, so every
+    committed endpoint went stale at midnight with nothing in `state/` having
+    changed -- `R-067`. `last_audit` is the date that answers the question a
+    consumer is actually asking, and it only moves when an audit runs. The
+    real generation record is the commit that carries the file.
+    """
     block = {
-        "generated": datetime.date.today().isoformat(),
         "source": "state/ in hooterjackson/product-os",
     }
     if stamp:

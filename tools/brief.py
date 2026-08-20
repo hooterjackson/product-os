@@ -96,24 +96,42 @@ def read_stamp(root):
 def freshness(root, node, stamp, repos_spec, volatile=True):
     """One line, always. Names what it could not check.
 
-    `volatile=False` drops the "+N commits since the audit" delta.
+    `volatile=False` means "this line is about to be COMMITTED", and drops
+    every quantity that is a property of this machine at this moment rather
+    than of the audit:
 
-    That delta is a function of the local working copy's HEAD, so a COMMITTED
-    copy of this line is invalidated by the very commit that publishes it:
-    measured `+9` before a commit and `+10` after, which made `public/`
-    permanently out of sync and shipped a stale stamp to a live URL. No amount
-    of "regenerate before committing" fixes it -- regenerating and committing
-    increments it again.
+        the "+N commits since the audit" delta   -- moves with local HEAD
+        the "(2 days ago)" age                   -- moves with the calendar
+        "could not check X offline"              -- moves with what is cloned here
 
-    So the published surface carries only the DURABLE half: when the last audit
-    ran, over what window, and what it found. That is the fact a remote
-    consumer needs and it does not move between audits. The live delta stays in
-    `build/`, for the person at the keyboard who can act on it.
+    All three make a committed copy wrong without anything in `state/`
+    changing. The delta was measured at `+9` before a commit and `+10` after,
+    which is `R-061`.
+
+    `R-067` is the same defect four lines further down, left behind by that
+    fix: the age. Measured 2026-08-20 -- `publish.py --check` reported **121
+    files out of sync on a clean tree**, the whole difference being
+    `(today)` -> `(1 day ago)`. `validate.py` was therefore red every day but
+    the audit's, which trains a reader to regenerate-and-commit or to stop
+    looking. **A guardrail that is red by default is off.**
+
+    So the published surface carries only the DURABLE half: when the last
+    audit ran and what it found. That does not move between audits, and it is
+    identical on every machine. The live delta stays in `build/`, for the
+    person at the keyboard who can act on it -- and, from Phase 2, in
+    `index.html`, where a `data-audit-date` attribute lets the browser render
+    the age without the bytes ever changing.
     """
     if not stamp:
         return ("(no audit has ever run — freshness unknown. "
                 "`python3 tools/audit.py` sets this.)")
     when = stamp.get("date", "?")
+    found = ("" if stamp.get("group_d") is None
+             else " · %d commits unattributed then" % stamp["group_d"])
+
+    if not volatile:
+        return "last audit %s%s" % (when, found)
+
     age = ""
     try:
         days = (datetime.date.today()
@@ -146,10 +164,9 @@ def freshness(root, node, stamp, repos_spec, volatile=True):
         if n:
             moved.append("%s +%d" % (name, n))
 
-    line = "last audit %s (%s)" % (when, age) if age else "last audit %s" % when
-    if stamp.get("group_d") is not None:
-        line += " · %d commits unattributed then" % stamp["group_d"]
-    if moved and volatile:
+    line = ("last audit %s (%s)%s" % (when, age, found) if age
+            else "last audit %s%s" % (when, found))
+    if moved:
         line = "⚠ %s since the last audit — %s" % (", ".join(moved), line)
     if unchecked:
         line += " · could not check %s offline" % ", ".join(sorted(unchecked))

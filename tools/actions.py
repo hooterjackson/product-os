@@ -26,7 +26,6 @@ facts that sit still between audits -- never from a live `rev-list` against the
 working copy, which the publishing commit itself increments.
 """
 
-import datetime
 import json
 import os
 
@@ -50,14 +49,6 @@ def _shard_dates(root):
             continue
         out[name[:-5]] = shard.get("generated")
     return out
-
-
-def _age(when):
-    try:
-        days = (datetime.date.today() - datetime.date.fromisoformat(when)).days
-    except (TypeError, ValueError):
-        return None
-    return days
 
 
 # ------------------------------------------------------------------ reconcile
@@ -109,11 +100,8 @@ def reconcile(root, model, stamp, ranked):
                      "checked against the repos.")
         any_gap = True
     else:
-        age = _age(stamp.get("date"))
-        lines.append("- Last audit **%s**%s, over commits since %s."
-                     % (stamp.get("date"),
-                        " (%d days ago)" % age if age else " (today)",
-                        stamp.get("window_since")))
+        lines.append("- Last audit **%s**, over commits since %s."
+                     % (stamp.get("date"), stamp.get("window_since")))
         if stamp.get("group_d"):
             lines.append("- **%d commits were unattributed** at that audit — "
                          "work no item claims. That number is a to-do list, "
@@ -126,13 +114,10 @@ def reconcile(root, model, stamp, ranked):
                         ", ".join(n.id for n in unconfirmed)))
         any_gap = True
     for machine, when in sorted(shards.items()):
-        age = _age(when)
-        if age is None or age > 1:
-            lines.append("- Thread index for **%s** was built %s%s — chats "
-                         "since then are not in it."
-                         % (machine, when or "never",
-                            " (%d days ago)" % age if age else ""))
-            any_gap = True
+        lines.append("- Thread index for **%s** was built **%s** — chats "
+                     "since then are not in it."
+                     % (machine, when or "never"))
+        any_gap = True
     if not any_gap:
         lines.append("- Nothing outstanding, which is itself worth checking.")
 

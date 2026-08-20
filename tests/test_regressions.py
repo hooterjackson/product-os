@@ -14,9 +14,11 @@ and nothing about the answer looked wrong.** That is the class CLAUDE.md now
 opens on, and it is why these four are worth more than coverage.
 """
 
+import datetime
 import glob
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -825,6 +827,92 @@ class ApplyRefusals(unittest.TestCase):
         applier.set_field("EL-002", "cognitive_load", "low")
         self.assertTrue(applier.applied)
         self.assertEqual(applier.proposed, [])
+
+
+class PublishedBytesDoNotMoveWithTheCalendar(unittest.TestCase):
+    """`R-067`. Measured 2026-08-20 on a clean tree at `9b3ff8b`:
+    `publish.py --check` exited 1 reporting **121 files out of sync**, and the
+    entire difference was `(today)` -> `(1 day ago)`. Nothing in `state/` had
+    changed. `validate.py` was therefore red on every day but the audit's,
+    which trains a reader to regenerate-and-commit or to stop looking at it.
+
+    `R-061` established the rule and fixed the commit delta at `brief.py:152`,
+    leaving the age phrase four lines above it in the same function. So this
+    test asserts the PROPERTY, not the two quantities that have been found so
+    far: generate the whole published surface under two different calendar
+    dates and require the bytes to be identical. A third volatile quantity
+    added later fails here without anyone having to think of it.
+    """
+
+    def _publish_as_of(self, iso):
+        import _model as model_mod
+        import brief as brief_mod
+        import publish as publish_mod
+
+        class _Frozen(datetime.date):
+            @classmethod
+            def today(cls):
+                return datetime.date.fromisoformat(iso)
+
+        # Alias the module first: inside a class body, `datetime = ...`
+        # rebinds the name for every line after it.
+        _module = datetime
+
+        class _Shim(object):
+            date = _Frozen
+            datetime = _module.datetime
+            timedelta = _module.timedelta
+
+        real = brief_mod.datetime
+        target = tempfile.mkdtemp(prefix="po-cal-")
+        brief_mod.datetime = _Shim
+        try:
+            publish_mod.generate(ROOT, model_mod.Model.load(ROOT), target)
+        finally:
+            brief_mod.datetime = real
+        return target
+
+    def test_two_different_days_produce_identical_bytes(self):
+        first = self._publish_as_of("2026-08-19")
+        second = self._publish_as_of("2027-04-02")
+        try:
+            names = set()
+            for base in (first, second):
+                for root, _dirs, files in os.walk(base):
+                    for name in files:
+                        names.add(os.path.relpath(os.path.join(root, name), base))
+            # A scan that walked nothing would pass every assertion below it.
+            # `R-075`: assert the denominator before asserting the result.
+            self.assertGreater(len(names), 50,
+                               "the surface scan found %d files -- it did not "
+                               "run" % len(names))
+            drift = []
+            for rel in sorted(names):
+                a, b = os.path.join(first, rel), os.path.join(second, rel)
+                if not (os.path.exists(a) and os.path.exists(b)):
+                    drift.append("%s exists on only one date" % rel)
+                    continue
+                with open(a, encoding="utf-8") as fa, open(b, encoding="utf-8") as fb:
+                    if fa.read() != fb.read():
+                        drift.append(rel)
+            self.assertEqual(drift[:8], [],
+                             "%d published file(s) move with the calendar"
+                             % len(drift))
+        finally:
+            shutil.rmtree(first, ignore_errors=True)
+            shutil.rmtree(second, ignore_errors=True)
+
+    def test_the_durable_line_still_says_when_the_audit_ran(self):
+        """Durability must not be bought by saying nothing."""
+        import brief as brief_mod
+        node = type("N", (), {"get": lambda self, k, d=None: None})()
+        line = brief_mod.freshness(
+            ROOT, node, {"date": "2026-08-19", "group_d": 153}, {},
+            volatile=False)
+        self.assertIn("2026-08-19", line)
+        self.assertIn("153 commits unattributed", line)
+        self.assertNotIn("ago", line)
+        self.assertNotIn("today", line)
 
 
 if __name__ == "__main__":

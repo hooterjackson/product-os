@@ -1180,3 +1180,249 @@ renumbered to `R-065`/`R-066`; `E-REGISTER-DUPLICATE` now makes the collision an
 error rather than something you notice by reading. **The next free ID is not a
 lock.** Two agents reading the same tail of a file both compute the same answer,
 and appending is exactly the operation that looks conflict-free to git.
+
+---
+
+# The 2026-08-20 rebuild — what was removed, and why
+
+These nine were claimed in **one commit**. `R-066` is the reason: two sessions
+each taking "the next free number" both compute the same answer, and appending is
+the one operation that looks conflict-free to git.
+
+## R-067 · Publishing a line that carries the AGE of something
+**keywords:** freshness · stamp · publish · public · drift · age · today · calendar · volatile · committed · surface · check · gate · brief · kickoff · determinism
+**source:** product-os `tools/brief.py:149` @ `9b3ff8b` · 2026-08-20 · grade: measured
+
+**`publish.py --check` exited 1 on a clean tree, reporting 121 files out of sync,
+and the entire difference was `(today)` → `(1 day ago)`.** Not one byte of
+`state/` had changed; the calendar had advanced one day. `validate.py` was
+therefore red with 6 `E-PUBLIC-STALE` errors on every day but the audit's, which
+trains a reader either to regenerate-and-commit daily or to stop reading the
+gate. **A guardrail that is red by default is off.**
+
+This is `R-061` recurring one notch further along. That entry established that a
+published artifact must not embed a quantity the act of publishing changes, and
+its fix — `volatile=False` — was applied to the *commit delta* at `brief.py:152`
+while leaving the *age phrase* at `brief.py:149`, four lines above it in the same
+function. A rule can be right, recorded, and applied to one of the two things in
+front of it.
+
+Three volatile quantities were leaking, not two. The third is
+`could not check <repo> offline`, which is a property of **which machine is
+publishing** — it would flip the committed bytes between this Mac and `formd-t1`
+without any date changing at all.
+
+**The fix, and the shape of the fix.** The published surface carries only
+stamp-derived facts: when the audit ran and what it found. Both are identical on
+every machine and move only when an audit runs. `build/` keeps the live age for
+the person at the keyboard, and `public/index.html` renders it from a
+`data-audit-date` attribute in the browser, so the reader still sees "2 days ago"
+while the bytes never move.
+
+**The test asserts the property, not the two known quantities.**
+`PublishedBytesDoNotMoveWithTheCalendar` generates the whole published surface
+under two different `today()`s and requires the bytes to be identical. A third
+volatile quantity added later fails it without anyone having to think of it —
+which is what the first two fixes both failed to do. Proven both ways:
+reintroducing the age turns two tests red, restoring it turns them green.
+
+## R-068 · Scoring a solo backlog with impact × confidence ÷ effort
+**keywords:** score · scoring · rank · ranking · impact · confidence · effort · effort-minutes · leverage · priority · order · backlog · arithmetic · pin · formula
+**source:** product-os `tools/_model.py:221` @ `9b3ff8b` · 2026-08-20 · grade: measured
+
+**The ranking escalates on the majority of its own decisions.** `CLAUDE.md` says
+*"if two items score within ~10% of each other — stop and ask."* Measured across
+the 18 offerable nodes: **9 of the 17 adjacent pairs are within 10%.** Eleven of
+the eighteen sit in a tie group, the largest tie is four items sharing one score,
+and eighteen items produce only ten distinct scores. By its own constitution the
+tool should hand more than half its ordering back to the human — which is the
+whole job it was built to do.
+
+The cause is in the inputs, not the arithmetic. `impact` and `confidence` are
+1–5 integers and both cluster: impact is 3 or 4 on 31 of 41 nodes, confidence on
+34 of 41. A product of two clustered estimates does not discriminate, and no
+weighting fixes an input that carries no signal.
+
+Two supporting measurements. `lead_time_days` was non-zero on **2 of 41** nodes
+and `cost_usd` set on **2 of 41** — both times the same two hardware purchases,
+so the terms were inert on 39 items and tripled the score on the two that no
+longer mattered. `EL-001` held #1 in this portfolio for weeks on a shipping-time
+multiplier for parts already photographed on the bench. And `pin` — the field
+introduced so a human could override the maths, described in the plan as moving
+"from exception to ordinary use" — **was set on zero items, ever.**
+
+What replaces it: `state/backlog.md`, one ID per line, top is next. Marcelo's
+order **is** the data. This deliberately inverts the original spec's *"rank is
+derived, never stored"*; see `DEC-202`.
+
+## R-069 · A dependency graph for a portfolio with one chain in it
+**keywords:** graph · dependency · unblocks · blocked · blocked-by · leverage · chain · critical-path · graphlib · cycle · topological · edges · downstream
+**source:** product-os `tools/_model.py:169` @ `9b3ff8b` · 2026-08-20 · grade: measured
+
+**12 edges over 41 nodes, and 10 of the 12 are `GB→GB` inside one repo** — from a
+Zigbee phase plan Marcelo wrote by hand before this tool existed. The remaining
+two are `EL-001→GB-012` and `Q-001→GB-010`. `unblocks_inferred` was non-empty on
+exactly **1 of 41** nodes. So `graphlib`, transitive reachability, cycle
+detection, the `blocked` derivation, the leverage multiplier and the chain view
+were all built to discover a structure that was already written down, in one
+project, by the person asking.
+
+The failure this avoids is not "the graph was wrong" — the edges are real and
+quoted. It is that **a correct graph over a portfolio this size tells its author
+nothing he did not already know**, while costing a scoring term, a status
+derivation that can hide work, and a whole rendering surface.
+
+`intent.md`'s third precedence rule — *"What unblocks the most downstream
+work"* — still stands, and this entry does not touch it. Marcelo's ruling,
+2026-08-20: **"the criterion stays, the automation goes. `intent.md` describes
+how I decide, not what the tool computes."** A description of judgement is not a
+specification of arithmetic, and deleting a computation does not contradict a
+criterion. That settles the general case for the next agent who finds an
+`intent.md` line naming something the tool no longer derives.
+
+## R-070 · `--time` and `--energy` as ways to choose what to work on
+**keywords:** filter · time · energy · cognitive-load · minutes · hour · mechanical · triage · choose · what-next
+**source:** product-os `tools/rank.py:103` @ `9b3ff8b` · 2026-08-20 · grade: measured
+
+**The filters worked; they answered a question nobody was asking.** Stated
+honestly because the tempting version of this entry is that they were inert, and
+they were not: `cognitive_load` was populated on all 41 nodes — 23 high, 10
+medium, 8 low — so `--energy low` really did return a usable 8 items.
+
+The problem is what a filter is *for*. "Show me only what fits in an hour" is a
+way of narrowing a list you do not trust enough to read from the top. With an
+authored backlog the top **is** the answer, and a filter over it is a second
+ordering competing with the first. Two orderings is the condition this rebuild
+exists to remove.
+
+`effort_minutes` goes with them, and that is the load-bearing loss to be aware
+of: it was the denominator of every score and the only recorded estimate of how
+long anything takes. Nothing replaces it. If "what fits in an hour" turns out to
+be a real question later, it comes back as a note on the task, not as a filter
+over a derived order.
+
+## R-071 · Briefs as an artifact separate from the kickoff prompt
+**keywords:** brief · briefs · kickoff · prompt · artifact · paste · duplicate · surface · generated · context
+**source:** product-os `tools/brief.py` vs `tools/kickoff.py` @ `9b3ff8b` · 2026-08-20 · grade: measured
+
+**Two generated artifacts, one job.** Compared section by section,
+`kickoff.py`'s output is a superset of `brief.py`'s except for two things —
+`decisions_in_force()` and the ⚠-unconfirmed banner — both of which fold into the
+kickoff prompt in a few lines. Everything else (freshness, where it stands,
+what's next from the last handoff, the ruled-out matches) is the same content
+rendered twice, regenerated twice, and published twice.
+
+Only one of the two was ever pasted anywhere. The brief existed because the
+design started from "a session needs state" and the kickoff prompt was added
+later, from "a session needs to be *started*" — and the second turned out to
+contain the first.
+
+The shared helpers were the real asset and they survive in `tools/_context.py`:
+`parse_register`, `read_stamp`, `freshness`, `ruled_out_for`, `whats_next`. The
+lesson is narrow — **check whether the new artifact subsumes the old one before
+shipping both** — and the cost of missing it was two surfaces to keep in sync,
+which is where `R-065` lives.
+
+## R-072 · A backlog the system wrote for itself
+**keywords:** seed · backlog · proposal · prop-0001 · ratify · authored · creation · authority · items · recommendations · adopt
+**source:** product-os `state/proposals/PROP-0001-seed-scores.md` @ `9b3ff8b` · 2026-08-20 · grade: measured
+
+**The system generated ~30 items from the repos, then asked Marcelo to ratify the
+scores on work he had never chosen. `PROP-0001` was never answered, and the
+silence was the finding.** The authority model guarded `impact`, `confidence`,
+`unblocks` and the rest — but **creating an item was not guarded at all**, and
+creating one is a larger act than scoring it. A proposal asking "are these
+numbers right?" cannot be answered by someone whose actual objection is "I did
+not ask for any of this."
+
+The replacement keeps the derivation and moves the line. The audit still reads
+the repos and still produces candidates — as **recommendations**, which live
+*outside* the backlog, carry one sentence plus their evidence, and get no kickoff
+prompt until adopted. Generating full kickoff artifacts for un-adopted candidates
+would blur exactly the line the model rests on.
+
+A dismissed recommendation must not come back, or the next audit re-derives it
+from the same commits and he dismisses it weekly until he stops reading the list.
+Each carries a `fingerprint` over its normalised claim, and dismissed records
+stay on disk forever as tombstones.
+
+## R-073 · Treating the ranked list as the product
+**keywords:** product · ranking · list · prompt · paste · copy · dashboard · artifact · interaction · read-only · destination
+**source:** product-os `~/.claude/plans/…mighty-wave.md` v7 · 2026-08-20 · grade: inferred
+
+**The most-used artifact across this entire build was a hand-written,
+paste-ready prompt — written by hand roughly a dozen times before anyone noticed
+it was the product.** The ranking, the API, the briefs and the views were all
+nicer ways to arrive at something that then had to be copied and pasted by hand
+anyway.
+
+Graded `inferred`, not `measured`: the count comes from reading back the build's
+own transcripts, not from an instrument. It is recorded anyway because the design
+consequence is large — the dashboard is **read-only**, and every write leaves
+through a pre-filled GitHub issue under his own sign-in, so the page holds no
+token on any device.
+
+**The destination is part of the artifact, not a UI detail.** Three destinations
+— a new chat, an existing chat, a terminal — and they are not interchangeable.
+Pasting "link yourself to `GB-001`" into a fresh chat fails confusingly, so every
+generated artifact states where it goes *in its own text*, because it will be
+read far from the page that produced it.
+
+## R-074 · A proposal mechanism that outlived the fields it protected
+**keywords:** proposal · proposals · prop · authority · decided · human-authority · draft · drafts · apply · evidence-rule · redirect
+**source:** product-os `state/proposals/` @ `9b3ff8b` · 2026-08-20 · grade: measured
+
+**`state/proposals/` existed to protect the decided score inputs, and those are
+now deleted. After the cut the human-authority set is five fields** — `evidence`,
+`gate`, `machine_affinity`, `project`, and the `parked`/`dropped` statuses —
+plus item creation itself. Three mechanisms would then compete over those five,
+which is two too many: recommendations already carry "here is work you might
+want," and drafts already carry "here is the plumbing I drafted," with a
+word-level diff and a satisfiability refusal.
+
+Read that way, each of the four open proposals was one of the survivors wearing
+the wrong clothes. `PROP-0003` and `PROP-0004` propose creating items — that is a
+recommendation. `PROP-0002` reports a broken evidence rule — that is a draft,
+filed weeks late. `PROP-0001` is `R-072`.
+
+Two details that only appear on inspection. **`apply.py` contains no reference to
+`state/proposals/` at all** — it refuses and prints *"Proposed, not written"*,
+and the redirect lives only in the skill prose, so moving it to `state/drafts/`
+is a documentation change. And **`check_proposal_refs` survives, repointed at
+`state/archive/proposals/`**: eleven `PROP-` citations across eight files are
+real, and retiring the mechanism while leaving them dangling would be precisely
+the defect that check was written to catch.
+
+## R-075 · An empty scan result read as a clean result
+**keywords:** grep · scan · probe · empty · zero · absence · guard · test · glob · denominator · verification · signal · clean · green
+**source:** product-os · four instances, 2026-08-19 → 2026-08-20 · grade: measured
+
+**A scan that matched nothing looks identical whether the tree is clean, the
+probe was keyed wrong, or the scan never ran at all.** Assert the *denominator*:
+a guard must report how many files it walked before it reports how many
+violations it found. **A guard that scans zero files and reports clean is worse
+than no guard, because it is green.**
+
+Four instances, all inside two days, and three of them were produced *while
+reviewing the plan that lists this class*:
+
+| the probe | what it returned | what it meant |
+|---|---|---|
+| test names grepped for `lead\|urgency\|gate` | 5 affected tests | 15 — the bodies were never scanned |
+| thread shard keyed on `recommend`, `attach` | 0 across all 13 threads | wrong keys; the real ones are `verdict` and `items` |
+| a `state/decisions/*.md` glob | nothing, silently killing a loop | the glob did not match the layout |
+| a `find` compared against multiline output | blank | the comparison, not the tree, was broken |
+
+**This is a distinct class from `R-054`**, and folding them together loses the
+remedy. There, a cheap signal was trusted *over* a primary source, and the fix is
+to go and look at the source. Here **nothing was measured, and the absence of a
+result was read as a result** — the fix is to prove the instrument ran. The
+generalisation is older than the greps: *suspect the instrument before the
+subject*, which `R-066` reached from the other direction when 49 `PARSE FAIL`
+lines turned out to be a wrong function name rather than repo damage.
+
+The three deletion-guards this rebuild adds — `test_no_scoring_survives`,
+`test_no_dependency_graph_survives`, `test_no_authored_doc_describes_the_old_model`
+— are all greps, so each asserts `len(scanned) >= N` for a stated `N` before it
+asserts anything about hits, and each matches against a **named allowlist**
+rather than an expected violation count.
