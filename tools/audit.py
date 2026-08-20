@@ -578,7 +578,7 @@ def audit_item(node, repos, since):
         for sha, date, subject in repo.commits:
             if sha in claimed_here:
                 continue
-            if node.id in _fm.MENTION_RE.findall(subject):
+            if node.id in _fm.mention_re().findall(subject):
                 attributed.append((name, sha, date, subject, "id-mention"))
 
         if repo.unread_files:

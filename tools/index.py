@@ -173,8 +173,12 @@ def id_pattern(ids):
     times on the real corpus -- 100% false positives -- and missed `Q-007`
     entirely because its prefix is one letter. Two independent narrowings:
     the prefix alternation, and membership in the closed set below.
+
+    The alternation is derived from `state/projects/*/project.md` now rather
+    than hardcoded, so a project created inline is scanned for from its first
+    commit instead of being silently invisible.
     """
-    return _fm.MENTION_RE
+    return _fm.mention_re()
 
 
 # --- the one function allowed to see message text ---------------------------
@@ -185,13 +189,13 @@ def scan_text(text, known, found, unknown):
     This is the only function in this file that receives raw conversation text.
     It returns an integer, and the only other effect it may have is inserting
     into `found` / `unknown` -- and every string it inserts is matched by
-    `_fm.MENTION_RE` and then checked against `known`, so the sets can never
+    `_fm.mention_re()` and then checked against `known`, so the sets can never
     accumulate anything but item IDs this repo already defines.
 
     Nothing else in this module may take a text argument.
     """
     hits = 0
-    for match in _fm.MENTION_RE.findall(text):
+    for match in _fm.mention_re().findall(text):
         hits += 1
         if match in known:
             found.add(match)

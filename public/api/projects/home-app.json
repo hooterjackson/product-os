@@ -35,9 +35,9 @@
   ],
   "project": {
     "decision_authority": "home-app",
+    "description": "The household's own front end to the house.",
     "may_rule": true,
     "name": "Home app",
-    "north_star": "The household's own front end to the house.",
     "phase": "one squashed snapshot; no usable timeline",
     "repos": [
       "HomeApp"

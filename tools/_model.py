@@ -73,7 +73,41 @@ class Model(object):
                         ("state", "projects", "*", "decisions", "*.md")):
             for path in sorted(glob.glob(os.path.join(root, *pattern))):
                 model._add(model.decisions, "decision", path)
+        _fm.set_prefixes(model.prefixes())
         return model
+
+    def prefixes(self):
+        """prefix -> project slug, derived rather than hardcoded.
+
+        Three sources, and the third is the one that matters:
+
+          1. `prefix` on each `project.md`. The declared set.
+          2. `_fm.RESERVED_PREFIXES` -- `DEC` only; a ruling is portfolio-wide.
+          3. **Prefixes actually in use on disk.** `Q-001`..`Q-005` are the
+             live case: they were the `question` kind, which was collapsed,
+             and no project declares `Q`. Their ids are stable on purpose --
+             renaming them would break every transcript citation and re-create
+             `R-057`, where an id reused across seed generations bound a real
+             conversation to the wrong work. So a prefix that exists is
+             legitimate whether or not a project claims it, and the guard
+             against typos is `E-ID-PREFIX-UNKNOWN` in validate.py, which
+             checks against this same set.
+        """
+        out = dict(_fm.RESERVED_PREFIXES)
+        for slug, project in self.projects.items():
+            prefix = project.get("prefix")
+            if prefix:
+                out[prefix] = slug
+        for node in list(self.items.values()) + list(self.decisions.values()):
+            parsed = _fm.parse_id(node.id)
+            if parsed and parsed[0] not in out:
+                # None, NOT the project this one happens to sit in. `Q-001`..
+                # `Q-004` are gimbal-bench and `Q-005` is engineering-site, so
+                # binding the prefix to whichever loaded first would have made
+                # `E-ID-PROJECT-MISMATCH` fire on four real tasks. An
+                # undeclared prefix implies no project, which is the truth.
+                out[parsed[0]] = None
+        return out
 
     def _add(self, target, kind, path, key="id"):
         try:

@@ -3,7 +3,7 @@
   "slug": "engineering-site",
   "name": "Engineering site",
   "prefix": "SITE",
-  "north_star": "The published eight-document build series stays true to what the bench actually did.",
+  "description": "The published eight-document build series stays true to what the bench actually did.",
   "phase": "live at engineering.engineered.lighting; stale in both directions",
   "repos": [
     "engineered-lighting-site"
@@ -11,7 +11,7 @@
   "decision_authority": "gimbal-bench",
   "may_rule": false,
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

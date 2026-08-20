@@ -101,13 +101,14 @@ def _tilde(path):
 
 
 def cmd_item(root, args):
-    prefix = None
-    for key, project in _fm.PREFIX_PROJECT.items():
-        if project == args.project:
-            prefix = key
-            break
+    model = _model.Model.load(root)
+    if args.project not in model.projects:
+        sys.stderr.write("unknown project: %s (known: %s)\n"
+                         % (args.project, ", ".join(sorted(model.projects))))
+        return 2
+    prefix = _fm.prefix_for(args.project)
     if prefix is None:
-        sys.stderr.write("unknown project: %s\n" % args.project)
+        sys.stderr.write("project %s declares no `prefix`\n" % args.project)
         return 2
     item_id = next_id(root, prefix)
     fm = {

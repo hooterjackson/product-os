@@ -3,7 +3,7 @@
   "slug": "robotic-spotlight",
   "name": "Robotic spotlight",
   "prefix": "EL",
-  "north_star": "A silent, high-CRI pan/tilt head on CAN servos that behaves like an ordinary light and can also aim itself.",
+  "description": "A silent, high-CRI pan/tilt head on CAN servos that behaves like an ordinary light and can also aim itself.",
   "phase": "bench proven; LED head unordered",
   "repos": [
     "gimbal-bench",
@@ -12,7 +12,7 @@
   "decision_authority": "gimbal-bench",
   "may_rule": false,
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

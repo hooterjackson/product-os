@@ -3,7 +3,7 @@
   "slug": "gimbal-bench",
   "name": "Gimbal bench",
   "prefix": "GB",
-  "north_star": "Firmware and a commissioning bench that can prove, from a record, that the fixture stays a light.",
+  "description": "Firmware and a commissioning bench that can prove, from a record, that the fixture stays a light.",
   "phase": "M5 fault ring layers one and two measured; Zigbee parked (D15)",
   "repos": [
     "gimbal-bench"
@@ -11,7 +11,7 @@
   "decision_authority": "gimbal-bench",
   "may_rule": true,
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

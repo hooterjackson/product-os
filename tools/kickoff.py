@@ -137,6 +137,23 @@ def render(node, model, entries, stamp, repos_spec, root, manual,
             "",
         ]
 
+    # --- the project's own description, injected into every one of its tasks
+    #
+    # This is the point of `description` being a field rather than prose in
+    # the project body: a session that has never seen this portfolio gets the
+    # frame before the task, in every prompt, without anyone remembering to
+    # paste it. Kept to one short paragraph on purpose -- this file has a
+    # ~2-3 KB target and it is spent on operands, not preamble.
+    project = model.projects.get(node.project)
+    description = (project.get("description") or "").strip() if project else ""
+    if description:
+        lines += ["## Project context", "", description, ""]
+    elif project:
+        lines += ["## Project context", "",
+                  "`%s` has no description written yet, so this prompt carries "
+                  "no project framing. That is a gap, not a clean slate."
+                  % node.project, ""]
+
     # --- what this is, from the body, first paragraph only
     lines += ["## What this is", ""]
     picked = []
@@ -187,13 +204,26 @@ def render(node, model, entries, stamp, repos_spec, root, manual,
 
     # --- where the work happens
     lines += ["## Work here, not in product-os", ""]
+    project_repos = (project.get("repos") or []) if project else []
     if repos:
         lines.append("Repo: %s. product-os TRACKS the work; it does not host "
                      "it. Make the change there and come back only to write "
                      "the handoff." % ", ".join("`%s`" % r for r in repos))
+    elif project and not project_repos:
+        # A project with no repository AT ALL is a different fact from a task
+        # that forgot to name one, and telling a session to "find out where
+        # the work lives" when the answer is "nowhere, it is a GPU box" sends
+        # it looking for something that does not exist.
+        lines.append("**`%s` has no repository.** Nothing about this task can "
+                     "be verified from commits, so its status changes only "
+                     "when Marcelo says so. Do not report it as stale, and do "
+                     "not close it on anything but his word or a dated note."
+                     % node.project)
     else:
-        lines.append("This item names no repo. Find out where the work lives "
-                     "before starting.")
+        lines.append("This task names no repo, though `%s` has one (%s). Find "
+                     "out where the work lives before starting."
+                     % (node.project,
+                        ", ".join("`%s`" % r for r in project_repos)))
     if machine:
         lines.append("Machine: **%s**. If that is not where you are, the "
                      "honest answer is \"resume on %s\" — not a plan you "

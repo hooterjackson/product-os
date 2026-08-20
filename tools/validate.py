@@ -162,6 +162,27 @@ class Validator(object):
             self.error("E-MODEL", "state/", err)
 
         nodes = model.nodes
+        known_prefixes = model.prefixes()
+        self._projects = set(model.projects)
+
+        # Two projects claiming one prefix silently merges their id space, and
+        # `prefix_for()` would then return whichever sorted first -- so
+        # `new.py item` would file a task under the wrong project without
+        # anything failing.
+        claimed = {}
+        for slug, project in sorted(model.projects.items()):
+            prefix = project.get("prefix")
+            if not prefix:
+                self.error("E-PROJECT-NO-PREFIX", project.path,
+                           "project %s declares no `prefix`, so no task can "
+                           "be created in it" % slug)
+            elif prefix in claimed:
+                self.error("E-PREFIX-DUPLICATE", project.path,
+                           "prefix %r is also claimed by %s"
+                           % (prefix, claimed[prefix]))
+            else:
+                claimed[prefix] = slug
+
         seen = {}
         for node in list(nodes.values()) + list(model.decisions.values()):
             path = node.path
@@ -176,8 +197,13 @@ class Validator(object):
                            "id %s also defined in %s" % (node.id, seen[node.id]))
             seen[node.id] = path
 
+            if prefix not in known_prefixes:
+                self.error("E-ID-PREFIX-UNKNOWN", path,
+                           "id %s uses prefix %r, which no project declares "
+                           "and no existing id uses. Add `prefix` to a "
+                           "project.md, or fix the typo." % (node.id, prefix))
             if node.kind == "item":
-                expected = _fm.PREFIX_PROJECT.get(prefix)
+                expected = _fm.project_for(prefix)
                 if expected and node.project and node.project != expected:
                     self.error("E-ID-PROJECT-MISMATCH", path,
                                "prefix %s implies project %s, frontmatter says %s"
@@ -203,6 +229,12 @@ class Validator(object):
                        "every task must belong to a project -- a task with no "
                        "project gets no context injected into its kickoff "
                        "prompt, and no card to appear on")
+        elif node.project not in self._projects:
+            self.error("E-TASK-NO-PROJECT", path,
+                       "names project %r, which has no state/projects/%s/"
+                       "project.md. A dangling project is worse than none: it "
+                       "reads as framed and injects nothing."
+                       % (node.project, node.project))
         if node.status not in VALID_STATUS:
             self.error("E-SCHEMA-ENUM", path,
                        "status %r not in %s" % (node.status, sorted(VALID_STATUS)))

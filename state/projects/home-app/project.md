@@ -3,7 +3,7 @@
   "slug": "home-app",
   "name": "Home app",
   "prefix": "APP",
-  "north_star": "The household's own front end to the house.",
+  "description": "The household's own front end to the house.",
   "phase": "one squashed snapshot; no usable timeline",
   "repos": [
     "HomeApp"
@@ -11,7 +11,7 @@
   "decision_authority": "home-app",
   "may_rule": true,
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

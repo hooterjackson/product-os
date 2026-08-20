@@ -3,13 +3,13 @@
   "slug": "home-ai-infra",
   "name": "Home AI infra",
   "prefix": "HAI",
-  "north_star": "A GPU box the perception stack can be built on without ceremony.",
+  "description": "A GPU box the perception stack can be built on without ceremony.",
   "phase": "provisioned; credential hygiene outstanding",
   "repos": [],
   "decision_authority": "home-ai-infra",
   "may_rule": true,
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

@@ -34,9 +34,9 @@
   ],
   "project": {
     "decision_authority": "home-ai-infra",
+    "description": "A GPU box the perception stack can be built on without ceremony.",
     "may_rule": true,
     "name": "Home AI infra",
-    "north_star": "A GPU box the perception stack can be built on without ceremony.",
     "phase": "provisioned; credential hygiene outstanding",
     "repos": [],
     "slug": "home-ai-infra"

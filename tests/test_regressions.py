@@ -1149,5 +1149,143 @@ class NoAuthoredDocDescribesTheOldModel(unittest.TestCase):
                          "these are clean now -- remove them from PENDING")
 
 
+class ProjectsAreFirstClass(unittest.TestCase):
+    """Every task belongs to a project, and the project's description is
+    injected into every one of its kickoff prompts.
+
+    The point of `description` being a field rather than prose in the project
+    body: a session that has never seen this portfolio gets the frame before
+    the task, in every prompt, without anyone remembering to paste it."""
+
+    def test_every_task_names_a_project_that_exists(self):
+        import _model as model_mod
+        model = model_mod.Model.load(ROOT)
+        self.assertGreater(len(model.items), 20, "the scan did not run")  # R-075
+        slugs = set(model.projects)
+        for node in model.items.values():
+            self.assertIn(node.project, slugs,
+                          "%s names a project that does not exist" % node.id)
+
+    def test_every_project_has_a_description_and_a_prefix(self):
+        import _model as model_mod
+        model = model_mod.Model.load(ROOT)
+        self.assertGreaterEqual(len(model.projects), 5, "the scan did not run")
+        for slug, project in model.projects.items():
+            self.assertTrue((project.get("description") or "").strip(),
+                            "%s has no description, so its tasks ship with no "
+                            "project framing" % slug)
+            self.assertTrue(project.get("prefix"),
+                            "%s declares no prefix" % slug)
+        self.assertNotIn("north_star", _fm.FIELD_ORDER["project"])
+
+    def test_the_description_reaches_the_kickoff_prompt(self):
+        import _model as model_mod
+        model = model_mod.Model.load(ROOT)
+        prompts = glob.glob(os.path.join(ROOT, "public", "kickoff", "*.md"))
+        self.assertGreater(len(prompts), 10, "the scan did not run")   # R-075
+        for path in prompts:
+            with open(path, encoding="utf-8") as fh:
+                text = fh.read()
+            node = model.nodes[os.path.basename(path)[:-3]]
+            description = model.projects[node.project].get("description")
+            self.assertIn("## Project context", text)
+            self.assertIn(description.strip(), text,
+                          "%s carries no project framing" % node.id)
+
+    def test_a_project_with_no_repo_says_so_rather_than_looking_stale(self):
+        """`home-ai-infra` is the V-JEPA GPU box and has no repository at all.
+
+        Telling a session to "find out where the work lives" when the answer is
+        "nowhere, it is a machine in the house" sends it looking for something
+        that does not exist -- and an evidence query against it must report
+        unreachable, never clean."""
+        import _model as model_mod
+        model = model_mod.Model.load(ROOT)
+        repoless = [slug for slug, p in model.projects.items()
+                    if not (p.get("repos") or [])]
+        self.assertIn("home-ai-infra", repoless)
+        for slug in repoless:
+            for node in model.items.values():
+                if node.project != slug or not node.is_active:
+                    continue
+                path = os.path.join(ROOT, "public", "kickoff",
+                                    "%s.md" % node.id)
+                if not os.path.exists(path):
+                    continue
+                with open(path, encoding="utf-8") as fh:
+                    text = fh.read()
+                self.assertIn("has no repository", text, node.id)
+                self.assertIn("only when Marcelo says so", text, node.id)
+
+
+class ThePrefixSetIsDerivedNotHardcoded(unittest.TestCase):
+    """It was three hardcoded tables -- `ID_RE`, `MENTION_RE` and
+    `PREFIX_PROJECT`. A project created inline needed a new prefix edited into
+    all three, and `MENTION_RE` is the audit's id-mention fallback, so missing
+    one meant the audit silently stopped recognising a project's commits."""
+
+    def test_the_hardcoded_tables_are_gone(self):
+        """Anchored to the start of a LINE, because a module-level table is
+        defined at column 0. The substring form of this test failed on its own
+        replacement: `MENTION_RE = re.compile` is a substring of the private
+        `_MENTION_RE = re.compile` that caches the derived pattern."""
+        with open(os.path.join(ROOT, "tools", "_fm.py"), encoding="utf-8") as fh:
+            lines = fh.read().splitlines()
+        self.assertGreater(len(lines), 100, "the file did not load")  # R-075
+        defined = [ln.split(" =")[0] for ln in lines
+                   if " = " in ln and not ln.startswith((" ", "\t", "#"))]
+        for gone in ("PREFIX_PROJECT", "ID_RE", "MENTION_RE"):
+            self.assertNotIn(gone, defined,
+                             "%s is a hardcoded table again" % gone)
+
+    def test_the_derived_set_covers_every_live_id(self):
+        """The regression this test exists for, found by printing the set and
+        reading it: `ID_SHAPE` was written `[A-Z]{2,6}`, so `parse_id("Q-001")`
+        returned None and `Q` fell out of the derived set entirely -- exactly
+        the bug the old comment warned about ("misses Q-007 because its prefix
+        is one letter"). `mention_re()` would have stopped matching five live
+        tasks and the thread indexer would have quietly stopped binding them.
+        Nothing would have failed."""
+        import _model as model_mod
+        model = model_mod.Model.load(ROOT)
+        pattern = _fm.mention_re()
+        ids = [n.id for n in model.items.values()] + \
+              [d.id for d in model.decisions.values()]
+        self.assertGreater(len(ids), 20, "the scan did not run")     # R-075
+        for item_id in ids:
+            self.assertEqual(pattern.findall(item_id), [item_id],
+                             "%s is not matched by the derived pattern -- the "
+                             "indexer cannot see it" % item_id)
+
+    def test_it_is_still_narrow_enough_to_reject_the_known_false_positives(self):
+        """916 hits, 100% false positives, on the real corpus."""
+        import _model as model_mod
+        model_mod.Model.load(ROOT)
+        pattern = _fm.mention_re()
+        for probe in ("AES-256", "SHA-256", "ISO-8601", "RFC-2119", "UTF-8"):
+            self.assertEqual(pattern.findall(probe), [], probe)
+
+    def test_an_unloaded_prefix_set_raises_rather_than_matching_nothing(self):
+        """R-075. A regex built from an empty set matches nothing and reads
+        exactly like a corpus with nothing in it."""
+        saved = _fm.prefixes()
+        try:
+            _fm.set_prefixes({})
+            with self.assertRaises(RuntimeError):
+                _fm.mention_re()
+        finally:
+            _fm.set_prefixes(saved)
+
+    def test_an_undeclared_prefix_implies_no_project(self):
+        """`Q-001`..`Q-004` are gimbal-bench and `Q-005` is engineering-site.
+        Binding the prefix to whichever loaded first would make
+        `E-ID-PROJECT-MISMATCH` fire on four real tasks."""
+        import _model as model_mod
+        model = model_mod.Model.load(ROOT)
+        self.assertIsNone(model.prefixes().get("Q"))
+        self.assertIsNone(model.prefixes().get("DEC"))
+        self.assertEqual(model.prefixes().get("GB"), "gimbal-bench")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

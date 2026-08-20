@@ -237,7 +237,7 @@ def project_llms(slug, project, model, stamp, ordered):
     lines = [
         "# product-os — %s" % slug,
         "",
-        (project.get("north_star") or "").strip(),
+        (project.get("description") or "").strip(),
         "",
         "Scoped to this project so a chat about it does not drag the whole",
         "portfolio into context.",
@@ -352,7 +352,7 @@ def generate(root, model, target, volatile=False):
                   "freshness": fresh,
                   "project": {
                       "slug": slug, "name": project.get("name"),
-                      "north_star": project.get("north_star"),
+                      "description": project.get("description"),
                       "phase": project.get("phase"),
                       "repos": project.get("repos") or [],
                       "may_rule": project.get("may_rule"),

@@ -546,9 +546,9 @@
   ],
   "project": {
     "decision_authority": "gimbal-bench",
+    "description": "Firmware and a commissioning bench that can prove, from a record, that the fixture stays a light.",
     "may_rule": true,
     "name": "Gimbal bench",
-    "north_star": "Firmware and a commissioning bench that can prove, from a record, that the fixture stays a light.",
     "phase": "M5 fault ring layers one and two measured; Zigbee parked (D15)",
     "repos": [
       "gimbal-bench"

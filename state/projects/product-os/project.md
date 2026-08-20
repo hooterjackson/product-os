@@ -3,7 +3,7 @@
   "slug": "product-os",
   "name": "product-os",
   "prefix": "POS",
-  "north_star": "Know what to work on next, and never be told progress that cannot be clicked.",
+  "description": "Know what to work on next, and never be told progress that cannot be clicked.",
   "phase": "slice 1a-minus",
   "repos": [
     "product-os"
@@ -11,7 +11,7 @@
   "decision_authority": "product-os",
   "may_rule": true,
   "created": "2026-08-19",
-  "updated": "2026-08-19"
+  "updated": "2026-08-20"
 }
 ---
 

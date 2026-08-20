@@ -141,9 +141,9 @@
   ],
   "project": {
     "decision_authority": "gimbal-bench",
+    "description": "The published eight-document build series stays true to what the bench actually did.",
     "may_rule": false,
     "name": "Engineering site",
-    "north_star": "The published eight-document build series stays true to what the bench actually did.",
     "phase": "live at engineering.engineered.lighting; stale in both directions",
     "repos": [
       "engineered-lighting-site"

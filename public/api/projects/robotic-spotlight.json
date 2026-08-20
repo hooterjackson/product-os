@@ -212,9 +212,9 @@
   ],
   "project": {
     "decision_authority": "gimbal-bench",
+    "description": "A silent, high-CRI pan/tilt head on CAN servos that behaves like an ordinary light and can also aim itself.",
     "may_rule": false,
     "name": "Robotic spotlight",
-    "north_star": "A silent, high-CRI pan/tilt head on CAN servos that behaves like an ordinary light and can also aim itself.",
     "phase": "bench proven; LED head unordered",
     "repos": [
       "gimbal-bench",

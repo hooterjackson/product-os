@@ -50,7 +50,7 @@ FIELD_ORDER = {
         "keywords", "evidence", "created", "updated",
     ],
     "project": [
-        "slug", "name", "prefix", "north_star", "phase", "repos",
+        "slug", "name", "prefix", "description", "phase", "repos",
         "decision_authority", "may_rule", "created", "updated",
     ],
     "capture": ["captured", "machine", "source", "cwd"],
@@ -174,24 +174,84 @@ def write(path, fm, body, kind):
     return text
 
 
-ID_RE = re.compile(r"^(EL|SITE|GB|APP|HAI|POS|Q|DEC)-(\d{3,})$")
-# Anchored to the live prefix set on purpose. The spec's \b[A-Z]{2,4}-\d{3,}\b
-# matches AES-256, SHA-256 and ISO-8601 -- 916 hits, 100% false positives on the
-# real corpus -- and misses Q-007 entirely.
-MENTION_RE = re.compile(r"\b(?:EL|SITE|GB|APP|HAI|POS|Q|DEC)-\d{3,}\b")
+# --- the prefix set, DERIVED ------------------------------------------------
+#
+# This was three hardcoded tables: `ID_RE`, `MENTION_RE` and `PREFIX_PROJECT`.
+# Projects are first-class now and can be created inline, so a new project
+# needed a new prefix edited into all three by hand -- and `MENTION_RE` is the
+# audit's id-mention fallback, so forgetting one meant the audit silently
+# stopped recognising a whole project's commits. Silently is the operative
+# word: nothing would have failed.
+#
+# `Model.load()` calls `set_prefixes()` with what it finds. Two guarantees are
+# worth stating because they pull in opposite directions:
+#
+#   SHAPE matching stays generic. `parse_id` and `sort_key` only ever see a
+#   string already sitting in an `id` field, and they only need (prefix,
+#   number) to sort. A generic shape there cannot cause a false attribution.
+#
+#   TEXT matching is never generic. `mention_re()` scans raw conversation and
+#   commit subjects, where the spec's `\b[A-Z]{2,4}-\d{3,}\b` matched
+#   AES-256, SHA-256 and ISO-8601 916 times -- 100% false positives -- while
+#   missing `Q-007`, whose prefix is one letter. So it is built from the live
+#   set and RAISES if that set was never loaded. A regex that matches nothing
+#   reads exactly like a corpus with nothing in it (`R-075`).
 
-PREFIX_PROJECT = {
-    "EL": "robotic-spotlight",
-    "SITE": "engineering-site",
-    "GB": "gimbal-bench",
-    "APP": "home-app",
-    "HAI": "home-ai-infra",
-    "POS": "product-os",
-}
+# `{1,6}`, not `{2,6}`. A single-letter prefix is real: `Q-001`..`Q-005` are
+# live task ids. Writing `{2,6}` here reproduced, exactly, the bug the old
+# comment warned about -- "misses Q-007 entirely because its prefix is one
+# letter" -- and it was silent: the derived set simply came back without `Q`,
+# so `mention_re()` would have stopped matching five tasks and the thread
+# indexer would have quietly stopped binding them. Caught by printing the set
+# and reading it, which is the only reason it is not in this commit.
+ID_SHAPE = re.compile(r"^([A-Z]{1,6})-(\d{3,})$")
+
+# `DEC` is an entity kind, not a project -- rulings are portfolio-wide. It is
+# the only structural prefix, so it is the only one named here.
+RESERVED_PREFIXES = {"DEC": None}
+
+_PREFIXES = {}
+_MENTION_RE = None
+
+
+def set_prefixes(mapping):
+    """prefix -> project slug (or None for a non-project prefix)."""
+    global _PREFIXES, _MENTION_RE
+    _PREFIXES = dict(mapping)
+    _MENTION_RE = None
+
+
+def prefixes():
+    return dict(_PREFIXES)
+
+
+def project_for(prefix):
+    return _PREFIXES.get(prefix)
+
+
+def prefix_for(project_slug):
+    for prefix, slug in sorted(_PREFIXES.items()):
+        if slug == project_slug:
+            return prefix
+    return None
+
+
+def mention_re():
+    """The id pattern for scanning free text. Never permissive."""
+    global _MENTION_RE
+    if _MENTION_RE is None:
+        if not _PREFIXES:
+            raise RuntimeError(
+                "prefix set not loaded -- call _model.Model.load() first. "
+                "Scanning text with an empty prefix set would match nothing "
+                "and read as a corpus with nothing in it (R-075).")
+        alternation = "|".join(sorted(_PREFIXES, key=lambda p: (-len(p), p)))
+        _MENTION_RE = re.compile(r"\b(?:%s)-\d{3,}\b" % alternation)
+    return _MENTION_RE
 
 
 def parse_id(value):
-    match = ID_RE.match(value or "")
+    match = ID_SHAPE.match(value or "")
     if not match:
         return None
     return match.group(1), int(match.group(2))

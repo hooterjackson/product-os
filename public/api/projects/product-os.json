@@ -442,9 +442,9 @@
   ],
   "project": {
     "decision_authority": "product-os",
+    "description": "Know what to work on next, and never be told progress that cannot be clicked.",
     "may_rule": true,
     "name": "product-os",
-    "north_star": "Know what to work on next, and never be told progress that cannot be clicked.",
     "phase": "slice 1a-minus",
     "repos": [
       "product-os"
