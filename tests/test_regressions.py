@@ -1287,5 +1287,87 @@ class ThePrefixSetIsDerivedNotHardcoded(unittest.TestCase):
         self.assertEqual(model.prefixes().get("GB"), "gimbal-bench")
 
 
+class ReorderingTheBacklogNeedsHisWords(unittest.TestCase):
+    """`state/backlog.md` is the only place his order exists (`DEC-202`), so
+    the two write operations are gated differently on purpose:
+
+      appending asserts NOTHING about priority -- ungated
+      moving asserts EVERYTHING -- needs `--said`
+
+    The origin lives in the flag name, borrowed from `apply.py`, so an agent
+    that forgets it fails safe toward refusing rather than toward writing."""
+
+    def _scratch(self):
+        import shutil as sh
+        tmp = tempfile.mkdtemp(prefix="po-bl-")
+        sh.copy(os.path.join(ROOT, "state", "backlog.md"),
+                os.path.join(tmp, "backlog.md"))
+        return tmp
+
+    def _run(self, *args):
+        return subprocess.run(
+            [sys.executable, os.path.join(ROOT, "tools", "backlog.py")]
+            + list(args), stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            cwd=ROOT)
+
+    def test_move_without_said_is_refused(self):
+        proc = self._run("--move", "HAI-001", "1")
+        self.assertEqual(proc.returncode, 2)
+        self.assertIn("--said", proc.stdout.decode())
+
+    def test_move_with_said_reorders_and_keeps_the_header(self):
+        import _model as model_mod
+        path = os.path.join(ROOT, "state", "backlog.md")
+        with open(path, encoding="utf-8") as fh:
+            before = fh.read()
+        try:
+            proc = self._run("--move", "HAI-001", "1", "--said", "test move")
+            self.assertEqual(proc.returncode, 0, proc.stdout.decode())
+            model = model_mod.Model.load(ROOT)
+            self.assertEqual(model.backlog_ids()[0], "HAI-001")
+            with open(path, encoding="utf-8") as fh:
+                after = fh.read()
+            # The header is his prose and must survive a rewrite untouched.
+            self.assertIn("THIS FILE IS THE PRIORITY", after)
+            self.assertEqual(before.count("\n"), after.count("\n"),
+                             "the rewrite added or dropped lines")
+            self.assertEqual(sorted(model.backlog_ids()),
+                             sorted(_ids(before)),
+                             "the rewrite changed the SET, not just the order")
+        finally:
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write(before)
+
+    def test_a_move_says_the_surface_is_now_stale(self):
+        """Reordering changes what llms.txt and reconcile.md name as next, so
+        the gate goes red until publish.py runs. Discovering that from a red
+        validate is how a guardrail gets ignored (`R-067`)."""
+        proc = self._run("--move", "HAI-001", "1")
+        with open(os.path.join(ROOT, "tools", "backlog.py"),
+                  encoding="utf-8") as fh:
+            self.assertIn("python3 tools/publish.py", fh.read())
+
+    def test_add_refuses_a_task_that_does_not_exist(self):
+        proc = self._run("--add", "ZZ-999")
+        self.assertEqual(proc.returncode, 2)
+        self.assertIn("no such task", proc.stdout.decode())
+
+    def test_add_refuses_a_duplicate(self):
+        """`E-BACKLOG-DRIFT` catches a duplicate, but catching it at the write
+        is better than catching it at the gate."""
+        proc = self._run("--add", "HAI-001")
+        self.assertEqual(proc.returncode, 2)
+        self.assertIn("already in the backlog", proc.stdout.decode())
+
+
+def _ids(text):
+    out = []
+    for line in text.splitlines():
+        line = line.split("#", 1)[0].strip()
+        if line:
+            out.append(line)
+    return out
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
