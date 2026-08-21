@@ -1,0 +1,13 @@
+name: Capture a thought
+description: Don't let me forget this. It asks nothing else.
+title: capture
+labels:
+  - inbox
+body:
+  - type: textarea
+    id: capture
+    attributes:
+      label: What you were about to forget
+      placeholder: spot 1 buzzes at 40% but not at 100
+    validations:
+      required: true

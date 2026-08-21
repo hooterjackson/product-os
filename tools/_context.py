@@ -278,6 +278,60 @@ def reach(node, model, repos_spec, machine):
                command="cd %s" % paths[0])
 
 
+def last_handoff(nodes):
+    """The most recent handoff's `**Did:**`, in English, across a group.
+
+    Recency has to come from handoffs, not from `updated`. The migration
+    stamped every one of the 41 items `2026-08-20`, so that field cannot
+    express recency at all -- it says only when the schema last changed.
+    Handoffs are dated, machine-stamped and already written for a human, which
+    makes them the only honest source for a "last session" line.
+
+    Returns None when nobody has written one. Five of six projects are in that
+    state, and the card must SAY so rather than render an empty heading: the
+    absence of a record is not the absence of a fact.
+    """
+    best = None
+    for node in nodes:
+        body = node.body or ""
+        for match in re.finditer(r"^### (\d{4}-\d{2}-\d{2})[^\n]*\n"
+                                 r"\*\*Did:\*\*\s*(.+?)(?=\n\n|\n\*\*|\Z)",
+                                 body, re.S | re.M):
+            when, said = match.group(1), " ".join(match.group(2).split())
+            if best is None or when >= best[0]:
+                best = (when, said, node.id)
+    if best is None:
+        return None
+    return {"date": best[0], "said": best[1], "item": best[2]}
+
+
+def latest_audit(root):
+    """The TL;DR the audit wrote, from the newest per-machine shard.
+
+    Sharded rather than kept in `build/`: `build/` is git-ignored, so a machine
+    without a stamp would silently publish a page with no TL;DR at all and
+    `publish.py --check` would call it drift. Machine-derived data is sharded,
+    never shared -- the same rule the thread index already follows.
+
+    Returns None before any audit has run, which is a real state on day one and
+    renders as a stated absence.
+    """
+    base = os.path.join(root, "state", "audits")
+    if not os.path.isdir(base):
+        return None
+    newest = None
+    for machine in sorted(os.listdir(base)):
+        path = os.path.join(base, machine, "latest.md")
+        if not os.path.exists(path):
+            continue
+        with open(path, "r", encoding="utf-8") as fh:
+            text = fh.read().strip()
+        stamp = os.path.getmtime(path)
+        if text and (newest is None or stamp > newest[0]):
+            newest = (stamp, text, machine)
+    return None if newest is None else newest[1]
+
+
 # --- the pointer rule ------------------------------------------------------
 #
 # Stated ONCE, here, because a rule that lives in one tool's docstring is a

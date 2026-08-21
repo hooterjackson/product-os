@@ -1,0 +1,67 @@
+# Deploy public/ to GitHub Pages.
+#
+# ACTIONS, not a branch source. A branch source would publish the whole
+# repository as a browsable site — state/, tools/, wiki/ and all — for no gain,
+# and it is also the only way to enable Pages before this file exists, which is
+# why Pages stays off until this lands.
+#
+# NO CNAME FILE. The custom domain is set in Settings → Pages and stored in the
+# repository's Pages config; an Actions deploy does not need one in the
+# artifact. It must not be hand-placed either: `publish.py --check` walks the
+# target and reports anything the generator did not produce as `orphan:`,
+# exit 1 — so a hand-placed public/CNAME turns the gate red and the next
+# publish deletes it. If one ever proves necessary, `surface.py` emits it and
+# `advertised()` expects it.
+#
+# There is no build step. This repo is stdlib Python and public/ is committed,
+# so the job's real work is REFUSING TO DEPLOY a surface the gate rejects.
+
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; never cancel one in flight, because a half-replaced
+# surface is worse than a stale one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # check_authority and check_commit_identities read history; a shallow
+          # clone makes them pass by seeing nothing, which is R-075's shape.
+          fetch-depth: 0
+
+      - name: The gate that decides whether this deploys
+        run: |
+          python3 -m unittest discover -s tests -v
+          python3 tools/validate.py
+
+      - name: public/ must match a fresh generation
+        run: python3 tools/publish.py --check
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: gate
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

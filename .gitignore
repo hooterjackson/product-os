@@ -16,3 +16,6 @@ __pycache__/
 
 # Web-chat URLs. Presence is tracked in manual.yaml; the URLs are not.
 state/threads/manual.local.yaml
+
+# Local preview config — a port choice, not part of the product.
+.claude/

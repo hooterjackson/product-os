@@ -1,0 +1,4 @@
+# No blank issues. Every write path into product-os is a shaped form, because an
+# unshaped one cannot hold its contract: capture promises to ask nothing, and a
+# task promises to name a project. A blank issue does neither.
+blank_issues_enabled: false

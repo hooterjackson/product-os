@@ -1,0 +1,109 @@
+/* ============================================================================
+ * Engineered Lighting — Design Tokens.  VENDORED, do not edit here.
+ * ----------------------------------------------------------------------------
+ * Source: the engineered-lighting design system, via Claude Design.
+ * Darkness first. All tokens are defined for a dark surface; no light mode.
+ *
+ * Product OS constraint: NO NETWORK AT VIEW TIME. The design system's Google
+ * Fonts @import is deliberately absent from this copy -- a published page that
+ * fetches a font has a second way to fail and leaks a request per reader. The
+ * stacks below fall back to the system faces, which is what the header always
+ * allowed.
+ * ========================================================================= */
+
+:root {
+  --bg-0: #000000;
+  --bg-1: #0A0A0A;
+  --bg-2: #111111;
+  --bg-blur: rgba(0, 0, 0, 0.35);
+
+  --fg-0: #FFFFFF;
+  --fg-1: #EDEDED;
+  --fg-2: #A1A1A1;
+  --fg-3: #8F8F8F;
+  --fg-4: #666666;
+  --fg-5: #2E2E2E;
+
+  --fg-a-92: rgba(255, 255, 255, 0.92);
+  --fg-a-85: rgba(255, 255, 255, 0.85);
+  --fg-a-55: rgba(255, 255, 255, 0.55);
+  --fg-a-40: rgba(255, 255, 255, 0.40);
+  --fg-a-24: rgba(255, 255, 255, 0.24);
+  --fg-a-12: rgba(255, 255, 255, 0.12);
+  --fg-a-08: rgba(255, 255, 255, 0.08);
+  --fg-a-05: rgba(255, 255, 255, 0.05);
+
+  --accent-blue: #0072F5;
+  --accent-blue-soft: rgba(0, 114, 245, 0.18);
+  --accent-ice: #B8D8FF;
+  --accent-ice-glow: rgba(184, 216, 255, 0.25);
+  --accent-warn: #FFB224;
+
+  --border-hairline: rgba(255, 255, 255, 0.08);
+  --border-default: rgba(255, 255, 255, 0.12);
+  --border-strong:  rgba(255, 255, 255, 0.24);
+  --border-focus:   var(--accent-blue);
+
+  --font-sans: "IBM Plex Sans", "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-display: var(--font-sans);
+
+  --fs-micro: 10px;
+  --fs-chrome: 11px;
+  --fs-label: 13px;
+  --fs-body: 14px;
+  --fs-body-l: 16px;
+  --fs-h4: 18px;
+  --fs-h3: 22px;
+  --fs-h2: 32px;
+  --fs-h1: 48px;
+
+  --tracking-chrome: 0.14em;
+  --tracking-label:  0.12em;
+  --tracking-ui:     0.08em;
+  --tracking-tight: -0.015em;
+  --tracking-normal: 0;
+
+  --lh-tight: 0.95;
+  --lh-snug: 1.2;
+  --lh-body: 1.5;
+  --lh-loose: 1.7;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  --sp-0: 0;
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-7: 28px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+  --sp-16: 64px;
+  --sp-20: 80px;
+  --sp-24: 96px;
+
+  --r-0: 0;
+  --r-1: 2px;
+  --r-pill: 999px;
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 120ms;
+  --dur-label: 220ms;
+}
+
+html, body {
+  background: var(--bg-0);
+  color: var(--fg-0);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}

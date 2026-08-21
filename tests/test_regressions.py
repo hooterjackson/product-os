@@ -1454,18 +1454,21 @@ class AWayInIsDerivedNeverTemplated(unittest.TestCase):
         self.assertIsNone(verdict["command"])
         self.assertIn("says so", verdict["reason"])
 
-    def test_site_py_when_it_lands_must_use_the_derivation(self):
-        """The forward constraint. Skips today and stops skipping the moment
-        site.py appears -- a vacuous pass is `R-075`, so it says which it is."""
-        path = os.path.join(ROOT, "tools", "site.py")
-        if not os.path.exists(path):
-            self.skipTest("site.py does not exist yet; this guard is waiting")
+    def test_the_surface_generator_uses_the_derivation(self):
+        """The forward constraint, now live. It is `surface.py`, not `site.py`:
+        `site` is a stdlib module CPython imports at interpreter startup, and
+        every tool here puts `tools/` on sys.path, so `tools/site.py` shadows
+        it. The plan said site.py; the interpreter disagreed and won."""
+        path = os.path.join(ROOT, "tools", "surface.py")
+        self.assertTrue(os.path.exists(path), "the generator is missing")
+        self.assertFalse(os.path.exists(os.path.join(ROOT, "tools", "site.py")),
+                         "tools/site.py shadows the stdlib `site` module")
         with open(path, encoding="utf-8") as fh:
             source = fh.read()
-        self.assertIn("reach(", source,
-                      "site.py builds a way-in without _context.reach -- the "
-                      "one thing this test exists to prevent")
-        self.assertNotIn("cd ~/", source, "site.py templates a local path")
+        self.assertIn("_context.reach(", source,
+                      "the generator builds a way-in without _context.reach -- "
+                      "the one thing this test exists to prevent")
+        self.assertNotIn('"cd ~/', source, "a local path is templated")
 
 
 class NothingCommittedUnderPublicNamesThisMachine(unittest.TestCase):
@@ -1779,6 +1782,258 @@ class ThePointerRuleIsStatedOnce(unittest.TestCase):
         header = open(path, encoding="utf-8").read()
         self.assertIn("UNBACKED-UP", header)
         self.assertIn("R-076", header)
+
+
+class TheIssueFormsExistAndAreShaped(unittest.TestCase):
+    """The page's write path is a pre-filled GitHub issue. Until `.github/`
+    existed, every one of those links opened a BLANK issue with no template and
+    an undefined label -- so `capture`'s contract ("it asks nothing: no project,
+    no priority, no 'should I file this as an item?'") could not hold, because
+    nothing shaped the form.
+
+    A malformed form fails the same way: GitHub falls back to a blank issue. So
+    the shape is asserted here rather than discovered on a phone.
+
+    This machine has no PyYAML (see `_fm.py`), so this checks LINE SHAPES and
+    schema keys rather than parsing. That is deliberate -- a hand-rolled YAML
+    parser is more likely to be wrong than the file it validates."""
+
+    DIR = os.path.join(ROOT, ".github", "ISSUE_TEMPLATE")
+    TYPES = {"markdown", "textarea", "input", "dropdown", "checkboxes"}
+
+    def _lines(self, name):
+        with open(os.path.join(self.DIR, name), encoding="utf-8") as fh:
+            return [ln.rstrip("\n") for ln in fh if ln.strip()]
+
+    def test_both_forms_exist(self):
+        for name in ("capture.yml", "task.yml", "config.yml"):
+            self.assertTrue(os.path.exists(os.path.join(self.DIR, name)),
+                            "%s is missing -- its links open a blank issue" % name)
+
+    def test_indentation_is_a_multiple_of_two_and_never_a_tab(self):
+        """The commonest way an issue form silently degrades."""
+        checked = 0
+        for name in ("capture.yml", "task.yml", "config.yml"):
+            for line in self._lines(name):
+                checked += 1
+                self.assertNotIn("\t", line, "%s: tab" % name)
+                indent = len(line) - len(line.lstrip(" "))
+                self.assertEqual(indent % 2, 0,
+                                 "%s: odd indent %d in %r" % (name, indent, line))
+        self.assertGreater(checked, 20, "the scan did not run")      # R-075
+
+    def test_every_body_item_declares_a_valid_type(self):
+        for name in ("capture.yml", "task.yml"):
+            lines = self._lines(name)
+            types = [ln.split("type:", 1)[1].strip()
+                     for ln in lines if ln.lstrip("- ").startswith("type:")]
+            self.assertTrue(types, "%s declares no body items" % name)
+            for kind in types:
+                self.assertIn(kind, self.TYPES, "%s: bad type %r" % (name, kind))
+            for key in ("name:", "description:", "body:"):
+                self.assertTrue(any(ln.startswith(key) for ln in lines),
+                                "%s has no top-level %s" % (name, key))
+
+    def test_capture_asks_exactly_one_thing(self):
+        """If capture asks a question, capture is broken. An issue form always
+        renders a title box, so the only way to honour that is to leave nothing
+        to DECIDE in it -- the title is pre-filled and intake.py reads the body."""
+        lines = self._lines("capture.yml")
+        fields = [ln for ln in lines
+                  if ln.lstrip("- ").startswith("type:")
+                  and "markdown" not in ln]
+        self.assertEqual(len(fields), 1,
+                         "capture asks %d things; it may ask one" % len(fields))
+        self.assertTrue(any(ln.startswith("title:") for ln in lines),
+                        "the title is not pre-filled, so capture asks for one")
+        self.assertIn("inbox", " ".join(lines),
+                      "captures must land in the inbox, outside the backlog")
+
+    def test_a_task_names_a_project_and_it_is_required(self):
+        lines = self._lines("task.yml")
+        joined = "\n".join(lines)
+        self.assertIn("id: project", joined)
+        self.assertIn("required: true", joined)
+        self.assertIn("- task", joined, "the task label is what intake drains")
+
+    def test_the_project_options_match_the_real_projects(self):
+        """A dropdown listing a project that does not exist creates a task
+        `E-TASK-NO-PROJECT` will reject after he has already typed it."""
+        import _model as model_mod
+        model = model_mod.Model.load(ROOT)
+        listed = {ln.strip("- ").strip() for ln in self._lines("task.yml")
+                  if ln.startswith("        - ")}
+        self.assertTrue(listed, "the dropdown has no options")           # R-075
+        self.assertEqual(listed - {"new project"}, set(model.projects),
+                         "the dropdown and state/projects/ disagree")
+
+    def test_blank_issues_are_disabled(self):
+        joined = "\n".join(self._lines("config.yml"))
+        self.assertIn("blank_issues_enabled: false", joined,
+                      "a blank issue holds neither contract")
+
+
+class EveryIssueLinkNamesATemplateThatExists(unittest.TestCase):
+    """Marcelo's guard, and it is the same class as the site.py-must-use-reach()
+    one: a link to a form that is not there fails SILENTLY and looks fine. The
+    page shipped pointing at `template=capture.yml` while `.github/` did not
+    exist at all.
+
+    Scans the generated surface, not the generator, because the URL is only
+    wrong once it has been written into something a person can tap."""
+
+    def test_every_generated_issue_url_resolves_to_a_template(self):
+        import re as _re
+        target = os.path.join(ROOT, "public")
+        pattern = _re.compile(r"issues/new\?([^\"'\s)]*)")
+        scanned, urls, bad = 0, 0, []
+        for base, _dirs, files in os.walk(target):
+            for name in files:
+                path = os.path.join(base, name)
+                if not name.endswith((".md", ".html", ".txt", ".json")):
+                    continue
+                scanned += 1
+                with open(path, encoding="utf-8", errors="replace") as fh:
+                    text = fh.read()
+                for query in pattern.findall(text):
+                    urls += 1
+                    found = _re.search(r"template=([A-Za-z0-9_.-]+)", query)
+                    if not found:
+                        bad.append("%s: no template= in %r"
+                                   % (os.path.basename(path), query[:50]))
+                        continue
+                    tpl = os.path.join(ROOT, ".github", "ISSUE_TEMPLATE",
+                                       found.group(1))
+                    if not os.path.exists(tpl):
+                        bad.append("%s: template %s does not exist"
+                                   % (os.path.basename(path), found.group(1)))
+        self.assertGreater(scanned, 20, "the scan did not run")          # R-075
+        self.assertEqual(bad, [], "an issue link points at nothing")
+        if not urls:
+            self.skipTest("no issue links generated yet; guard is waiting")
+
+
+class TheDashboardIsReadOnlyAndSaysWhatItKnows(unittest.TestCase):
+    """`Product OS Surfaces v2`, built. Four sections, every panel closed on
+    load, and the product is the copyable prompt."""
+
+    def _page(self):
+        path = os.path.join(ROOT, "public", "index.html")
+        self.assertTrue(os.path.exists(path), "the dashboard was not generated")
+        with open(path, encoding="utf-8") as fh:
+            return fh.read()
+
+    def test_the_four_sections_are_present_and_in_order(self):
+        page = self._page()
+        want = ["TL;DR", "Backlog", "Closed without you", "Chats"]
+        at = [page.find(">%s" % w) for w in want]
+        for name, pos in zip(want, at):
+            self.assertGreater(pos, 0, "%s is missing" % name)
+        self.assertEqual(at, sorted(at), "the sections are out of order")
+
+    def test_the_page_holds_no_token_and_writes_nothing(self):
+        """Every action leaves through a chat or a GitHub issue under his own
+        sign-in. A form or a fetch on this page would be a different product."""
+        page = self._page()
+        for forbidden in ("<form", "<input", "fetch(", "XMLHttpRequest",
+                          "localStorage", "method=\"post\""):
+            self.assertNotIn(forbidden, page, forbidden)
+
+    def test_every_panel_is_closed_on_load(self):
+        """Closed is <details>'s own default, not a state we set. With JS off
+        every panel still opens and every prompt is still selectable."""
+        page = self._page()
+        self.assertGreater(page.count("<details"), 20, "no disclosures")  # R-075
+        self.assertNotIn("<details open", page)
+
+    def test_the_copy_payload_is_the_visible_prompt(self):
+        """One source, so what is copied and what is shown cannot drift."""
+        page = self._page()
+        self.assertGreater(page.count("data-prompt"), 10)
+        self.assertIn("data-copy", page)
+        self.assertIn("querySelector('[data-prompt]')", page)
+
+    def test_the_js_budget_is_copy_and_the_age_renderer(self):
+        page = self._page()
+        script = page[page.rindex("<script>"):]
+        self.assertIn("clipboard", script)
+        self.assertIn("data-audit-date", script)
+        # The age is rendered by the browser so the BYTES carry only the date:
+        # publish --check therefore passes on two consecutive days (R-067).
+        self.assertNotIn("days ago<", page[:page.rindex("<script>")])
+
+    def test_no_row_prints_a_command_for_a_machine_that_is_not_this_one(self):
+        """The four kinds, and only `local` yields a command -- and only on a
+        local build, because public/ is served to every machine."""
+        page = self._page()
+        for chip in ("elsewhere", "not cloned", "no repo"):
+            self.assertIn(">%s<" % chip, page, "the %s kind never renders" % chip)
+        self.assertNotIn("cd ~", page)
+        self.assertNotIn("C:\\", page)
+
+    def test_an_empty_ruled_out_section_says_it_is_empty(self):
+        """A section that vanishes when empty teaches you it is always clear."""
+        self.assertIn("empty, not clear", self._page())
+
+    def test_the_disclosure_affordance_exists(self):
+        """25 summaries with list-style:none and nothing replacing the marker
+        means nothing on the page says a row opens."""
+        with open(os.path.join(ROOT, "tools", "assets",
+                               "product-os-theme.css"), encoding="utf-8") as fh:
+            theme = fh.read()
+        self.assertIn("summary::after", theme)
+        self.assertIn("details[open] > summary::after", theme)
+
+    def test_the_page_fetches_nothing_at_view_time(self):
+        """No network at view time: a published page that pulls a font has a
+        second way to fail and leaks a request per reader."""
+        page = self._page()
+        for host in ("http://", "fonts.googleapis", "fonts.gstatic", "cdn."):
+            self.assertNotIn('href="%s' % host, page)
+            self.assertNotIn('src="%s' % host, page)
+        with open(os.path.join(ROOT, "tools", "assets", "tokens.css"),
+                  encoding="utf-8") as fh:
+            self.assertNotIn("@import url(", fh.read())
+
+    def test_the_stylesheets_are_emitted_not_hand_placed(self):
+        """`publish.py --check` reports anything the generator did not produce
+        as `orphan:` and the next publish deletes it. That is why the CSS is
+        source in tools/assets/ and copied out -- and it is the same reason a
+        Pages CNAME must never be dropped into public/ by hand."""
+        for name in ("tokens.css", "product-os-theme.css"):
+            self.assertTrue(os.path.exists(
+                os.path.join(ROOT, "tools", "assets", name)))
+            self.assertTrue(os.path.exists(
+                os.path.join(ROOT, "public", "assets", name)))
+        self.assertFalse(os.path.exists(os.path.join(ROOT, "public", "CNAME")),
+                         "a hand-placed CNAME turns the gate red")
+
+
+class ThePagesWorkflowRefusesToDeployARejectedSurface(unittest.TestCase):
+
+    PATH = os.path.join(ROOT, ".github", "workflows", "pages.yml")
+
+    def test_it_exists_and_deploys_from_actions_not_a_branch(self):
+        self.assertTrue(os.path.exists(self.PATH))
+        with open(self.PATH, encoding="utf-8") as fh:
+            body = fh.read()
+        self.assertIn("actions/deploy-pages", body)
+        self.assertIn("actions/upload-pages-artifact", body)
+        self.assertIn("path: public", body)
+
+    def test_the_gate_runs_before_the_deploy(self):
+        with open(self.PATH, encoding="utf-8") as fh:
+            body = fh.read()
+        for gate in ("unittest discover", "tools/validate.py",
+                     "tools/publish.py --check"):
+            self.assertIn(gate, body, "the workflow skips %s" % gate)
+        self.assertIn("needs: gate", body, "deploy does not wait for the gate")
+
+    def test_history_is_not_shallow(self):
+        """check_authority and check_commit_identities read git history. A
+        shallow clone makes them pass by seeing nothing -- R-075's shape."""
+        with open(self.PATH, encoding="utf-8") as fh:
+            self.assertIn("fetch-depth: 0", fh.read())
 
 
 if __name__ == "__main__":

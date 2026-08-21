@@ -44,6 +44,7 @@ import _model
 import actions as actions_mod
 import _context
 import kickoff as kickoff_mod
+import surface as surface_mod
 
 RAW = "https://raw.githubusercontent.com/hooterjackson/product-os/main/public"
 
@@ -315,6 +316,7 @@ def generate(root, model, target, volatile=False):
     # --- the five actions. Everything this tool does is one of these.
     kickoff_mod.generate(root, model, target, volatile,
                          manual=redacted if not volatile else manual)
+    surface_mod.generate(root, model, target, volatile)
     actions_mod.generate(root, model, target, stamp, ordered, volatile)
 
     # --- api
@@ -436,7 +438,8 @@ def generate(root, model, target, volatile=False):
 
 def advertised(model):
     """Every path this surface promises. Used by the CI link check."""
-    paths = ["llms.txt", "api/index.json", "api/now.json",
+    paths = ["index.html", "assets/tokens.css", "assets/product-os-theme.css",
+             "llms.txt", "api/index.json", "api/now.json",
              "api/threads.json", "api/unconfirmed.json",
              "reconcile.md", "connect-repo.md", "capture.md"]
     for slug in model.projects:
@@ -510,7 +513,8 @@ def main(argv=None):
     for target in targets:
         # wholesale: an orphan endpoint that llms.txt no longer advertises is
         # still fetchable, and still answers with something stale.
-        for sub in ("api", "briefs", "projects", "kickoff", "attach"):
+        for sub in ("api", "assets", "briefs", "projects", "kickoff",
+                    "attach"):
             shutil.rmtree(os.path.join(target, sub), ignore_errors=True)
         generate(root, model, target, volatile=(target == build_dir))
         print("wrote %s" % os.path.relpath(target, root))

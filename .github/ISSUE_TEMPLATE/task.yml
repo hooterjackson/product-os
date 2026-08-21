@@ -1,0 +1,30 @@
+name: Add a task
+description: Something you have decided is worth doing. Lands at the bottom of your backlog.
+labels:
+  - task
+body:
+  - type: markdown
+    attributes:
+      value: The title above is the task. One sentence, in your words.
+  - type: dropdown
+    id: project
+    attributes:
+      label: Project
+      description: Every task belongs to one.
+      options:
+        - engineering-site
+        - gimbal-bench
+        - home-ai-infra
+        - home-app
+        - product-os
+        - robotic-spotlight
+        - new project
+    validations:
+      required: true
+  - type: textarea
+    id: detail
+    attributes:
+      label: Anything else
+      description: Optional. A repo, a machine, why it matters, or nothing.
+    validations:
+      required: false

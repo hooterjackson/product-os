@@ -1,0 +1,84 @@
+/* ============================================================================
+ * Product OS — a theme layer over Engineered Lighting.  VENDORED.
+ * ----------------------------------------------------------------------------
+ * Load AFTER tokens.css. Nothing here invents a role: every token is either an
+ * Engineered Lighting token consumed as-is, or a warm-ramp override of one
+ * under its own name, so the two files cannot drift apart.
+ * ========================================================================= */
+
+:root {
+  /* Foreground ramp, warm. Same names, same roles, warmer values. */
+  --fg-0: #F2EEE6;
+  --fg-1: rgba(242, 238, 230, 0.72);
+  --fg-2: #9C937F;
+  --fg-3: #7D765F;
+
+  --fg-a-85: rgba(242, 238, 230, 0.85);
+  --fg-a-55: rgba(242, 238, 230, 0.55);
+  --fg-a-24: rgba(242, 238, 230, 0.24);
+  --fg-a-12: rgba(242, 238, 230, 0.12);
+  --fg-a-08: rgba(242, 238, 230, 0.08);
+  --fg-a-05: rgba(242, 238, 230, 0.05);
+
+  /* This product's interactive accent is amber, not the DS blue. Named for its
+     role, and --accent-blue is left untouched rather than redefined as
+     something that is not blue. */
+  --accent-link: #E2A24C;
+  --accent-link-soft: rgba(226, 162, 76, 0.10);
+  --accent-ice: #D6E5F4;
+  --border-focus: var(--accent-ice);
+
+  --border-hairline: rgba(242, 238, 230, 0.08);
+  --border-default:  rgba(242, 238, 230, 0.12);
+  --border-strong:   rgba(242, 238, 230, 0.24);
+
+  /* One documented extension: the DS scale steps 11 -> 13, and mono metadata
+     at 13px with the house tracking overflows a 375px row. */
+  --fs-meta: 12px;
+
+  /* The page's own names. The markup holds no hex and no literal size. */
+  --el-bg-0: var(--bg-0);
+  --el-panel: var(--bg-1);
+  --el-ink: var(--fg-0);
+  --el-ink-2: var(--fg-1);
+  --el-ink-3: var(--fg-2);
+  --el-amber: var(--accent-link);
+  --el-amber-soft: var(--accent-link-soft);
+  --el-ice: var(--accent-ice);
+  --el-line: var(--border-default);
+  --el-line-2: var(--border-strong);
+}
+
+html, body {
+  margin: 0;
+  background: var(--el-bg-0);
+  color: var(--el-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+* { box-sizing: border-box; }
+
+a { color: var(--el-amber); text-decoration: none; }
+a:hover { color: var(--el-ink); opacity: 1; }
+
+summary { list-style: none; cursor: pointer; }
+summary::-webkit-details-marker { display: none; }
+
+/* The native marker is suppressed above, so one quiet affordance replaces it on
+   every summary: a trailing ">", turning down when open. Nothing else on the
+   page says a row opens. */
+summary::after {
+  content: "\203A";
+  font: 400 var(--fs-label)/1 var(--font-mono);
+  color: var(--el-ink-3);
+  flex: none;
+  align-self: center;
+  margin-left: var(--sp-2);
+  transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+details[open] > summary::after { transform: rotate(90deg); }
+
+summary:hover { background: var(--fg-a-05); }
+
+:focus-visible { outline: 1px solid var(--border-focus); outline-offset: 2px; }
