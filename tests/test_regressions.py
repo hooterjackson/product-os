@@ -1478,6 +1478,87 @@ class NothingCommittedUnderPublicNamesThisMachine(unittest.TestCase):
     `publish.py` already redacted `manual.yaml` chat URLs for this exact
     reason. It covered one of two sources -- the shape of `R-067`."""
 
+    SPELLINGS = ["cd ~/Claude/product-os",
+                 "git -C ~/Claude/product-os push",
+                 # Uppercase placeholder on purpose: it exercises ROOTED (which
+                 # keys on `/Users/`) without being a real home path, which
+                 # the disclosure screen is right to flag in a committed file.
+                 "python3 /Users/USERNAME/x.py",
+                 "code C:\\Claude\\gimbal-bench",
+                 "ls /home/USERNAME/",
+                 "$ cd ~/Claude/product-os"]
+
+    def test_the_check_matches_the_CLASS_not_the_known_spellings(self):
+        """The finding this test exists for. The first version was anchored to
+        `cd `, one of the two spellings that had shipped, and missed `git -C
+        ~/Claude/product-os` -- **54 of them, live across 27 committed files,
+        with the gate green.** `R-067` again, one syntax over.
+
+        So the assertion is over a LIST of spellings, and adding one is how a
+        future shape gets covered without rewriting the check."""
+        import validate as validate_mod
+        pattern = validate_mod.Validator.ROOTED
+        for probe in self.SPELLINGS:
+            self.assertTrue(pattern.search(probe),
+                            "%r is machine-local and unmatched" % probe)
+
+    def test_it_does_not_fire_on_a_path_that_names_no_machine(self):
+        """A repo-relative path is correct on every machine, and `~45` is an
+        approximation, not a path. A guard that cries wolf gets switched off."""
+        import validate as validate_mod
+        pattern = validate_mod.Validator.ROOTED
+        for probe in ("tools/publish.py", "state/backlog.md", "~45 entries",
+                      "~30 register entries", "wiki/ruled-out.md"):
+            self.assertIsNone(pattern.search(probe), probe)
+
+    def test_prose_is_exempt_because_nobody_runs_a_citation(self):
+        """Scoped to command context on purpose. Three kinds of `~` path exist
+        under public/: leaked commands, a `~/path/to/clone` PLACEHOLDER in a
+        JSON fence, and `~/Claude/PICKUP.md:19` as a CITATION in an item body.
+        Only the first is a hazard, and stripping the third would break the
+        provenance it exists to give."""
+        # Calls the check DIRECTLY. Shelling out to validate.py from a test
+        # recurses without bound -- validate.py runs this suite as its own
+        # gate, so the subprocess re-enters the test that spawned it. Found by
+        # a 120s timeout, which is the polite version of the failure.
+        import validate as validate_mod
+        published = glob.glob(os.path.join(ROOT, "public", "kickoff", "*.md"))
+        self.assertGreater(len(published), 10, "the scan did not run")  # R-075
+        citation = [p for p in published
+                    if "PICKUP.md" in open(p, encoding="utf-8").read()]
+        if not citation:
+            self.skipTest("the citation is not currently published")
+        checker = validate_mod.Validator(ROOT)
+        checker.check_public_is_machine_neutral()
+        offenders = [f.code for f in checker.findings
+                     if f.code == "E-PUBLIC-LOCAL-PATH"]
+        self.assertEqual(offenders, [],
+                         "a citation in prose was flagged as a command")
+
+    def test_the_clone_path_is_derived_and_not_published(self):
+        """`~/Claude/product-os` was hardcoded in two lines of actions.py and
+        published 54 times. It comes from repos.json now, and only build/ --
+        which nobody but this machine reads -- gets the real thing."""
+        # Asserted POSITIVELY -- that the derivation is wired -- rather than
+        # by grepping for the absence of the old string. The absence form
+        # failed on this function's own docstring, which quotes the path to
+        # explain the bug: a guard tripping on its own explanation, the same
+        # shape as `MENTION_RE` matching `_MENTION_RE`.
+        import actions as actions_mod
+        self.assertIn("repos.json", actions_mod.clone_hint.__doc__ or "")
+        self.assertEqual(actions_mod.clone_hint(ROOT, False),
+                         "-C <your product-os clone>")
+        self.assertIn("~/Claude/product-os",
+                      actions_mod.clone_hint(ROOT, True),
+                      "the volatile form lost the real path, so build/ is "
+                      "useless to the person at this keyboard")
+        published = glob.glob(os.path.join(ROOT, "public", "attach", "*.md"))
+        self.assertGreater(len(published), 10, "the scan did not run")  # R-075
+        for path in published:
+            with open(path, encoding="utf-8") as fh:
+                self.assertIn("<your product-os clone>", fh.read(),
+                              "%s names a machine" % os.path.basename(path))
+
     def test_the_gate_carries_this_check(self):
         with open(os.path.join(ROOT, "tools", "validate.py"),
                   encoding="utf-8") as fh:

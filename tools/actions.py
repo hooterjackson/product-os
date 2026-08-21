@@ -162,7 +162,33 @@ def reconcile(root, model, stamp, ordered):
 
 # --------------------------------------------------------------------- attach
 
-def attach(node, root):
+def clone_hint(root, volatile):
+    """How to say "your product-os clone", correctly, for the reader.
+
+    The path was hardcoded as `~/Claude/product-os` in two lines here, and
+    published: 54 occurrences across 27 committed `attach/*.md`. On `formd-t1`
+    that path is `C:\\Claude\\`, so the instruction was wrong on the machine
+    most of this portfolio's work happens on.
+
+    Derived from `state/repos.json` now, so the hardcoded spelling cannot be
+    written again -- and split the same way as everything else that names this
+    machine: `build/` gets the real path because only the person at this
+    keyboard reads it, `public/` gets `-C <your product-os clone>`, which is
+    correct on every machine because it is not a path at all.
+    """
+    if not volatile:
+        return "-C <your product-os clone>"
+    try:
+        with open(os.path.join(root, "state", "repos.json"), "r",
+                  encoding="utf-8") as fh:
+            spec = json.load(fh)
+    except (OSError, ValueError):
+        return "-C <your product-os clone>"
+    local = (spec.get("product-os") or {}).get("local")
+    return "-C %s" % local if local else "-C <your product-os clone>"
+
+
+def attach(node, root, volatile=False):
     """Paste into an EXISTING chat that has repo access.
 
     For a web chat -- claude.ai, ChatGPT -- which has no transcript on disk, so
@@ -216,10 +242,10 @@ def attach(node, root):
         "## Syncing",
         "",
         "```bash",
-        "git -C ~/Claude/product-os pull --rebase",
+        "git %s pull --rebase" % clone_hint(root, volatile),
         "#   ... make the edits ...",
         "python3 tools/validate.py && python3 tools/publish.py",
-        "git -C ~/Claude/product-os push",
+        "git %s push" % clone_hint(root, volatile),
         "```",
         "",
         "**If the rebase conflicts on an item file, stop.** Two people's words",
@@ -345,7 +371,7 @@ def capture():
     ]) + "\n"
 
 
-def generate(root, model, target, stamp, ranked):
+def generate(root, model, target, stamp, ranked, volatile=False):
     def put(rel, text):
         path = os.path.join(target, rel)
         os.makedirs(os.path.dirname(path), exist_ok=True)
@@ -357,4 +383,5 @@ def generate(root, model, target, stamp, ranked):
     put("capture.md", capture())
     for node in model.nodes.values():
         if node.is_active:
-            put(os.path.join("attach", "%s.md" % node.id), attach(node, root))
+            put(os.path.join("attach", "%s.md" % node.id),
+                attach(node, root, volatile))

@@ -315,7 +315,7 @@ def generate(root, model, target, volatile=False):
     # --- the five actions. Everything this tool does is one of these.
     kickoff_mod.generate(root, model, target, volatile,
                          manual=redacted if not volatile else manual)
-    actions_mod.generate(root, model, target, stamp, ordered)
+    actions_mod.generate(root, model, target, stamp, ordered, volatile)
 
     # --- api
     write(target, os.path.join("api", "now.json"), dump({
