@@ -276,3 +276,38 @@ def reach(node, model, repos_spec, machine):
     return out(LOCAL,
                "Cloned here. product-os TRACKS the work; it does not host it.",
                command="cd %s" % paths[0])
+
+
+# --- the pointer rule ------------------------------------------------------
+#
+# Stated ONCE, here, because a rule that lives in one tool's docstring is a
+# rule applied to one of two sources by construction -- which is `R-067` and
+# has now cost three separate fixes.
+#
+# `manual.yaml` was never the only route a chat URL could reach a public
+# surface. Three were live at the same time:
+#
+#     kickoff.py       "paste its URL into state/threads/manual.yaml"
+#     publish.py       the threads.json note, saying the same
+#     the design       "put the chat's URL in the task's GitHub issue"
+#
+# product-os is public, so its issues are world-readable -- and the issue is
+# the PRIMARY path the design ships for web chats, which is exactly the case
+# `manual.yaml` exists for. Untracking one file closed the narrow route and
+# left the wide one open.
+#
+# So it is a rule about the DATA, not about a file:
+
+POINTER_RULE_PUBLIC = (
+    "PRESENCE is public: which task has a chat, which machine holds it, and "
+    "when it was recorded.")
+POINTER_RULE_LOCAL = (
+    "THE URL IS LOCAL, wherever it is written — never a tracked file, never a "
+    "GitHub issue, never a generated page.")
+
+
+def pointer_rule(one_line=False):
+    """The sentence every instruction site must use, so they cannot drift."""
+    if one_line:
+        return "%s %s" % (POINTER_RULE_PUBLIC, POINTER_RULE_LOCAL)
+    return [POINTER_RULE_PUBLIC, POINTER_RULE_LOCAL]

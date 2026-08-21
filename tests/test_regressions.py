@@ -1715,5 +1715,71 @@ class TheWebChatAttachPathWorks(unittest.TestCase):
                          "exercised for real, so delete this test")
 
 
+class ThePointerRuleIsStatedOnce(unittest.TestCase):
+    """`R-076`. A private URL had three routes onto a public surface and
+    untracking one file closed the narrowest.
+
+    `manual.yaml` was tracked, so a URL there was published -- but so were
+    kickoff.py's instruction to paste it there, publish.py's threads.json note
+    repeating it, and the design's PRIMARY path for web chats: "put the chat's
+    URL in the task's GitHub issue." product-os is public, so its issues are
+    world-readable.
+
+    Third time this shape has cost a fix: `R-061` fixed the commit delta and
+    left the age; `R-062` fixed manual.yaml's urls and left the shard's
+    `command`/`id`/`parent`; `E-PUBLIC-LOCAL-PATH` anchored to `cd ` and missed
+    `git -C`. Each time the rule was right and the scope was a list of the
+    instances somebody had seen."""
+
+    STALE = ["paste its URL into", "paste one in once",
+             "their URLs live in state/threads/manual.yaml"]
+
+    def test_the_canonical_sentence_exists_and_names_both_halves(self):
+        import _context as ctx
+        self.assertIn("PRESENCE is public", ctx.POINTER_RULE_PUBLIC)
+        self.assertIn("URL IS LOCAL", ctx.POINTER_RULE_LOCAL)
+        self.assertIn("GitHub issue", ctx.POINTER_RULE_LOCAL,
+                      "the rule must name the issue route, which is the one "
+                      "the design ships as primary")
+
+    def test_no_tool_phrases_its_own_version(self):
+        sources = glob.glob(os.path.join(ROOT, "tools", "*.py"))
+        self.assertGreater(len(sources), 8, "the scan did not run")   # R-075
+        offenders = []
+        for path in sources:
+            if os.path.basename(path) in ("_context.py",):
+                continue          # where the sentence is DEFINED
+            with open(path, encoding="utf-8") as fh:
+                text = fh.read()
+            for stale in self.STALE:
+                if stale in text:
+                    offenders.append("%s: %r"
+                                     % (os.path.basename(path), stale))
+        self.assertEqual(offenders, [],
+                         "an instruction still routes a URL by its own wording")
+
+    def test_the_published_surface_never_tells_a_reader_to_publish_one(self):
+        """The instruction is as dangerous as the data: a page telling him to
+        paste a private URL into a tracked file is a leak with a delay."""
+        published = glob.glob(os.path.join(ROOT, "public", "**", "*.md"),
+                              recursive=True)
+        self.assertGreater(len(published), 20, "the scan did not run")  # R-075
+        for path in published:
+            with open(path, encoding="utf-8") as fh:
+                text = fh.read()
+            for stale in self.STALE:
+                self.assertNotIn(stale, text, os.path.basename(path))
+
+    def test_the_cost_of_untracking_is_written_where_it_is_read(self):
+        """Untracked means unbacked-up. Stated in the file's own header so it
+        is known rather than found -- `R-065`, a correction is only real where
+        it is read, and the reader of this decision is whoever opens the
+        file."""
+        path = os.path.join(ROOT, "state", "threads", "manual.yaml")
+        header = open(path, encoding="utf-8").read()
+        self.assertIn("UNBACKED-UP", header)
+        self.assertIn("R-076", header)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

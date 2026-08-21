@@ -1426,3 +1426,47 @@ The three deletion-guards this rebuild adds — `test_no_scoring_survives`,
 — are all greps, so each asserts `len(scanned) >= N` for a stated `N` before it
 asserts anything about hits, and each matches against a **named allowlist**
 rather than an expected violation count.
+
+## R-076 · Closing one route to a public surface and calling it fixed
+**keywords:** url · chat · pointer · manual · presence · public · issue · github · disclosure · redaction · route · split · attach · web-chat · privacy
+**source:** product-os `tools/_context.py` · 2026-08-20 · grade: measured
+
+**A private URL had three routes onto a public surface, and untracking one file
+closed the narrowest of them.** `state/threads/manual.yaml` was tracked, so a
+chat URL pasted there was published — but so were `kickoff.py`'s instruction to
+paste it there, `publish.py`'s `threads.json` note repeating it, and, worse, the
+design's **primary** path for web chats: *"put the chat's URL in the task's
+GitHub issue."* `product-os` is public, so its issues are world-readable. The
+narrow route was the one that got fixed; the wide one was the one the design
+ships.
+
+This is the third time the same shape has cost a fix here, and the first two are
+worth naming together because the pattern only becomes obvious in a row:
+
+| the rule | applied to | missed |
+|---|---|---|
+| `R-061` — no volatile quantity in a published artifact | the commit delta | the age phrase, four lines up in the same function |
+| `R-062` — no chat URL in the generated surface | `manual.yaml`'s URLs | the thread shard's `command`, `id` and `parent` |
+| this one | `manual.yaml` the file | `kickoff.py`, `publish.py`, and the GitHub issue |
+
+Each time the rule was correct and the *scope* was a list of the instances
+somebody had already seen. `E-PUBLIC-LOCAL-PATH` made the same mistake inside
+the check written to stop it: anchored to `cd `, it missed `git -C` — 54 live,
+gate green.
+
+**The fix is to state the rule about the DATA and let every site reference it**,
+rather than to fix each site:
+
+> **Presence is public** — which task has a chat, which machine holds it, when.
+> **The URL is local, wherever it is written** — never a tracked file, never a
+> GitHub issue, never a generated page.
+
+`_context.POINTER_RULE_PUBLIC` / `POINTER_RULE_LOCAL` are that sentence, and
+`kickoff.py`, `publish.py` and `actions.attach()` all render it rather than
+phrasing their own. A rule that lives in one tool's docstring is a rule applied
+to one of two sources by construction.
+
+**The generalisation, which is the part worth carrying:** when you find a
+disclosure, do not ask "where is this string" — ask **"what are all the routes
+this KIND of data can take to a reader who should not have it."** Then fix the
+class. Counting the instances you can see is how all three of these shipped.

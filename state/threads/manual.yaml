@@ -17,6 +17,18 @@
 # chat exists, on that machine, since that date. The URL stays on the one
 # machine that can open it, which needs his login anyway.
 #
+# THE RULE IS ABOUT THE URL, NOT ABOUT THIS FILE. Presence is public wherever
+# it is written; the URL is local wherever it is written -- never a tracked
+# file, never a GitHub issue (this repo is public, so its issues are
+# world-readable), never a generated page. See wiki/ruled-out.md R-076.
+#
+# WHAT THIS COSTS, so it is known rather than found: the local half is
+# UNTRACKED, and untracked means UNBACKED-UP. A clean clone or a dead laptop
+# loses every URL in it. Accepted deliberately -- the chat itself still exists
+# on claude.ai and is reachable from its own session picker, so what is lost is
+# a shortcut, not the conversation. The presence half survives, which is why it
+# is the half that is tracked.
+#
 # Format: <ITEM-ID>: <machine> <YYYY-MM-DD>   -- one per line, # comments fine.
 # validate.py fails if a URL appears here (E-MANUAL-URL-TRACKED), so the split
 # cannot erode by accident.

@@ -29,6 +29,7 @@ working copy, which the publishing commit itself increments.
 import json
 import os
 
+import _context
 import _fm
 
 MANUAL = "state/threads/manual.yaml"
@@ -227,8 +228,13 @@ def attach(node, root, volatile=False):
         "   ```",
         "",
         "   Flat `key: value`, one per line. If you cannot see the URL, ask me",
-        "   for it — do not guess one. **Never put the URL in the tracked",
-        "   file**, and never commit the local one.",
+        "   for it — do not guess one.",
+        "",
+        "   **The rule is about the URL, not about this file.** " +
+        _context.POINTER_RULE_PUBLIC,
+        "   " + _context.POINTER_RULE_LOCAL + " This repo is public, so its",
+        "   GitHub issues are world-readable too — recording a chat on an issue",
+        "   means recording THAT it exists, never the link.",
         "",
         "2. **Write what this chat actually achieved** into `%s`'s"
         % node.id,

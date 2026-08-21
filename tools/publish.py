@@ -411,8 +411,10 @@ def generate(root, model, target, volatile=False):
                                        key=lambda n: _fm.sort_key(n.id))
                     if kickoff_mod.threads_for(root, node.id, manual)},
                 "note": ("A RESUME verdict with no way back is a dead end. "
-                         "Web chats have no CLI, so their URLs live in "
-                         "state/threads/manual.yaml -- paste one in once.")}))
+                         "Web chats have no CLI, so a pointer is written by "
+                         "hand -- split: %s %s"
+                         % (_context.POINTER_RULE_PUBLIC,
+                            _context.POINTER_RULE_LOCAL))}))
 
     unconfirmed = [n for n in model.nodes.values()
                    if n.status == "done" and n.get("closed_origin") != "his-word"]

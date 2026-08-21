@@ -362,8 +362,12 @@ def render(node, model, entries, stamp, repos_spec, root, manual,
                              "from the app's own session picker.")
     else:
         lines.append("None indexed. Starting fresh is correct.")
-        lines.append("If you are in a web chat, paste its URL into "
-                     "`%s` so it is reachable next time." % MANUAL)
+        lines.append("If you are in a web chat, record it so it is reachable "
+                     "next time — and mind which half goes where:")
+        lines.append("  `%s` (tracked, public): `%s: <machine> <date>`"
+                     % (MANUAL, node.id))
+        lines.append("  `%s` (git-ignored): the URL." % MANUAL_LOCAL)
+        lines.append("  " + _context.POINTER_RULE_LOCAL)
     lines.append("")
 
     # --- decisions in force, inherited from the brief (R-071)

@@ -260,7 +260,7 @@
     "unattributed_commits_at_last_audit": 153
   },
   "manual_urls": {},
-  "note": "A RESUME verdict with no way back is a dead end. Web chats have no CLI, so their URLs live in state/threads/manual.yaml -- paste one in once.",
+  "note": "A RESUME verdict with no way back is a dead end. Web chats have no CLI, so a pointer is written by hand -- split: PRESENCE is public: which task has a chat, which machine holds it, and when it was recorded. THE URL IS LOCAL, wherever it is written \u2014 never a tracked file, never a GitHub issue, never a generated page.",
   "return_paths": {
     "POS-001": [
       {
