@@ -73,10 +73,31 @@ PRE = ("margin:0;font:400 var(--fs-meta)/1.6 var(--font-mono);color:var(--el-ink
        "background:var(--el-panel);border:1px solid var(--el-line);"
        "padding:var(--sp-4);white-space:pre-wrap;overflow-wrap:anywhere")
 
-# The four kinds, as the chip says them. `local` is the only one that can yield
-# a command, and it only does so on a local build.
+# The four kinds, as the chip says them on a LOCAL build. `local` is the only
+# one that can yield a command.
 CHIP = {_context.LOCAL: "this machine", _context.ELSEWHERE: "elsewhere",
         _context.NO_CLONE: "not cloned", _context.NO_REPO: "no repo"}
+
+# What a PUBLISHED page may say. Two of the four kinds are facts about the
+# reader's machine -- `local` and `not cloned` differ only in whether the repo
+# happens to be on the box that ran `publish` -- and a committed page is read
+# by machines it cannot see. Measured: index.html rendered `this machine` for
+# product-os here and `not cloned` on CI, so `publish.py --check` could never
+# pass on two machines at once.
+#
+# The other two ARE durable. `no repo` is a property of the project; `elsewhere`
+# is a property of the task's own machine_affinity. Those keep their words.
+#
+# This is the same rule as the command and the chat url, one level up: a
+# published surface may not speak about "here".
+PUBLISHED_CHIP = {_context.LOCAL: "needs the repo",
+                  _context.NO_CLONE: "needs the repo",
+                  _context.ELSEWHERE: "elsewhere",
+                  _context.NO_REPO: "no repo"}
+
+
+def chip(verdict, volatile):
+    return (CHIP if volatile else PUBLISHED_CHIP)[verdict["kind"]]
 
 
 MONTHS = ("Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -122,26 +143,27 @@ def copy_control(sub):
         'white-space:nowrap">%s</span></span>' % esc(sub))
 
 
-def where_to_paste(verdict, volatile):
-    """The way in, as the three-value enum. The third value is a value, not a
-    null: an honest inert state names the machine you need."""
-    kind, out = verdict["kind"], []
-    if kind == _context.LOCAL and volatile and verdict.get("command"):
-        out.append(field("Machine · this laptop",
-                         '<code style="font:400 var(--fs-meta)/1.6 '
-                         'var(--font-mono);color:var(--el-ink);border:1px solid '
-                         'var(--el-line);padding:var(--sp-3);display:inline-block">'
-                         '%s &amp;&amp; claude</code>' % esc(verdict["command"])))
-    elif kind == _context.LOCAL:
-        out.append(field("Machine · cloned here",
-                         "This repo is on the machine that built the page. The "
-                         "command is not printed here, because this page is "
-                         "served to every machine and a path is true on one.",
-                         BODY))
-    else:
-        out.append(field("Machine · %s" % CHIP[kind], esc(verdict["reason"]),
-                         BODY))
-    return "".join(out)
+def where_to_paste(verdict, volatile, repos):
+    """The way in. An honest inert state names what you need, and never
+    pretends to know where you are reading from."""
+    kind = verdict["kind"]
+    if volatile and kind == _context.LOCAL and verdict.get("command"):
+        return field("Machine · this laptop",
+                     '<code style="font:400 var(--fs-meta)/1.6 '
+                     'var(--font-mono);color:var(--el-ink);border:1px solid '
+                     'var(--el-line);padding:var(--sp-3);display:inline-block">'
+                     '%s &amp;&amp; claude</code>' % esc(verdict["command"]))
+    if volatile or kind in (_context.ELSEWHERE, _context.NO_REPO):
+        return field("Machine · %s" % chip(verdict, volatile),
+                     esc(verdict["reason"]), BODY)
+    return field(
+        "Machine · needs the repo",
+        "This task is worked in %s. Whether the machine you are reading this "
+        "on has a clone is not something a published page can know, so no "
+        "command is offered — run it where the repo is."
+        % (", ".join("<code style=\"font-family:var(--font-mono)\">%s</code>"
+                     % esc(r) for r in repos) or "the repo it names"),
+        BODY)
 
 
 # ------------------------------------------------------------------ sections
@@ -278,7 +300,7 @@ def task_row(node, model, entries, stamp, repos_spec, root, manual, machine,
              % (MICRO, META,
                 esc(_context.freshness(root, node, stamp, repos_spec, False)),
                 PRE, esc(prompt)))
-    body += where_to_paste(verdict, volatile)
+    body += where_to_paste(verdict, volatile, verdict["repos"])
     body += field("What happens next",
                   "The chat works in the repo the task names and writes a "
                   "handoff when it stops. Nothing here changes until the next "
@@ -295,7 +317,7 @@ def task_row(node, model, entries, stamp, repos_spec, root, manual, machine,
         '<span style="flex:1;font:400 var(--fs-body-l)/1.45 var(--font-sans);'
         'color:var(--el-ink);text-wrap:pretty">%s</span>%s</summary>'
         '<div style="padding:var(--sp-1) 0 var(--sp-6)">%s</div></details>'
-        % (esc(node.id), esc(node.title), copy_control(CHIP[verdict["kind"]]),
+        % (esc(node.id), esc(node.title), copy_control(chip(verdict, volatile)),
            body))
 
 

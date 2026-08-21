@@ -46,6 +46,7 @@ import sys
 import _fm
 import _git
 import _model
+import new
 import stale
 
 DEFAULT_WINDOW_DAYS = 45
@@ -489,18 +490,34 @@ def audit(root, since, only_item=None):
         if repo.commits:
             heads[name] = repo.commits[0][0]
             latest[name] = max(c[1] for c in repo.commits)
-    stamp_dir = os.path.join(root, "build")
+    # TWO halves, in two places, because they have different lifetimes.
+    #
+    # Durable -- when the audit ran, over what window, what it found. Tracked
+    # and sharded per machine, so every machine regenerates the same public/.
+    # Live -- per-repo HEAD shas. Git-ignored: a sha names one working copy,
+    # and publishing one made public/ unreproducible anywhere else.
+    durable = {
+        "date": datetime.date.today().isoformat(),
+        "window_since": since,
+        "group_d": sum(len(v) for v in unattributed.values()),
+        "machine": new.machine_id(root),
+    }
+    shard_dir = os.path.join(root, "state", "audits", durable["machine"])
     try:
-        os.makedirs(stamp_dir, exist_ok=True)
-        with open(os.path.join(stamp_dir, "audit-stamp.json"), "w",
+        os.makedirs(shard_dir, exist_ok=True)
+        with open(os.path.join(shard_dir, "stamp.json"), "w",
                   encoding="utf-8") as fh:
-            json.dump({
-                "date": datetime.date.today().isoformat(),
-                "window_since": since,
-                "heads": heads,
-                "latest_commit": latest,
-                "group_d": sum(len(v) for v in unattributed.values()),
-            }, fh, indent=2, sort_keys=True)
+            json.dump(durable, fh, indent=2, sort_keys=True)
+            fh.write("\n")
+    except OSError:
+        pass
+    try:
+        os.makedirs(os.path.join(root, "build"), exist_ok=True)
+        with open(os.path.join(root, "build", "audit-stamp.json"), "w",
+                  encoding="utf-8") as fh:
+            live = dict(durable)
+            live.update({"heads": heads, "latest_commit": latest})
+            json.dump(live, fh, indent=2, sort_keys=True)
     except OSError:
         pass
 

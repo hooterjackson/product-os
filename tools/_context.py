@@ -25,7 +25,11 @@ import re
 import _fm
 import _git
 
-STAMP_FILE = "build/audit-stamp.json"
+# The DURABLE half of the audit stamp, tracked and sharded per machine. The
+# live half -- per-repo HEAD shas, used only by the volatile freshness probe --
+# stays in git-ignored build/, because a sha is a fact about one working copy.
+STAMP_SHARD = "stamp.json"
+LOCAL_STAMP = "build/audit-stamp.json"
 REGISTER = "wiki/ruled-out.md"
 MAX_RULED_OUT = 4
 
@@ -68,13 +72,53 @@ def parse_register(root):
 
 
 def read_stamp(root):
-    path = os.path.join(root, STAMP_FILE)
+    """The newest audit stamp, from TRACKED per-machine shards.
+
+    This read `build/audit-stamp.json` and `build/` is git-ignored, so the
+    entire published surface was generated from a file that does not travel.
+    Measured in a clean clone with no `build/`: **88 files out of sync**, and
+    `publish.py --check` fails on every machine that has not run an audit --
+    CI included, permanently.
+
+    That is the same shape as `R-067` one directory over. There the bytes moved
+    with the calendar; here they move with which machine ran `publish`. Both
+    make a committed artifact unreproducible, and both make the gate red by
+    default, which is how a gate stops being read.
+
+    Sharded rather than shared because an audit is a machine's observation:
+    `state/audits/<machine>/stamp.json`, the same discipline the thread index
+    already follows. Newest wins.
+    """
+    base = os.path.join(root, "state", "audits")
+    if not os.path.isdir(base):
+        return None
+    best = None
+    for machine in sorted(os.listdir(base)):
+        path = os.path.join(base, machine, STAMP_SHARD)
+        if not os.path.exists(path):
+            continue
+        try:
+            with open(path, "r", encoding="utf-8") as fh:
+                data = json.load(fh)
+        except (OSError, ValueError):
+            continue
+        if not isinstance(data, dict) or not data.get("date"):
+            continue
+        if best is None or data["date"] > best["date"]:
+            best = data
+    return best
+
+
+def read_local_stamp(root):
+    """The live half: per-repo HEADs, for the volatile probe only. Never
+    published -- a sha names one working copy."""
+    path = os.path.join(root, LOCAL_STAMP)
     if not os.path.exists(path):
         return None
     try:
         with open(path, "r", encoding="utf-8") as fh:
             return json.load(fh)
-    except ValueError:
+    except (OSError, ValueError):
         return None
 
 
@@ -127,9 +171,10 @@ def freshness(root, node, stamp, repos_spec, volatile=True):
 
     # Offline delta, where a local clone exists. Repos without one are NAMED,
     # never silently treated as unchanged.
+    local = read_local_stamp(root) or {}
     moved, unchecked = [], []
     for name in node.get("repos") or []:
-        head = (stamp.get("heads") or {}).get(name)
+        head = (local.get("heads") or {}).get(name)
         spec = repos_spec.get(name) or {}
         local = spec.get("local")
         local = os.path.expanduser(local) if local else None

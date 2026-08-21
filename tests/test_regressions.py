@@ -16,6 +16,7 @@ opens on, and it is why these four are worth more than coverage.
 
 import datetime
 import glob
+import re
 import json
 import os
 import shutil
@@ -1429,22 +1430,64 @@ class AWayInIsDerivedNeverTemplated(unittest.TestCase):
 
     def test_machine_affinity_beats_a_local_clone(self):
         """Checked before the clone test on purpose: a command that RUNS is not
-        a command that HELPS. Synthetic, because no real task currently pairs a
-        cloned repo with a foreign machine -- and that is exactly the
-        combination a future task will hit."""
+        a command that HELPS.
+
+        The spec is SYNTHETIC, and that is the fix rather than a shortcut. The
+        first version read `Q-005` against the real `repos.json` and asserted
+        LOCAL -- true on this laptop, where engineered-lighting-site is cloned,
+        and false on CI, where nothing is. It failed on the Pages workflow's
+        first run, which is the same class of bug this whole session has been
+        removing: an assertion that holds on one machine. `ROOT` exists
+        wherever the tests run, so this exercises the ordering everywhere."""
         import _context as ctx
-        root, model, spec, machine = self._fixture()
-        node = model.nodes["Q-005"]          # engineered-lighting-site, cloned
-        self.assertEqual(
-            ctx.reach(node, model, spec, machine)["kind"], ctx.LOCAL)
+        _root, model, _spec, _machine = self._fixture()
+        node = model.nodes["Q-005"]
+        spec = {"engineered-lighting-site": {"local": ROOT}}
+        here = "test-machine"
+        self.assertEqual(ctx.reach(node, model, spec, here)["kind"], ctx.LOCAL,
+                         "the synthetic clone did not read as local")
         node.fm["machine_affinity"] = "formd-t1"
         try:
-            verdict = ctx.reach(node, model, spec, machine)
-            self.assertEqual(verdict["kind"], ctx.ELSEWHERE)
+            verdict = ctx.reach(node, model, spec, here)
+            self.assertEqual(verdict["kind"], ctx.ELSEWHERE,
+                             "a cloned repo outranked the machine it is bound to")
             self.assertIsNone(verdict["command"])
             self.assertIn("formd-t1", verdict["reason"])
         finally:
             node.fm["machine_affinity"] = None
+
+    def test_all_four_kinds_are_reachable_on_any_machine(self):
+        """`test_a_command_only_ever_comes_back_for_a_clone_that_is_here`
+        sweeps real state, so on a machine with no clones NOTHING returns a
+        command and it passes having proved nothing -- `R-075` wearing a
+        different hat. This drives all four kinds from synthetic input, so the
+        enum is exercised wherever the suite runs."""
+        import _context as ctx
+        _root, model, _spec, _machine = self._fixture()
+        here = "test-machine"
+        cases = [
+            (ctx.LOCAL, model.nodes["Q-005"], None,
+             {"engineered-lighting-site": {"local": ROOT}}),
+            (ctx.NO_CLONE, model.nodes["Q-005"], None,
+             {"engineered-lighting-site": {"local": None}}),
+            (ctx.ELSEWHERE, model.nodes["Q-005"], "formd-t1",
+             {"engineered-lighting-site": {"local": ROOT}}),
+            (ctx.NO_REPO, model.nodes["HAI-001"], None, {}),
+        ]
+        seen = set()
+        for want, node, affinity, spec in cases:
+            original = node.get("machine_affinity")
+            node.fm["machine_affinity"] = affinity
+            try:
+                verdict = ctx.reach(node, model, spec, here)
+            finally:
+                node.fm["machine_affinity"] = original
+            self.assertEqual(verdict["kind"], want, "%s -> %s" % (node.id, want))
+            if want != ctx.LOCAL:
+                self.assertIsNone(verdict["command"],
+                                  "%s offered a command" % want)
+            seen.add(want)
+        self.assertEqual(len(seen), 4, "not every kind was exercised")
 
     def test_a_project_with_no_repo_is_its_own_verdict(self):
         import _context as ctx
@@ -1962,14 +2005,51 @@ class TheDashboardIsReadOnlyAndSaysWhatItKnows(unittest.TestCase):
         # publish --check therefore passes on two consecutive days (R-067).
         self.assertNotIn("days ago<", page[:page.rindex("<script>")])
 
-    def test_no_row_prints_a_command_for_a_machine_that_is_not_this_one(self):
-        """The four kinds, and only `local` yields a command -- and only on a
-        local build, because public/ is served to every machine."""
+    def test_the_published_page_never_speaks_about_here(self):
+        """`local` and `not cloned` differ only in whether the repo happens to
+        sit on the box that ran `publish`. A committed page is read by machines
+        it cannot see, so both collapse to `needs the repo` -- measured:
+        index.html said `this machine` for product-os on this laptop and `not
+        cloned` on CI, so publish --check could never pass on two machines at
+        once.
+
+        `elsewhere` and `no repo` keep their words: one is a property of the
+        task's machine_affinity, the other of the project. Those are durable."""
         page = self._page()
-        for chip in ("elsewhere", "not cloned", "no repo"):
-            self.assertIn(">%s<" % chip, page, "the %s kind never renders" % chip)
+        chips = set(re.findall(r'white-space:nowrap">([a-z ]+)</span>', page))
+        self.assertTrue(chips, "no chips rendered")                   # R-075
+        self.assertEqual(chips - {"elsewhere", "needs the repo", "no repo"},
+                         set(), "a published chip names the reader's machine")
         self.assertNotIn("cd ~", page)
         self.assertNotIn("C:\\", page)
+
+    def test_the_page_is_byte_identical_on_a_machine_with_no_clones(self):
+        """The whole point of the collapse. Regenerates the page against a
+        repos.json where nothing is cloned -- CI's condition -- and requires
+        the bytes to match what is committed."""
+        import _model as model_mod
+        import surface as surface_mod
+        import json as _json
+        real = _json.load
+        spec_path = os.path.join(ROOT, "state", "repos.json")
+
+        def blind(fh):
+            data = real(fh)
+            if getattr(fh, "name", "") == spec_path:
+                return {k: (v if not isinstance(v, dict)
+                            else dict(v, local=None))
+                        for k, v in data.items()}
+            return data
+
+        _json.load = blind
+        try:
+            elsewhere = surface_mod.render(ROOT, model_mod.Model.load(ROOT),
+                                           volatile=False)
+        finally:
+            _json.load = real
+        self.assertEqual(elsewhere, self._page(),
+                         "the published page differs on a machine with no "
+                         "clones -- publish --check cannot pass on both")
 
     def test_an_empty_ruled_out_section_says_it_is_empty(self):
         """A section that vanishes when empty teaches you it is always clear."""
