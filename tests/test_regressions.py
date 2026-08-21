@@ -2018,8 +2018,11 @@ class TheDashboardIsReadOnlyAndSaysWhatItKnows(unittest.TestCase):
         page = self._page()
         chips = set(re.findall(r'white-space:nowrap">([a-z ]+)</span>', page))
         self.assertTrue(chips, "no chips rendered")                   # R-075
-        self.assertEqual(chips - {"elsewhere", "needs the repo", "no repo"},
-                         set(), "a published chip names the reader's machine")
+        for chip in chips:
+            self.assertTrue(
+                chip in ("needs the repo", "no repo") or chip.startswith("on "),
+                "%r is a comparison with the reader's machine, not a fact"
+                % chip)
         self.assertNotIn("cd ~", page)
         self.assertNotIn("C:\\", page)
 
@@ -2028,25 +2031,32 @@ class TheDashboardIsReadOnlyAndSaysWhatItKnows(unittest.TestCase):
         repos.json where nothing is cloned -- CI's condition -- and requires
         the bytes to match what is committed."""
         import _model as model_mod
+        import new as new_mod
         import surface as surface_mod
         import json as _json
-        real = _json.load
+        real_load, real_machine = _json.load, new_mod.machine_id
         spec_path = os.path.join(ROOT, "state", "repos.json")
 
         def blind(fh):
-            data = real(fh)
+            data = real_load(fh)
             if getattr(fh, "name", "") == spec_path:
                 return {k: (v if not isinstance(v, dict)
                             else dict(v, local=None))
                         for k, v in data.items()}
             return data
 
+        # BOTH, and the second one is the finding: blinding only the clones
+        # left machine_id() answering `work-laptop`, so a task bound to this
+        # laptop still resolved as "not elsewhere" and the test passed here
+        # while failing on CI.
         _json.load = blind
+        new_mod.machine_id = lambda root: "some-other-machine"
         try:
             elsewhere = surface_mod.render(ROOT, model_mod.Model.load(ROOT),
                                            volatile=False)
         finally:
-            _json.load = real
+            _json.load = real_load
+            new_mod.machine_id = real_machine
         self.assertEqual(elsewhere, self._page(),
                          "the published page differs on a machine with no "
                          "clones -- publish --check cannot pass on both")

@@ -90,14 +90,26 @@ CHIP = {_context.LOCAL: "this machine", _context.ELSEWHERE: "elsewhere",
 #
 # This is the same rule as the command and the chat url, one level up: a
 # published surface may not speak about "here".
-PUBLISHED_CHIP = {_context.LOCAL: "needs the repo",
-                  _context.NO_CLONE: "needs the repo",
-                  _context.ELSEWHERE: "elsewhere",
-                  _context.NO_REPO: "no repo"}
+# `elsewhere` looked durable and is not: it is a COMPARISON with the reader's
+# machine, not a fact about the task. One task carries
+# `machine_affinity: work-laptop`, so the row read `needs the repo` on this
+# laptop and `elsewhere` on a runner -- caught by the byte-identical test,
+# which was itself blinding only the clone state and so missed it locally.
+#
+# So a published row states the FACT and makes no comparison at all:
+#   no repo        the project has none
+#   on <machine>   the task names one, verbatim
+#   needs the repo neither -- run it where the repo is
+def published_chip(node, verdict):
+    if verdict["kind"] == _context.NO_REPO:
+        return "no repo"
+    affinity = node.get("machine_affinity")
+    return ("on %s" % affinity) if affinity else "needs the repo"
 
 
-def chip(verdict, volatile):
-    return (CHIP if volatile else PUBLISHED_CHIP)[verdict["kind"]]
+def chip(node, verdict, volatile):
+    return (CHIP[verdict["kind"]] if volatile
+            else published_chip(node, verdict))
 
 
 MONTHS = ("Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -143,7 +155,7 @@ def copy_control(sub):
         'white-space:nowrap">%s</span></span>' % esc(sub))
 
 
-def where_to_paste(verdict, volatile, repos):
+def where_to_paste(node, verdict, volatile, repos):
     """The way in. An honest inert state names what you need, and never
     pretends to know where you are reading from."""
     kind = verdict["kind"]
@@ -153,9 +165,18 @@ def where_to_paste(verdict, volatile, repos):
                      'var(--font-mono);color:var(--el-ink);border:1px solid '
                      'var(--el-line);padding:var(--sp-3);display:inline-block">'
                      '%s &amp;&amp; claude</code>' % esc(verdict["command"]))
-    if volatile or kind in (_context.ELSEWHERE, _context.NO_REPO):
-        return field("Machine · %s" % chip(verdict, volatile),
-                     esc(verdict["reason"]), BODY)
+    if volatile:
+        return field("Machine · %s" % CHIP[kind], esc(verdict["reason"]), BODY)
+    if kind == _context.NO_REPO:
+        return field("Machine · no repo", esc(verdict["reason"]), BODY)
+    affinity = node.get("machine_affinity")
+    if affinity:
+        return field(
+            "Machine · on %s" % esc(affinity),
+            "This task is bound to <code style=\"font-family:var(--font-mono)\">"
+            "%s</code>. Whether that is the machine you are reading this on is "
+            "not something a published page can know, so no command is offered."
+            % esc(affinity), BODY)
     return field(
         "Machine · needs the repo",
         "This task is worked in %s. Whether the machine you are reading this "
@@ -300,7 +321,7 @@ def task_row(node, model, entries, stamp, repos_spec, root, manual, machine,
              % (MICRO, META,
                 esc(_context.freshness(root, node, stamp, repos_spec, False)),
                 PRE, esc(prompt)))
-    body += where_to_paste(verdict, volatile, verdict["repos"])
+    body += where_to_paste(node, verdict, volatile, verdict["repos"])
     body += field("What happens next",
                   "The chat works in the repo the task names and writes a "
                   "handoff when it stops. Nothing here changes until the next "
@@ -317,7 +338,7 @@ def task_row(node, model, entries, stamp, repos_spec, root, manual, machine,
         '<span style="flex:1;font:400 var(--fs-body-l)/1.45 var(--font-sans);'
         'color:var(--el-ink);text-wrap:pretty">%s</span>%s</summary>'
         '<div style="padding:var(--sp-1) 0 var(--sp-6)">%s</div></details>'
-        % (esc(node.id), esc(node.title), copy_control(chip(verdict, volatile)),
+        % (esc(node.id), esc(node.title), copy_control(chip(node, verdict, volatile)),
            body))
 
 
@@ -466,7 +487,7 @@ def add_controls(model):
         % (ISSUES, ISSUES))
 
 
-def closures(model, machine):
+def closures(model):
     """A closure row is a disclosure. Closed, the IDs. Open, the title, the date
     and that row's own way out with its real ID in it -- never a template."""
     rows = sorted([n for n in model.nodes.values()
@@ -501,11 +522,12 @@ def closures(model, machine):
                                    % (node.get("completed") or "?", evidence)),
                      META),
                field("Your way out",
-                     'Confirm it was right, or reopen it. From a terminal on '
-                     '<code style="font-family:var(--font-mono)">%s</code>: '
+                     'Confirm it was right, or reopen it. From a terminal in '
+                     'your product-os clone — the command is repo-relative, so '
+                     'it is the same wherever that is: '
                      '<code style="font-family:var(--font-mono);'
-                     'font-size:var(--fs-meta)">tools/backlog.py --unconfirmed'
-                     '</code>' % esc(machine), BODY)))
+                     'font-size:var(--fs-meta)">python3 tools/backlog.py '
+                     '--unconfirmed</code>', BODY)))
     out.append("</section>")
     return "".join(out)
 
@@ -607,7 +629,7 @@ def render(root, model, volatile=False):
         tldr(root, model, stamp, volatile),
         backlog(root, model, entries, stamp, repos_spec, manual, machine,
                 volatile),
-        closures(model, machine),
+        closures(model),
         chats(root, model, manual, machine),
         '<p style="%s;margin:var(--sp-8) 0 0">This page reads. It never writes '
         '— every action leaves through a chat or a GitHub issue under your own '
