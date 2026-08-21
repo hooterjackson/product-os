@@ -1579,5 +1579,89 @@ class NothingCommittedUnderPublicNamesThisMachine(unittest.TestCase):
             "build/ lost the resume command too -- the split is gone")
 
 
+class TheWebChatAttachPathWorks(unittest.TestCase):
+    """`state/threads/manual.yaml` holds ZERO urls. A web chat has no
+    transcript on disk, so no amount of id-citation will ever let the indexer
+    find it -- a hand-written pointer is the only record that will ever exist
+    of one. The whole path is therefore unexercised, and an unexercised path
+    is indistinguishable from a broken one until the day it matters.
+
+    This exercises the MECHANISM with a synthetic url. It does not put a real
+    one in the file: that is Marcelo's to paste, and inventing one would be
+    fabricating the evidence the test is supposed to check for."""
+
+    URL = "https://claude.ai/chat/00000000-0000-4000-8000-000000000000"
+
+    def _fixture(self):
+        import _context as ctx
+        import _model as model_mod
+        model = model_mod.Model.load(ROOT)
+        with open(os.path.join(ROOT, "state", "repos.json"),
+                  encoding="utf-8") as fh:
+            spec = {k: v for k, v in json.load(fh).items()
+                    if not k.startswith("_")}
+        return model, ctx.parse_register(ROOT), ctx.read_stamp(ROOT), spec
+
+    def test_a_pasted_url_reaches_the_prompt_for_that_task(self):
+        import kickoff as kickoff_mod
+        model, entries, stamp, spec = self._fixture()
+        node = model.nodes["GB-001"]
+        text = kickoff_mod.render(node, model, entries, stamp, spec, ROOT,
+                                  {"GB-001": [self.URL]}, volatile=True)
+        self.assertIn(self.URL, text,
+                      "a url he pasted in by hand never reached the one "
+                      "artifact that would show it to him again")
+        self.assertIn("Chats already working on this", text)
+
+    def test_it_reaches_only_that_task(self):
+        import kickoff as kickoff_mod
+        model, entries, stamp, spec = self._fixture()
+        other = kickoff_mod.render(model.nodes["GB-004"], model, entries,
+                                   stamp, spec, ROOT,
+                                   {"GB-001": [self.URL]}, volatile=True)
+        self.assertNotIn(self.URL, other)
+
+    def test_a_chat_url_is_never_republished(self):
+        """`R-062`. This repo is PUBLIC, `manual.yaml` is committed, and a chat
+        url is a private conversation identifier. `public/` records THAT a url
+        exists and where to read it; it must never carry the url itself."""
+        import kickoff as kickoff_mod
+        import publish as publish_mod
+        import _model as model_mod
+        real = kickoff_mod.load_manual
+        kickoff_mod.load_manual = lambda root: {"GB-001": [self.URL]}
+        target = tempfile.mkdtemp(prefix="po-manual-")
+        try:
+            publish_mod.generate(ROOT, model_mod.Model.load(ROOT), target)
+            scanned, leaked = 0, []
+            for base, _dirs, files in os.walk(target):
+                for name in files:
+                    path = os.path.join(base, name)
+                    scanned += 1
+                    with open(path, encoding="utf-8", errors="replace") as fh:
+                        if self.URL in fh.read():
+                            leaked.append(os.path.relpath(path, target))
+            # R-075: a walk of nothing would pass the assertion below it.
+            self.assertGreater(scanned, 50,
+                               "scanned %d files -- the surface did not "
+                               "generate" % scanned)
+            self.assertEqual(leaked, [],
+                             "a chat url reached the public surface")
+        finally:
+            kickoff_mod.load_manual = real
+            shutil.rmtree(target, ignore_errors=True)
+
+    def test_the_file_is_still_empty_of_urls(self):
+        """States the gap rather than hiding it. When Marcelo pastes his first
+        url this fails, and that failure is the reminder to delete the test."""
+        path = os.path.join(ROOT, "state", "threads", "manual.yaml")
+        urls = [ln for ln in open(path, encoding="utf-8").read().splitlines()
+                if ln.strip() and not ln.strip().startswith("#")
+                and ":" in ln and "http" in ln]
+        self.assertEqual(urls, [],
+                         "manual.yaml now has real urls -- the mechanism is "
+                         "exercised for real, so delete this test")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
