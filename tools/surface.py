@@ -4,10 +4,29 @@
     python3 tools/surface.py            write public/index.html
     python3 tools/surface.py --out DIR
 
-Named `surface`, not `site`: `site` is a stdlib module that CPython imports
-during interpreter startup, and every tool here does
-`sys.path.insert(0, "tools")`. A module called `site.py` on that path shadows
-it. The plan said `site.py`; the interpreter disagrees, and it wins.
+Named `surface`, not `site`, and the mechanism is worth stating correctly
+because an earlier version of this docstring got it wrong.
+
+`site` is a stdlib module CPython imports during interpreter startup. Measured,
+three ways:
+
+    sys.path.insert(0, "tools") at runtime   NO shadow -- by then `site` is
+                                             already in sys.modules
+    running a script from inside tools/      NO shadow, same reason
+    PYTHONPATH=tools                         the real trigger
+
+and the trigger has two outcomes, of which the quiet one is worse:
+
+    the shadowing module RAISES         the interpreter dies at startup
+    it imports cleanly                  it BOOTS, stdlib `site` is silently
+                                        replaced, and site-packages is never
+                                        set up
+
+So the danger is not "every tool here shadows it" -- that claim was false --
+and it is not only "the interpreter refuses to boot". It is that under
+PYTHONPATH the failure can be completely silent, which is the shape this
+repository exists to refuse. The plan said `site.py`; the interpreter wins,
+and the design calls this file a surface anyway.
 
 Built to `Product OS Surfaces v2`. Four sections in this order -- TL;DR,
 backlog, closures, chats -- because the daily action is what he opens the page

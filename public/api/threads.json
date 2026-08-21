@@ -15,16 +15,16 @@
           "Q-007",
           "Q-011"
         ],
-        "claude_files_read": 6,
+        "claude_files_read": 8,
         "codex_files_read": 1108,
         "generation_collisions": 1,
         "malformed_lines_skipped": 0,
-        "self_transcripts_scoped_to_own_project": 3,
+        "self_transcripts_scoped_to_own_project": 4,
         "sidechains_excluded": 0,
-        "threads_bound_to_items": 3,
+        "threads_bound_to_items": 5,
         "unreadable_files": 0
       },
-      "generated": "2026-08-19",
+      "generated": "2026-08-21",
       "machine": "work-laptop",
       "redacted": [
         "command",
@@ -46,15 +46,20 @@
             "POS-004",
             "POS-005",
             "POS-006",
-            "POS-007"
+            "POS-007",
+            "POS-008",
+            "POS-009",
+            "POS-010",
+            "POS-011",
+            "POS-012"
           ],
-          "last_active": "2026-08-19T21:26:32.299Z",
-          "prompts": 12,
-          "started": "2026-08-19T17:36:50.201Z",
-          "title": "Product-OS slice 1a-minus seed",
+          "last_active": "2026-08-21T17:20:19.380Z",
+          "prompts": 16,
+          "started": "2026-08-20T21:07:54.725Z",
+          "title": "Tool rebuild around refined model",
           "tool": "claude-code",
           "verdict": "resume",
-          "verdict_reason": "0 day(s) old, this machine, and nothing has landed in product-os since"
+          "verdict_reason": "last active 2026-08-21, and nothing has landed in product-os since"
         },
         {
           "branch": "main",
@@ -68,15 +73,112 @@
             "POS-004",
             "POS-005",
             "POS-006",
-            "POS-007"
+            "POS-007",
+            "POS-008",
+            "POS-009",
+            "POS-010",
+            "POS-011",
+            "POS-012"
           ],
-          "last_active": "2026-08-19T21:26:25.648Z",
-          "prompts": 32,
+          "last_active": "2026-08-21T17:08:11.882Z",
+          "prompts": 123,
           "started": "2026-08-18T23:29:52.603Z",
           "title": "BOOTSTRAP.md setup plan",
           "tool": "claude-code",
+          "verdict": "restart",
+          "verdict_reason": "123 prompts \u2014 long enough that its early context is noise"
+        },
+        {
+          "branch": "claude/lucid-mclaren-2df227",
+          "cited_unknown": [],
+          "files": 1,
+          "forks": 0,
+          "items": [
+            "APP-001",
+            "DEC-003",
+            "DEC-012",
+            "DEC-013",
+            "DEC-014",
+            "DEC-015",
+            "DEC-016",
+            "DEC-101",
+            "DEC-102",
+            "DEC-201",
+            "EL-001",
+            "EL-002",
+            "EL-003",
+            "EL-004",
+            "EL-005",
+            "GB-001",
+            "GB-002",
+            "GB-003",
+            "GB-004",
+            "GB-005",
+            "GB-006",
+            "GB-007",
+            "GB-008",
+            "GB-009",
+            "GB-010",
+            "GB-011",
+            "GB-012",
+            "GB-013",
+            "GB-014",
+            "HAI-001",
+            "POS-001",
+            "POS-002",
+            "POS-003",
+            "POS-004",
+            "POS-005",
+            "POS-006",
+            "POS-007",
+            "POS-008",
+            "POS-009",
+            "POS-010",
+            "POS-011",
+            "POS-012",
+            "Q-001",
+            "Q-002",
+            "Q-003",
+            "Q-004",
+            "Q-005",
+            "SITE-001",
+            "SITE-002",
+            "SITE-003"
+          ],
+          "last_active": "2026-08-19T23:43:21.029Z",
+          "prompts": 5,
+          "started": "2026-08-19T22:23:57.784Z",
+          "title": "Fix stale product-os entry in state/repos.json",
+          "tool": "claude-code",
           "verdict": "resume",
-          "verdict_reason": "0 day(s) old, this machine, and nothing has landed in product-os since"
+          "verdict_reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first"
+        },
+        {
+          "branch": "main",
+          "cited_unknown": [],
+          "files": 1,
+          "forks": 0,
+          "items": [
+            "POS-001",
+            "POS-002",
+            "POS-003",
+            "POS-004",
+            "POS-005",
+            "POS-006",
+            "POS-007",
+            "POS-008",
+            "POS-009",
+            "POS-010",
+            "POS-011",
+            "POS-012"
+          ],
+          "last_active": "2026-08-19T23:42:56.106Z",
+          "prompts": 19,
+          "started": "2026-08-19T17:36:50.201Z",
+          "title": "Product-OS slice 1a-minus seed",
+          "tool": "claude-code",
+          "verdict": "resume",
+          "verdict_reason": "last active 2026-08-19, and nothing has landed in product-os since"
         },
         {
           "branch": "main",
@@ -92,7 +194,7 @@
           "title": "Product-OS slice 1a-minus build",
           "tool": "claude-code",
           "verdict": "resume",
-          "verdict_reason": "0 day(s) old, this machine, and nothing has landed in product-os since"
+          "verdict_reason": "last active 2026-08-19, and nothing has landed in product-os since"
         },
         {
           "branch": "main",
@@ -117,8 +219,8 @@
           "started": "2026-08-18T22:28:57.624Z",
           "title": "Project planning and chat organization tool",
           "tool": "claude-code",
-          "verdict": "resume",
-          "verdict_reason": "1 day(s) old, this machine, and nothing has landed in engineered-lighting-site since"
+          "verdict": "restart",
+          "verdict_reason": "last active 2026-08-18; engineered-lighting-site has commits after that, so its model of the repo is provably behind and the brief is not"
         },
         {
           "branch": null,
@@ -132,7 +234,7 @@
           "title": "Implement guided recovery",
           "tool": "codex",
           "verdict": "restart",
-          "verdict_reason": "16 days stale (threshold 7)"
+          "verdict_reason": "last active 2026-08-03, more than 7 days before this index ran"
         },
         {
           "branch": "HEAD",
@@ -146,7 +248,7 @@
           "title": "Engineered Lighting MkDocs site build",
           "tool": "claude-code",
           "verdict": "restart",
-          "verdict_reason": "engineered-lighting-site has commits after this chat's last message \u2014 its model of the repo is provably behind, and the brief is not"
+          "verdict_reason": "last active 2026-07-29; engineered-lighting-site has commits after that, so its model of the repo is provably behind and the brief is not"
         },
         {
           "branch": null,
@@ -160,7 +262,7 @@
           "title": "Parse CAP Entitlements docs",
           "tool": "codex",
           "verdict": "restart",
-          "verdict_reason": "26 days stale (threshold 7)"
+          "verdict_reason": "last active 2026-07-24, more than 7 days before this index ran"
         },
         {
           "branch": null,
@@ -174,7 +276,7 @@
           "title": "Fix premium mission slot eligibility",
           "tool": "codex",
           "verdict": "restart",
-          "verdict_reason": "27 days stale (threshold 7)"
+          "verdict_reason": "last active 2026-07-23, more than 7 days before this index ran"
         },
         {
           "branch": null,
@@ -188,7 +290,7 @@
           "title": "Plan Apple Music playlist tool",
           "tool": "codex",
           "verdict": "restart",
-          "verdict_reason": "28 days stale (threshold 7)"
+          "verdict_reason": "last active 2026-07-22, more than 7 days before this index ran"
         },
         {
           "branch": null,
@@ -202,7 +304,7 @@
           "title": "Confirm smart home context",
           "tool": "codex",
           "verdict": "restart",
-          "verdict_reason": "29 days stale (threshold 7)"
+          "verdict_reason": "last active 2026-07-21, more than 7 days before this index ran"
         },
         {
           "branch": null,
@@ -216,7 +318,7 @@
           "title": "Compare Parallels alternatives",
           "tool": "codex",
           "verdict": "restart",
-          "verdict_reason": "30 days stale (threshold 7)"
+          "verdict_reason": "last active 2026-07-20, more than 7 days before this index ran"
         },
         {
           "branch": null,
@@ -230,7 +332,7 @@
           "title": "Plan Paulinho playlist tool",
           "tool": "codex",
           "verdict": "restart",
-          "verdict_reason": "37 days stale (threshold 7)"
+          "verdict_reason": "last active 2026-07-13, more than 7 days before this index ran"
         },
         {
           "branch": "HEAD",
@@ -244,11 +346,11 @@
           "title": "V-JEPA 2.1 home context training",
           "tool": "claude-code",
           "verdict": "restart",
-          "verdict_reason": "70 days stale (threshold 7)"
+          "verdict_reason": "last active 2026-06-10, more than 7 days before this index ran"
         }
       ],
       "tool_counts": {
-        "claude-code": 6,
+        "claude-code": 8,
         "codex": 7
       }
     }
@@ -262,13 +364,294 @@
   "manual_urls": {},
   "note": "A RESUME verdict with no way back is a dead end. Web chats have no CLI, so a pointer is written by hand -- split: PRESENCE is public: which task has a chat, which machine holds it, and when it was recorded. THE URL IS LOCAL, wherever it is written \u2014 never a tracked file, never a GitHub issue, never a generated page.",
   "return_paths": {
+    "APP-001": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "EL-001": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "EL-002": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "EL-003": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "EL-004": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "EL-005": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "GB-001": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "GB-002": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "GB-003": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "GB-004": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "GB-005": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "GB-006": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "GB-007": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "GB-008": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "GB-009": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "GB-010": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "GB-011": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "GB-012": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "GB-013": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "GB-014": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "HAI-001": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
     "POS-001": [
       {
         "command": null,
         "id": null,
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
+        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "title": "Tool rebuild around refined model",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": null,
+        "id": null,
+        "machine": "work-laptop",
+        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "title": "BOOTSTRAP.md setup plan",
+        "tool": "claude-code",
+        "verdict": "restart"
+      },
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19, and nothing has landed in product-os since",
         "title": "Product-OS slice 1a-minus seed",
         "tool": "claude-code",
         "verdict": "resume"
@@ -278,17 +661,7 @@
         "id": null,
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
-        "title": "BOOTSTRAP.md setup plan",
-        "tool": "claude-code",
-        "verdict": "resume"
-      },
-      {
-        "command": null,
-        "id": null,
-        "local_only": true,
-        "machine": "work-laptop",
-        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
+        "reason": "last active 2026-08-19, and nothing has landed in product-os since",
         "title": "Product-OS slice 1a-minus build",
         "tool": "claude-code",
         "verdict": "resume"
@@ -300,8 +673,27 @@
         "id": null,
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
-        "title": "Product-OS slice 1a-minus seed",
+        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "title": "Tool rebuild around refined model",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": null,
+        "id": null,
+        "machine": "work-laptop",
+        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "title": "BOOTSTRAP.md setup plan",
+        "tool": "claude-code",
+        "verdict": "restart"
+      },
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
         "tool": "claude-code",
         "verdict": "resume"
       },
@@ -310,8 +702,8 @@
         "id": null,
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
-        "title": "BOOTSTRAP.md setup plan",
+        "reason": "last active 2026-08-19, and nothing has landed in product-os since",
+        "title": "Product-OS slice 1a-minus seed",
         "tool": "claude-code",
         "verdict": "resume"
       }
@@ -322,8 +714,27 @@
         "id": null,
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
-        "title": "Product-OS slice 1a-minus seed",
+        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "title": "Tool rebuild around refined model",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": null,
+        "id": null,
+        "machine": "work-laptop",
+        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "title": "BOOTSTRAP.md setup plan",
+        "tool": "claude-code",
+        "verdict": "restart"
+      },
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
         "tool": "claude-code",
         "verdict": "resume"
       },
@@ -332,8 +743,8 @@
         "id": null,
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
-        "title": "BOOTSTRAP.md setup plan",
+        "reason": "last active 2026-08-19, and nothing has landed in product-os since",
+        "title": "Product-OS slice 1a-minus seed",
         "tool": "claude-code",
         "verdict": "resume"
       }
@@ -344,8 +755,27 @@
         "id": null,
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
-        "title": "Product-OS slice 1a-minus seed",
+        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "title": "Tool rebuild around refined model",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": null,
+        "id": null,
+        "machine": "work-laptop",
+        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "title": "BOOTSTRAP.md setup plan",
+        "tool": "claude-code",
+        "verdict": "restart"
+      },
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
         "tool": "claude-code",
         "verdict": "resume"
       },
@@ -354,8 +784,8 @@
         "id": null,
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
-        "title": "BOOTSTRAP.md setup plan",
+        "reason": "last active 2026-08-19, and nothing has landed in product-os since",
+        "title": "Product-OS slice 1a-minus seed",
         "tool": "claude-code",
         "verdict": "resume"
       }
@@ -366,8 +796,27 @@
         "id": null,
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
-        "title": "Product-OS slice 1a-minus seed",
+        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "title": "Tool rebuild around refined model",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": null,
+        "id": null,
+        "machine": "work-laptop",
+        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "title": "BOOTSTRAP.md setup plan",
+        "tool": "claude-code",
+        "verdict": "restart"
+      },
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
         "tool": "claude-code",
         "verdict": "resume"
       },
@@ -376,8 +825,8 @@
         "id": null,
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
-        "title": "BOOTSTRAP.md setup plan",
+        "reason": "last active 2026-08-19, and nothing has landed in product-os since",
+        "title": "Product-OS slice 1a-minus seed",
         "tool": "claude-code",
         "verdict": "resume"
       }
@@ -388,8 +837,27 @@
         "id": null,
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
-        "title": "Product-OS slice 1a-minus seed",
+        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "title": "Tool rebuild around refined model",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": null,
+        "id": null,
+        "machine": "work-laptop",
+        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "title": "BOOTSTRAP.md setup plan",
+        "tool": "claude-code",
+        "verdict": "restart"
+      },
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
         "tool": "claude-code",
         "verdict": "resume"
       },
@@ -398,8 +866,8 @@
         "id": null,
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
-        "title": "BOOTSTRAP.md setup plan",
+        "reason": "last active 2026-08-19, and nothing has landed in product-os since",
+        "title": "Product-OS slice 1a-minus seed",
         "tool": "claude-code",
         "verdict": "resume"
       }
@@ -410,8 +878,27 @@
         "id": null,
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
-        "title": "Product-OS slice 1a-minus seed",
+        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "title": "Tool rebuild around refined model",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": null,
+        "id": null,
+        "machine": "work-laptop",
+        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "title": "BOOTSTRAP.md setup plan",
+        "tool": "claude-code",
+        "verdict": "restart"
+      },
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
         "tool": "claude-code",
         "verdict": "resume"
       },
@@ -420,8 +907,309 @@
         "id": null,
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "0 day(s) old, this machine, and nothing has landed in product-os since",
+        "reason": "last active 2026-08-19, and nothing has landed in product-os since",
+        "title": "Product-OS slice 1a-minus seed",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "POS-008": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "title": "Tool rebuild around refined model",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": null,
+        "id": null,
+        "machine": "work-laptop",
+        "reason": "123 prompts \u2014 long enough that its early context is noise",
         "title": "BOOTSTRAP.md setup plan",
+        "tool": "claude-code",
+        "verdict": "restart"
+      },
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19, and nothing has landed in product-os since",
+        "title": "Product-OS slice 1a-minus seed",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "POS-009": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "title": "Tool rebuild around refined model",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": null,
+        "id": null,
+        "machine": "work-laptop",
+        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "title": "BOOTSTRAP.md setup plan",
+        "tool": "claude-code",
+        "verdict": "restart"
+      },
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19, and nothing has landed in product-os since",
+        "title": "Product-OS slice 1a-minus seed",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "POS-010": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "title": "Tool rebuild around refined model",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": null,
+        "id": null,
+        "machine": "work-laptop",
+        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "title": "BOOTSTRAP.md setup plan",
+        "tool": "claude-code",
+        "verdict": "restart"
+      },
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19, and nothing has landed in product-os since",
+        "title": "Product-OS slice 1a-minus seed",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "POS-011": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "title": "Tool rebuild around refined model",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": null,
+        "id": null,
+        "machine": "work-laptop",
+        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "title": "BOOTSTRAP.md setup plan",
+        "tool": "claude-code",
+        "verdict": "restart"
+      },
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19, and nothing has landed in product-os since",
+        "title": "Product-OS slice 1a-minus seed",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "POS-012": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "title": "Tool rebuild around refined model",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": null,
+        "id": null,
+        "machine": "work-laptop",
+        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "title": "BOOTSTRAP.md setup plan",
+        "tool": "claude-code",
+        "verdict": "restart"
+      },
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      },
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19, and nothing has landed in product-os since",
+        "title": "Product-OS slice 1a-minus seed",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "Q-001": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "Q-002": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "Q-003": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "Q-004": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "Q-005": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "SITE-001": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "SITE-002": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
+        "tool": "claude-code",
+        "verdict": "resume"
+      }
+    ],
+    "SITE-003": [
+      {
+        "command": null,
+        "id": null,
+        "local_only": true,
+        "machine": "work-laptop",
+        "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
+        "title": "Fix stale product-os entry in state/repos.json",
         "tool": "claude-code",
         "verdict": "resume"
       }

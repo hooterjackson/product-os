@@ -107,7 +107,28 @@ def resume_command(thread):
 
 
 def verdict_for(thread, today, latest_commit, repo_for_cwd):
-    """RESUME, RESTART, or a stated reason for neither."""
+    """RESUME, RESTART, and a reason that states ABSOLUTE facts.
+
+    The reason is FROZEN INTO THE SHARD and the shard is committed and
+    published, so anything relative in it rots silently. Measured 2026-08-21:
+    `public/` carried 40 occurrences of "0 day(s) old" -- true on the 19th, two
+    days wrong by then -- and 67 of "this machine", which names whichever box
+    ran the indexer, across 32 files.
+
+    Both are the same rule the generator already obeys, arriving in STORED
+    DATA where a published-surface check cannot reach: **a committed string may
+    not carry a relative age or point at "here".**
+
+    And the failure shape is why it needed a rule rather than a fix.
+    `publish.py --check` regenerates from the frozen shard, gets the identical
+    string back, and stays green -- so unlike `R-061`, which broke loudly the
+    moment it was committed, this rots for as long as nobody re-runs the
+    indexer.
+
+    So: no ages, no deixis. The date the chat was last active, and what has
+    landed since. The reader computes the rest, exactly as `data-audit-date`
+    already lets the browser do.
+    """
     last = (thread.get("last_active") or "")[:10]
     if not last:
         return "restart", "no last-activity timestamp — cannot tell how stale it is"
@@ -124,21 +145,24 @@ def verdict_for(thread, today, latest_commit, repo_for_cwd):
 
     if landed:
         return ("restart",
-                "%s has commits after this chat's last message — its model of "
-                "the repo is provably behind, and the brief is not" % repo)
+                "last active %s; %s has commits after that, so its model of "
+                "the repo is provably behind and the brief is not"
+                % (last, repo))
     if age > STALE_DAYS:
-        return "restart", "%d days stale (threshold %d)" % (age, STALE_DAYS)
+        return ("restart",
+                "last active %s, more than %d days before this index ran"
+                % (last, STALE_DAYS))
     if (thread.get("prompts") or 0) > LONG_PROMPTS:
         return ("restart",
                 "%d prompts — long enough that its early context is noise"
                 % thread["prompts"])
     if landed is None:
         return ("resume",
-                "%d day(s) old, this machine; could NOT check whether work "
-                "landed in its repo — resume, but re-read the brief first" % age)
+                "last active %s; could NOT check whether work landed in its "
+                "repo — resume, but re-read the brief first" % last)
     return ("resume",
-            "%d day(s) old, this machine, and nothing has landed in %s since"
-            % (age, repo or "its repo"))
+            "last active %s, and nothing has landed in %s since"
+            % (last, repo or "its repo"))
 
 # Keys that must never appear, at any depth, in a shard.
 FORBIDDEN_KEY = re.compile(r"(?i)message|content|text|body|prompt_text|summary")
@@ -436,6 +460,21 @@ def index_claude(root, known, stats, exclude_cwd):
 
 # --- shard ------------------------------------------------------------------
 
+# Words, not syntax. E-PUBLIC-SESSION-ID, E-PUBLIC-HOME-DIR and
+# E-PUBLIC-LOCAL-PATH are all structural -- uuids, usernames, paths -- and none
+# of them can see a sentence that is merely no longer true.
+FROZEN_CLAIM = re.compile(
+    r"(?i)\bthis machine\b|\bday\(s\) old\b|\b\d+\s+days?\s+(?:old|stale|ago)\b"
+    r"|\btoday\b|\byesterday\b|\bright now\b")
+
+
+def frozen_claim(text):
+    """The offending phrase, or None. A reason is frozen into a committed file,
+    so it may not carry a relative age or point at "here"."""
+    found = FROZEN_CLAIM.search(text or "")
+    return found.group(0) if found else None
+
+
 def clean(thread):
     """Enforce the allowlist at the point of writing, not by convention."""
     out = {}
@@ -514,8 +553,18 @@ def build(root, machine):
         thread["verdict_reason"] = reason
         thread["command"] = resume_command(thread) if verdict == "resume" else None
         if verdict == "resume" and not thread["command"]:
-            thread["verdict_reason"] += (" · no verified command on this machine "
-                                         "— open it from the app's session picker")
+            thread["verdict_reason"] += (
+                " · no verified way back was found when this index ran — open "
+                "it from the app's own session picker")
+    for thread in threads:
+        offence = frozen_claim(thread.get("verdict_reason") or "")
+        if offence:
+            raise SystemExit(
+                "refusing to write the shard: a verdict reason says %r.\n"
+                "This string is committed and published, so a relative age "
+                "rots silently and \"this machine\" names whichever box ran "
+                "the indexer. State the date; let the reader compute the rest."
+                % offence)
     threads = [clean(t) for t in threads]
     threads.sort(key=lambda t: (t.get("last_active") or "", t.get("id") or ""),
                  reverse=True)

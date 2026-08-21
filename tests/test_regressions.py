@@ -2150,5 +2150,92 @@ class ThePagesWorkflowRefusesToDeployARejectedSurface(unittest.TestCase):
             self.assertIn("fetch-depth: 0", fh.read())
 
 
+class NoFrozenClaimReachesTheShard(unittest.TestCase):
+    """`R-077`. Three fixes removed "here" from the generator and left 67 of
+    them in the data.
+
+    `verdict_for()` froze "0 day(s) old, this machine, and nothing has landed
+    in product-os since" into the committed shard: 67 occurrences of "this
+    machine" across 32 published files, 40 of "0 day(s) old" that were two days
+    wrong, and validate.py reporting 0 errors throughout.
+
+    The structural guards could not see it. E-PUBLIC-SESSION-ID,
+    E-PUBLIC-HOME-DIR and E-PUBLIC-LOCAL-PATH match uuids, usernames and paths;
+    by then the rule was about WORDS. A structural check cannot enforce a
+    semantic rule, and the gap is where the instance lived."""
+
+    def test_the_guard_is_at_the_write_site(self):
+        """A published-surface check cannot repair a string state/ already
+        holds — it can only refuse to ship it, by which point the data is
+        still wrong."""
+        import index as index_mod
+        self.assertTrue(hasattr(index_mod, "frozen_claim"))
+        for bad in ("0 day(s) old, this machine", "3 days stale",
+                    "this machine", "2 days ago", "today", "right now"):
+            self.assertIsNotNone(index_mod.frozen_claim(bad), bad)
+        for good in ("last active 2026-08-19, and nothing has landed since",
+                     "last active 2026-08-12, more than 7 days before this "
+                     "index ran",
+                     "123 prompts — long enough that its early context is noise"):
+            self.assertIsNone(index_mod.frozen_claim(good), good)
+
+    def test_the_committed_shards_carry_no_frozen_claim(self):
+        import index as index_mod
+        shards = glob.glob(os.path.join(ROOT, "state", "threads",
+                                        "by-machine", "*.json"))
+        self.assertTrue(shards, "no shard to check")                  # R-075
+        checked = 0
+        for path in shards:
+            with open(path, encoding="utf-8") as fh:
+                shard = json.load(fh)
+            for thread in shard.get("threads") or []:
+                checked += 1
+                reason = thread.get("verdict_reason") or ""
+                self.assertIsNone(index_mod.frozen_claim(reason),
+                                  "%s: %r" % (os.path.basename(path), reason))
+        self.assertGreater(checked, 5, "the scan did not run")        # R-075
+
+    def test_a_claim_never_reaches_the_published_surface(self):
+        """A PLACEHOLDER may say it. `attach/*.md` carries
+        `<this machine> <today, YYYY-MM-DD>`: angle-bracketed instructions
+        telling the reader what to type, and deixis in an instruction resolves
+        against the reader, which is the intent. The rule is about claims."""
+        scanned, offenders = 0, []
+        for base, _dirs, files in os.walk(os.path.join(ROOT, "public")):
+            for name in files:
+                if not name.endswith((".md", ".html", ".json", ".txt")):
+                    continue
+                scanned += 1
+                path = os.path.join(base, name)
+                with open(path, encoding="utf-8", errors="replace") as fh:
+                    text = fh.read()
+                stripped = re.sub(r"<[^>\n]{0,40}>", " ", text)
+                for phrase in ("day(s) old", "days stale", "this machine"):
+                    if phrase in stripped:
+                        offenders.append("%s: %s" % (name, phrase))
+        self.assertGreater(scanned, 20, "the scan did not run")       # R-075
+        self.assertEqual(sorted(set(offenders)), [],
+                         "a frozen claim reached the published surface")
+
+
+class TheSurfaceNameIsExplainedCorrectly(unittest.TestCase):
+    """`R-077`'s sibling: a comment that teaches a false model. The docstring
+    claimed `sys.path.insert(0, "tools")` shadows the stdlib `site` module. It
+    does not — by then `site` is already in sys.modules. PYTHONPATH is the
+    trigger, and it either kills the interpreter or, if the shadowing module
+    imports cleanly, boots with site-packages silently never set up."""
+
+    def test_the_docstring_names_pythonpath_not_the_runtime_insert(self):
+        with open(os.path.join(ROOT, "tools", "surface.py"),
+                  encoding="utf-8") as fh:
+            head = fh.read()[:3000]
+        self.assertIn("PYTHONPATH", head)
+        self.assertIn("NO shadow", head,
+                      "the docstring must say the runtime insert is harmless")
+        self.assertIn("site-packages", head,
+                      "the silent outcome is the dangerous one and must be "
+                      "the one recorded")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

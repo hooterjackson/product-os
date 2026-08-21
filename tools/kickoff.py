@@ -358,8 +358,14 @@ def render(node, model, entries, stamp, repos_spec, root, manual,
                              % (" on %s" % row["machine"] if row["machine"]
                                 else "", MANUAL_LOCAL))
             elif row["verdict"] == "resume":
-                lines.append("  No verified way back on this machine. Open it "
-                             "from the app's own session picker.")
+                # Names the machine rather than saying "this machine". Latent
+                # rather than live -- every resume currently carries a command
+                # -- but a claim about the reader's box in a committed file is
+                # the same defect whether or not it happens to render today.
+                lines.append("  No verified way back was found%s. Open it from "
+                             "the app's own session picker."
+                             % (" on %s" % row["machine"] if row.get("machine")
+                                else ""))
     else:
         lines.append("None indexed. Starting fresh is correct.")
         lines.append("If you are in a web chat, record it so it is reachable "

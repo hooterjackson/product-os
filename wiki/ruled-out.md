@@ -1470,3 +1470,47 @@ to one of two sources by construction.
 disclosure, do not ask "where is this string" — ask **"what are all the routes
 this KIND of data can take to a reader who should not have it."** Then fix the
 class. Counting the instances you can see is how all three of these shipped.
+
+## R-077 · A rule enforced on syntax when the rule is about words
+**keywords:** frozen · stale · relative · age · deixis · this-machine · verdict · shard · stored · data · guard · syntax · words · index · publish · rot
+**source:** product-os `tools/index.py:109` @ `ca07429` · 2026-08-21 · grade: measured
+
+**Three fixes removed "here" from the generator and left 67 of them in the
+data.** `verdict_for()` froze `"0 day(s) old, this machine, and nothing has
+landed in product-os since"` into the committed thread shard. Measured on a
+green tree: **67 occurrences of "this machine" across 32 files** under
+`public/`, and **40 of "0 day(s) old"** — true on 19 Aug, two days wrong by
+21 Aug — while `validate.py` reported 0 errors.
+
+**The guards could not see it, and that is the finding.**
+`E-PUBLIC-SESSION-ID`, `E-PUBLIC-HOME-DIR` and `E-PUBLIC-LOCAL-PATH` are all
+**structural** — uuids, usernames, rooted paths. By this point the rule had
+become *a committed string may not carry a relative age or point at "here"*,
+which is about **words**, and none of those patterns can see a sentence whose
+only defect is that it is no longer true.
+
+**The failure shape is worse than `R-061`'s, in the one way that matters.**
+`R-061` broke loudly: the commit that published the counter invalidated it, so
+`--check` went red immediately. This one regenerates from the frozen shard,
+gets the identical string back, and stays **green** — it rots for as long as
+nobody re-runs the indexer, and nothing anywhere reports it.
+
+**Fix at the WRITE site, never the publish site.** A published-surface check
+cannot repair a string `state/` already holds; it can only refuse to ship it,
+by which point the data is still wrong. `index.py` now emits absolute facts —
+`last active 2026-08-19, and nothing has landed in product-os since` — and
+`frozen_claim()` refuses to write a shard containing a relative age or a
+deictic phrase at all.
+
+**One exception, and it is principled: a PLACEHOLDER may say "this machine".**
+27 occurrences survive in `attach/*.md` as `<this machine> <today,
+YYYY-MM-DD>`. Those are angle-bracketed instructions telling the reader what to
+type, and deixis in an instruction **resolves against the reader**, which is
+exactly the intent. The rule is about claims, not about the words.
+
+**The generalisation.** Every time this class recurred, the rule moved a level
+up and the enforcement stayed where it was: from a chat url, to a path, to a
+claim about the reader's filesystem, to a comparison with the reader's machine,
+to a sentence in stored data. **When a rule generalises, its guard has to
+generalise with it — a structural check cannot enforce a semantic rule**, and
+the gap between them is exactly where the next instance lives.
