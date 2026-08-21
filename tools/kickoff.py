@@ -31,7 +31,8 @@ import _model
 import _context
 
 MAX_RULED_OUT = 4
-MANUAL = "state/threads/manual.yaml"
+MANUAL = "state/threads/manual.yaml"          # tracked: presence only
+MANUAL_LOCAL = "state/threads/manual.local.yaml"   # gitignored: the urls
 
 
 def clip(text, limit):
@@ -44,19 +45,9 @@ def clip(text, limit):
     return cut + " …"
 
 
-def load_manual(root):
-    """Chat URLs Marcelo pasted in once, keyed by item ID or thread id.
-
-    `state/threads/manual.yaml` was reserved in the spec for exactly this and
-    had never been written to. A web chat has no CLI and no session file, so
-    without this a cloud thread is unreachable forever -- and a RESUME verdict
-    with no way to resume is a dead end wearing a green label.
-
-    Deliberately a flat `key: url` list, parsed in eight lines. No YAML
-    dependency, and he can add a line from a phone.
-    """
-    path = os.path.join(root, MANUAL)
-    out = {}
+def _pairs(path):
+    """`key: value` lines, comments stripped. Eight lines, no YAML dependency."""
+    out = []
     if not os.path.exists(path):
         return out
     with open(path, "r", encoding="utf-8") as fh:
@@ -64,11 +55,71 @@ def load_manual(root):
             line = line.split("#", 1)[0].strip()
             if not line or ":" not in line:
                 continue
-            key, _, url = line.partition(":")
-            url = url.strip()
-            if url:
-                out.setdefault(key.strip().upper(), []).append(url)
+            key, _, value = line.partition(":")
+            value = value.strip()
+            if value:
+                out.append((key.strip().upper(), value))
     return out
+
+
+def load_manual(root):
+    """Web-chat pointers, SPLIT: presence is committed, the url is not.
+
+    A web chat has no transcript on disk, so a hand-written pointer is the only
+    record that will ever exist of it. But this repo is PUBLIC and
+    `manual.yaml` is tracked, so pasting a url there publishes a link to a
+    private conversation -- the same class `R-062` removed from `public/`,
+    arriving by a third route into authored state, where the generated
+    surface's redaction cannot reach.
+
+    So two files:
+
+        state/threads/manual.yaml        TRACKED    `GB-001: work-laptop 2026-08-20`
+        state/threads/manual.local.yaml  IGNORED    `GB-001: https://claude.ai/chat/...`
+
+    The tracked half syncs the honest signal -- a chat exists, on that machine,
+    since that date -- to every machine and to `public/`. The url stays on the
+    one machine that can open it anyway, since it needs his login.
+
+    Why not just gitignore the whole file: `public/` is generated wherever the
+    url is and would still say "recorded in manual.yaml", while that file was
+    empty everywhere else. A pointer to nothing is the green-label dead end the
+    verdict system exists to prevent.
+
+    Why not a hash or a bare id: `claude.ai/chat/<uuid>` is a known template,
+    so publishing the uuid publishes the url minus a prefix anyone can supply;
+    and a one-way hash cannot be opened by him either, which destroys the
+    feature rather than protecting it.
+
+    Returns {ID: [{"url", "machine", "recorded"}]}. `url` is None on any
+    machine that does not hold it, and callers must render that as a stated
+    absence rather than as nothing.
+    """
+    entries = {}
+    for key, value in _pairs(os.path.join(root, MANUAL)):
+        parts = value.split()
+        entries.setdefault(key, []).append({
+            "url": None,
+            "machine": parts[0] if parts else None,
+            "recorded": parts[1] if len(parts) > 1 else None,
+        })
+    for key, url in _pairs(os.path.join(root, MANUAL_LOCAL)):
+        rows = entries.setdefault(key, [])
+        placed = False
+        for row in rows:
+            if row["url"] is None:
+                row["url"] = url
+                placed = True
+                break
+        if not placed:
+            rows.append({"url": url, "machine": None, "recorded": None})
+    return entries
+
+
+def redact_manual(manual):
+    """Presence without the url. What `public/` may carry."""
+    return {key: [dict(row, url=None) for row in rows]
+            for key, rows in manual.items()}
 
 
 def threads_for(root, item_id, manual):
@@ -96,10 +147,19 @@ def threads_for(root, item_id, manual):
                     "command": thread.get("command"),
                     "id": thread.get("id"),
                 })
-    for url in manual.get(item_id.upper(), []):
-        paths.append({"machine": None, "tool": "web", "title": "pasted URL",
-                      "verdict": "resume", "reason": "he recorded this URL",
-                      "command": None, "url": url, "id": None})
+    for entry in manual.get(item_id.upper(), []):
+        machine = entry.get("machine")
+        if entry.get("url"):
+            reason = "he recorded this URL"
+        elif machine:
+            reason = ("recorded on %s. The URL lives in %s there, which is not "
+                      "committed." % (machine, MANUAL_LOCAL))
+        else:
+            reason = "recorded, but no URL is available on this machine."
+        paths.append({"machine": machine, "tool": "web", "title": "pasted URL",
+                      "verdict": "resume", "reason": reason, "command": None,
+                      "url": entry.get("url"), "id": None,
+                      "web_only_elsewhere": not entry.get("url")})
     return paths
 
 
@@ -291,6 +351,12 @@ def render(node, model, entries, stamp, repos_spec, root, manual,
                                          node.id))
             elif row.get("url"):
                 lines.append("  %s" % row["url"])
+            elif row.get("web_only_elsewhere"):
+                lines.append("  A web chat is recorded%s. Its URL is in %s, "
+                             "which is deliberately not committed — open it "
+                             "from that machine."
+                             % (" on %s" % row["machine"] if row["machine"]
+                                else "", MANUAL_LOCAL))
             elif row["verdict"] == "resume":
                 lines.append("  No verified way back on this machine. Open it "
                              "from the app's own session picker.")

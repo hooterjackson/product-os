@@ -489,6 +489,35 @@ class Validator(object):
 
     # -- driver -------------------------------------------------------------
 
+    def check_manual_split(self):
+        """The tracked pointer file records PRESENCE; the url lives in the
+        git-ignored one.
+
+        Without this the split erodes the first time somebody pastes a url
+        into the wrong file, and the failure is silent -- a valid line, a
+        working return path, and a published link to a private conversation.
+        The generic `chat-url` disclosure pattern would also catch a claude.ai
+        or chatgpt.com url, but not a self-hosted or future one, and a
+        confusing error is a slower fix than a specific one.
+        """
+        path = os.path.join(self.root, "state", "threads", "manual.yaml")
+        if not os.path.exists(path):
+            return
+        with open(path, encoding="utf-8") as fh:
+            for number, line in enumerate(fh, 1):
+                bare = line.split("#", 1)[0].strip()
+                if not bare or ":" not in bare:
+                    continue
+                _key, _, value = bare.partition(":")
+                if "//" in value or value.strip().startswith("http"):
+                    self.error(
+                        "E-MANUAL-URL-TRACKED", "state/threads/manual.yaml",
+                        "this file is TRACKED and this repo is public, so a "
+                        "URL here is a published link to a private chat. "
+                        "Record `<machine> <date>` here and put the URL in "
+                        "state/threads/manual.local.yaml, which is ignored.",
+                        line=number)
+
     def check_thread_shards(self):
         """Thread shards carry METADATA ONLY, and this re-checks it here.
 
@@ -728,6 +757,7 @@ class Validator(object):
         self.check_proposal_refs()
         self.check_secrets()
         self.check_thread_shards()
+        self.check_manual_split()
         self.check_public_surface()
         self.check_public_is_machine_neutral()
         self.check_commit_identities()

@@ -298,14 +298,14 @@ def generate(root, model, target, volatile=False):
     fresh = freshness_block(root, stamp)
 
     # A chat URL is a private conversation identifier and this repo is PUBLIC
-    # (DEC-201). `state/threads/manual.yaml` is committed, so a URL there is
-    # already exposed -- the disclosure screen now says so and forces a
-    # conscious allowlist. What the derived surface must NOT do is multiply it
-    # across a dozen more files. public/ records THAT a URL exists and where to
-    # read it; build/ keeps the real thing, and build/ is git-ignored.
+    # (DEC-201). The url no longer lives in a tracked file at all -- presence
+    # is committed to `manual.yaml`, the url to the gitignored
+    # `manual.local.yaml`. This redaction stays anyway, because publish runs on
+    # the machine that HAS the urls: without it the loaded url would be written
+    # straight back out into `public/`. Belt and braces, and the braces are the
+    # part that was missing when this class shipped three times.
     manual = kickoff_mod.load_manual(root)
-    redacted = {k: ["(recorded in %s — not republished)" % kickoff_mod.MANUAL]
-                for k in manual}
+    redacted = kickoff_mod.redact_manual(manual)
 
     write(target, "llms.txt", root_llms(model, stamp, ordered))
     for slug, project in sorted(model.projects.items()):

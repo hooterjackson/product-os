@@ -13,3 +13,6 @@
 .DS_Store
 __pycache__/
 *.pyc
+
+# Web-chat URLs. Presence is tracked in manual.yaml; the URLs are not.
+state/threads/manual.local.yaml

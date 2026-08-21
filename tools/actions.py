@@ -32,6 +32,7 @@ import os
 import _fm
 
 MANUAL = "state/threads/manual.yaml"
+MANUAL_LOCAL = "state/threads/manual.local.yaml"
 
 
 def _shard_dates(root):
@@ -209,14 +210,25 @@ def attach(node, root, volatile=False):
         "There is no transcript of this conversation on disk, so the thread",
         "indexer will never find it on its own. Write the pointer by hand:",
         "",
-        "1. **Add a line to `%s`:**" % MANUAL,
+        "1. **Two lines, in two files. This split is deliberate:**",
+        "",
+        "   `%s` is TRACKED and this repo is PUBLIC, so a URL written there is" % MANUAL,
+        "   a published link to a private conversation. It records only that a",
+        "   chat exists:",
+        "",
+        "   ```",
+        "   %s: <this machine> <today, YYYY-MM-DD>" % node.id,
+        "   ```",
+        "",
+        "   `%s` is git-ignored. The URL goes there:" % MANUAL_LOCAL,
         "",
         "   ```",
         "   %s: <the URL of THIS chat, from your browser's address bar>" % node.id,
         "   ```",
         "",
-        "   Flat `key: url`, one per line. If you cannot see the URL, ask me",
-        "   for it — do not guess one.",
+        "   Flat `key: value`, one per line. If you cannot see the URL, ask me",
+        "   for it — do not guess one. **Never put the URL in the tracked",
+        "   file**, and never commit the local one.",
         "",
         "2. **Write what this chat actually achieved** into `%s`'s"
         % node.id,
@@ -232,7 +244,8 @@ def attach(node, root, volatile=False):
         "",
         "- **Do not write into `state/threads/by-machine/`.** Those shards are",
         "  regenerated wholesale by `tools/index.py` and your edit will be",
-        "  overwritten without warning. `%s` is the hand-written one." % MANUAL,
+        "  overwritten without warning. The two files above are the",
+        "  hand-written ones.",
         "- **Do not mark anything `done`** without an `evidence_found` entry —",
         "  a commit SHA, a file path, or a dated note.",
         "- **Do not write decided fields** (`project`, `gate`,",
