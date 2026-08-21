@@ -1369,5 +1369,134 @@ def _ids(text):
     return out
 
 
+class AWayInIsDerivedNeverTemplated(unittest.TestCase):
+    """Written BEFORE `site.py` exists, so the rule constrains it by
+    construction rather than by a review that might not happen.
+
+    Measured 2026-08-20: FOUR of the six repos in `state/repos.json` have
+    `local: null` -- HomeApp, genio, gimbal-bench and home-ai-infra are not
+    cloned on this Mac -- and `GB-001` is `machine_affinity: formd-t1`, a
+    Windows box. A card rendering `cd ~/Claude/<repo> && claude` from a
+    template is wrong for most of the portfolio and looks right.
+
+    `kickoff.py` did not have this bug in its repo section, but only BY
+    OMISSION: it names a repo and a machine and emits no path, so it cannot
+    emit a wrong one. That safety does not transfer to anything that wants to
+    offer a command, which is why the derivation lives in `_context.reach`."""
+
+    def _fixture(self):
+        import _model as model_mod
+        import new as new_mod
+        root = model_mod.find_root()
+        model = model_mod.Model.load(root)
+        with open(os.path.join(root, "state", "repos.json"),
+                  encoding="utf-8") as fh:
+            spec = {k: v for k, v in json.load(fh).items()
+                    if not k.startswith("_")}
+        return root, model, spec, new_mod.machine_id(root)
+
+    def test_a_command_only_ever_comes_back_for_a_clone_that_is_here(self):
+        import _context as ctx
+        root, model, spec, machine = self._fixture()
+        checked = 0
+        for node in model.nodes.values():
+            verdict = ctx.reach(node, model, spec, machine)
+            checked += 1
+            if verdict["command"] is None:
+                continue
+            # It offered a command. Every precondition must actually hold.
+            self.assertEqual(verdict["kind"], ctx.LOCAL, node.id)
+            affinity = node.get("machine_affinity")
+            self.assertIn(affinity, (None, machine),
+                          "%s is bound to %s and still got a command"
+                          % (node.id, affinity))
+            for name in verdict["repos"]:
+                local = (spec.get(name) or {}).get("local")
+                self.assertTrue(
+                    local and os.path.isdir(os.path.expanduser(local)),
+                    "%s got a command for %s, which is not cloned here"
+                    % (node.id, name))
+        self.assertGreater(checked, 20, "the sweep did not run")     # R-075
+
+    def test_an_uncloned_repo_yields_no_command(self):
+        """APP-001 -> HomeApp, `local: null`. The exact case a template breaks
+        on: no machine affinity, so nothing else stops it."""
+        import _context as ctx
+        root, model, spec, machine = self._fixture()
+        verdict = ctx.reach(model.nodes["APP-001"], model, spec, machine)
+        self.assertEqual(verdict["kind"], ctx.NO_CLONE)
+        self.assertIsNone(verdict["command"])
+
+    def test_machine_affinity_beats_a_local_clone(self):
+        """Checked before the clone test on purpose: a command that RUNS is not
+        a command that HELPS. Synthetic, because no real task currently pairs a
+        cloned repo with a foreign machine -- and that is exactly the
+        combination a future task will hit."""
+        import _context as ctx
+        root, model, spec, machine = self._fixture()
+        node = model.nodes["Q-005"]          # engineered-lighting-site, cloned
+        self.assertEqual(
+            ctx.reach(node, model, spec, machine)["kind"], ctx.LOCAL)
+        node.fm["machine_affinity"] = "formd-t1"
+        try:
+            verdict = ctx.reach(node, model, spec, machine)
+            self.assertEqual(verdict["kind"], ctx.ELSEWHERE)
+            self.assertIsNone(verdict["command"])
+            self.assertIn("formd-t1", verdict["reason"])
+        finally:
+            node.fm["machine_affinity"] = None
+
+    def test_a_project_with_no_repo_is_its_own_verdict(self):
+        import _context as ctx
+        root, model, spec, machine = self._fixture()
+        verdict = ctx.reach(model.nodes["HAI-001"], model, spec, machine)
+        self.assertEqual(verdict["kind"], ctx.NO_REPO)
+        self.assertIsNone(verdict["command"])
+        self.assertIn("says so", verdict["reason"])
+
+    def test_site_py_when_it_lands_must_use_the_derivation(self):
+        """The forward constraint. Skips today and stops skipping the moment
+        site.py appears -- a vacuous pass is `R-075`, so it says which it is."""
+        path = os.path.join(ROOT, "tools", "site.py")
+        if not os.path.exists(path):
+            self.skipTest("site.py does not exist yet; this guard is waiting")
+        with open(path, encoding="utf-8") as fh:
+            source = fh.read()
+        self.assertIn("reach(", source,
+                      "site.py builds a way-in without _context.reach -- the "
+                      "one thing this test exists to prevent")
+        self.assertNotIn("cd ~/", source, "site.py templates a local path")
+
+
+class NothingCommittedUnderPublicNamesThisMachine(unittest.TestCase):
+    """`public/` is served to every machine, so nothing in it may name this
+    one. Shipped and measured: 26 `cd ~/Claude/...` commands across 4 committed
+    files, session ids in `id` and `parent`, and the home directory
+    dash-encoded inside a transcript path as `-Users-mlima-...`, which is why
+    the disclosure screen's `/Users/...` pattern never saw it.
+
+    `publish.py` already redacted `manual.yaml` chat URLs for this exact
+    reason. It covered one of two sources -- the shape of `R-067`."""
+
+    def test_the_gate_carries_this_check(self):
+        with open(os.path.join(ROOT, "tools", "validate.py"),
+                  encoding="utf-8") as fh:
+            source = fh.read()
+        for code in ("E-PUBLIC-LOCAL-PATH", "E-PUBLIC-SESSION-ID",
+                     "E-PUBLIC-HOME-DIR"):
+            self.assertIn(code, source)
+
+    def test_build_keeps_what_public_may_not(self):
+        """The redaction must not cost the person at the keyboard the command.
+        `build/` is git-ignored and generated volatile for exactly that."""
+        prompts = glob.glob(os.path.join(ROOT, "build", "kickoff", "*.md"))
+        if not prompts:
+            self.skipTest("build/ not generated")
+        self.assertTrue(
+            any("claude -r" in open(p, encoding="utf-8").read()
+                for p in prompts),
+            "build/ lost the resume command too -- the split is gone")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

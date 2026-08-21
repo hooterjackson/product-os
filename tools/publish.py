@@ -364,19 +364,49 @@ def generate(root, model, target, volatile=False):
                                 _fm.sort_key(n.id)))],
               }))
 
+    # Four fields in a thread shard are machine-local and must not be
+    # republished. `command` and `cwd` name THIS machine's layout, which is
+    # wrong everywhere else -- formd-t1 is Windows. `id` is a private
+    # conversation identifier, the same class publish.py already redacts out of
+    # `manual.yaml` (R-062). And `path` embeds the home directory in
+    # dash-encoded form, `-Users-mlima-Claude-product-os`, which is precisely
+    # why the disclosure screen's `/Users/...` pattern never saw it.
+    #
+    # Measured 2026-08-20: 26 such commands across 4 committed files on a
+    # public repo. The redaction existed and covered one of two sources.
+    #
+    # What survives is what a remote consumer can actually use: that a thread
+    # exists, which tasks it cites, its verdict and the reason. You cannot
+    # resume from another machine anyway -- `build/` keeps the whole thing for
+    # the person at the keyboard who can.
+    # `parent` is a session id too -- a forked thread names the one it came
+    # from. Redacting `id` and leaving `parent` publishes the same class of
+    # identifier through the sibling field, which is this bug's whole shape.
+    MACHINE_LOCAL = ("command", "id", "parent", "path", "cwd")
+
     shard_dir = os.path.join(root, "state", "threads", "by-machine")
     shards = {}
     if os.path.isdir(shard_dir):
         for name in sorted(os.listdir(shard_dir)):
-            if name.endswith(".json"):
-                with open(os.path.join(shard_dir, name), "r",
-                          encoding="utf-8") as fh:
-                    shards[name[:-5]] = json.load(fh)
+            if not name.endswith(".json"):
+                continue
+            with open(os.path.join(shard_dir, name), "r",
+                      encoding="utf-8") as fh:
+                shard = json.load(fh)
+            if not volatile:
+                shard = dict(shard)
+                shard["threads"] = [
+                    {k: v for k, v in thread.items() if k not in MACHINE_LOCAL}
+                    for thread in shard.get("threads") or []]
+                shard["redacted"] = list(MACHINE_LOCAL)
+            shards[name[:-5]] = shard
     write(target, os.path.join("api", "threads.json"),
           dump({"freshness": fresh, "by_machine": shards,
                 "manual_urls": {k: v for k, v in sorted(redacted.items())},
                 "return_paths": {
-                    node.id: kickoff_mod.threads_for(root, node.id, redacted)
+                    node.id: kickoff_mod.redact(
+                        kickoff_mod.threads_for(root, node.id, redacted),
+                        volatile)
                     for node in sorted(model.nodes.values(),
                                        key=lambda n: _fm.sort_key(n.id))
                     if kickoff_mod.threads_for(root, node.id, manual)},
@@ -463,14 +493,24 @@ def main(argv=None):
         finally:
             shutil.rmtree(tmp, ignore_errors=True)
 
+    # `public/` is committed and served to every machine, so it is generated
+    # DURABLE: no ages, no machine-local paths, no session ids. `build/` is
+    # git-ignored and only ever read by the person sitting at this keyboard,
+    # so it is generated VOLATILE and keeps the live command and the live age.
+    #
+    # That split was documented in `_context.freshness` and was not actually
+    # true -- main() generated both targets with volatile=False, so build/ was
+    # as redacted as public/. A promise in a docstring that the code does not
+    # keep is worth less than no promise.
+    build_dir = os.path.join(root, "build")
     targets = [args.out] if args.out else [os.path.join(root, "public"),
-                                           os.path.join(root, "build")]
+                                           build_dir]
     for target in targets:
         # wholesale: an orphan endpoint that llms.txt no longer advertises is
         # still fetchable, and still answers with something stale.
         for sub in ("api", "briefs", "projects", "kickoff", "attach"):
             shutil.rmtree(os.path.join(target, sub), ignore_errors=True)
-        generate(root, model, target)
+        generate(root, model, target, volatile=(target == build_dir))
         print("wrote %s" % os.path.relpath(target, root))
     return 0
 

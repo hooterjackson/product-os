@@ -617,6 +617,56 @@ class Validator(object):
             for line in proc.stdout.decode("utf-8", "replace").splitlines()[:6]:
                 self.error("E-PUBLIC-STALE", "public/", line.strip())
 
+    def check_public_is_machine_neutral(self):
+        """`public/` is committed and served to every machine, so nothing in it
+        may name THIS one.
+
+        Three shapes, all measured in the committed surface on 2026-08-20:
+        26 `cd ~/Claude/...` commands wrong on any machine without that layout
+        (formd-t1 is Windows, `C:\\Claude\\`); session ids in `id` and
+        `parent`; and the home directory dash-encoded inside a transcript path
+        as `-Users-mlima-Claude-product-os`, which is exactly why the
+        disclosure screen's `/Users/...` pattern never saw it.
+
+        A targeted check rather than another SECRET_PATTERN, deliberately:
+        `state/repos.json` holds `~/Claude/product-os` as configuration and is
+        right to. The rule is not "never write a local path", it is "never
+        PUBLISH one".
+        """
+        public = os.path.join(self.root, "public")
+        if not os.path.isdir(public):
+            return
+        shapes = [
+            ("E-PUBLIC-LOCAL-PATH", re.compile(r"cd [~/][^\s\"]*"),
+             "a shell command naming this machine's layout"),
+            ("E-PUBLIC-SESSION-ID",
+             re.compile(r"\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}"
+                        r"-[0-9a-f]{4}-[0-9a-f]{12}\b"),
+             "a private conversation identifier"),
+            ("E-PUBLIC-HOME-DIR", re.compile(r"-Users-[a-z][a-z0-9_-]*-"),
+             "the home directory, dash-encoded"),
+        ]
+        scanned = 0
+        for base, _dirs, files in os.walk(public):
+            for name in files:
+                path = os.path.join(base, name)
+                if not self.is_text(path):
+                    continue
+                scanned += 1
+                rel = os.path.relpath(path, self.root)
+                with open(path, encoding="utf-8", errors="replace") as fh:
+                    text = fh.read()
+                for code, pattern, what in shapes:
+                    found = pattern.search(text)
+                    if found:
+                        self.error(code, rel, "%s: %r. `build/` is where that "
+                                   "belongs." % (what, found.group(0)[:60]))
+        # R-075: a walk of nothing passes every check above it.
+        if scanned < 20:
+            self.error("E-PUBLIC-SCAN-EMPTY", "public/",
+                       "scanned only %d files -- the check did not run"
+                       % scanned)
+
     def check_regressions(self):
         """Run tests/test_regressions.py as part of the gate.
 
@@ -650,6 +700,7 @@ class Validator(object):
         self.check_secrets()
         self.check_thread_shards()
         self.check_public_surface()
+        self.check_public_is_machine_neutral()
         self.check_commit_identities()
         self.check_authority(base_ref)
         if with_tests:

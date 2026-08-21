@@ -192,3 +192,87 @@ def decisions_in_force(node, model):
         if decision.project == node.project and decision.get("propagates_to"):
             out.append((decision.id, decision.get("ruling_id"), decision.title))
     return out[:4]
+
+
+# --- where the work happens, and how to get there ---------------------------
+#
+# `site.py` will want to offer a way in -- the terminal is one of the three
+# paste destinations and a Copy button is the product. That is the moment this
+# becomes dangerous, because a card that renders `cd ~/Claude/gimbal-bench`
+# from a template is wrong on this machine and looks right.
+#
+# Measured 2026-08-20: FOUR of the six repos in `state/repos.json` have
+# `local: null` -- HomeApp, genio, gimbal-bench and home-ai-infra are not
+# cloned on this Mac. `GB-001` is `machine_affinity: formd-t1`, a Windows box.
+# A templated `cd ~/Claude/<repo> && claude` is wrong for most of the
+# portfolio.
+#
+# `kickoff.py` does not have this bug, but it is worth being precise about WHY:
+# it is right BY OMISSION, not by derivation. It names a repo and a machine and
+# emits no path at all, so it cannot emit a wrong one. Its single `$` command
+# comes from the thread indexer, where `resume_command()` already returns None
+# when the binary is absent. That safety does not transfer to something that
+# wants to offer a command.
+#
+# So the rule is enforced here, once, by construction: a command comes back
+# ONLY when the repo is cloned on this machine AND the task is not bound
+# elsewhere. Every other case returns a command of None and says why.
+
+NO_REPO = "no-repo"          # the project has no repository at all
+ELSEWHERE = "elsewhere"      # bound to another machine
+NO_CLONE = "no-clone"        # repo exists, not cloned here
+LOCAL = "local"              # cloned here, and this is the right machine
+
+
+def reach(node, model, repos_spec, machine):
+    """How to get to this task's work FROM THIS MACHINE.
+
+    Returns {kind, command, repos, machine, reason}. `command` is None in
+    every case but `LOCAL`, and callers must render it rather than build their
+    own -- that is the whole point of this function existing.
+    """
+    project = model.projects.get(node.project)
+    repos = list(node.get("repos") or [])
+    if not repos and project:
+        repos = list(project.get("repos") or [])
+
+    def out(kind, reason, command=None):
+        return {"kind": kind, "command": command, "repos": repos,
+                "machine": node.get("machine_affinity"), "reason": reason}
+
+    if not repos:
+        return out(NO_REPO,
+                   "%s has no repository. Nothing here can be verified from "
+                   "commits, so its status changes only when Marcelo says so."
+                   % (node.project or "this project"))
+
+    affinity = node.get("machine_affinity")
+    if affinity and affinity != machine:
+        # Checked BEFORE the clone test on purpose. Even a cloned repo is the
+        # wrong answer when the work is bound to another machine -- the bench
+        # is not this laptop, and a command that runs is not a command that
+        # helps.
+        return out(ELSEWHERE,
+                   "This is %s work. The honest answer is \"resume on %s\", "
+                   "not a plan that cannot be executed from here."
+                   % (affinity, affinity))
+
+    missing = []
+    paths = []
+    for name in repos:
+        local = (repos_spec.get(name) or {}).get("local")
+        expanded = os.path.expanduser(local) if local else None
+        if expanded and os.path.isdir(expanded):
+            paths.append(local)
+        else:
+            missing.append(name)
+    if missing:
+        return out(NO_CLONE,
+                   "%s %s not cloned on %s. Clone it, or work on a machine "
+                   "that has it — there is no command to give you from here."
+                   % (", ".join("`%s`" % m for m in missing),
+                      "is" if len(missing) == 1 else "are", machine))
+
+    return out(LOCAL,
+               "Cloned here. product-os TRACKS the work; it does not host it.",
+               command="cd %s" % paths[0])

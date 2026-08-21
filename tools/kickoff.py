@@ -103,13 +103,53 @@ def threads_for(root, item_id, manual):
     return paths
 
 
+def redact(rows, volatile):
+    """Strip the machine-local way back when this is going to be COMMITTED.
+
+    A resume command is `cd ~/Claude/product-os && claude -r <uuid>`. Both
+    halves are wrong to publish, for different reasons:
+
+      the PATH is this machine's layout. `formd-t1` is Windows, `C:\Claude\`.
+      A committed command is right on one machine and misleading everywhere
+      else -- and `public/` is served to every machine by design.
+
+      the UUID is a private conversation identifier. `publish.py` already
+      redacts `manual.yaml` URLs for exactly this reason (`R-062`), and the
+      shard's `command` field carries the same class by a second route that
+      the redaction never covered. One rule, applied to one of two sources --
+      the shape of `R-067`.
+
+    Measured 2026-08-20: 26 such commands across 4 committed files under
+    `public/`, on a public repo. The disclosure screen missed them because its
+    `home-path` pattern is `/Users/...` and these are the tilde form.
+
+    `build/` keeps the real command, for the person at the keyboard who can
+    run it -- so does `python3 tools/kickoff.py <ID>` on stdout. That is the
+    same volatile/durable split as the freshness line.
+    """
+    if volatile:
+        return rows
+    out = []
+    for row in rows:
+        row = dict(row)
+        if row.get("command"):
+            row["command"] = None
+            row["local_only"] = True
+        # The session id is the identifier, not just the command that wraps
+        # it. Nulling one and publishing the other leaves the private half on
+        # the public surface -- which is how this got shipped the first time.
+        row["id"] = None
+        out.append(row)
+    return out
+
+
 def render(node, model, entries, stamp, repos_spec, root, manual,
            volatile=True):
     ruled = _context.ruled_out_for(node, entries)[:MAX_RULED_OUT]
     repos = node.get("repos") or []
     machine = node.get("machine_affinity")
     gate = node.get("gate") or "none"
-    returns = threads_for(root, node.id, manual)
+    returns = redact(threads_for(root, node.id, manual), volatile)
 
     lines = [
         "Cite %s in your first message." % node.id,
@@ -243,6 +283,12 @@ def render(node, model, entries, stamp, repos_spec, root, manual,
             lines.append("  %s — %s" % (row["verdict"].upper(), row["reason"]))
             if row.get("command"):
                 lines.append("  $ %s" % row["command"])
+            elif row.get("local_only"):
+                lines.append("  A verified way back exists on %s, but it names "
+                             "that machine's paths and the session id, so it is "
+                             "not republished. Run `python3 tools/kickoff.py %s` "
+                             "there." % (row.get("machine") or "that machine",
+                                         node.id))
             elif row.get("url"):
                 lines.append("  %s" % row["url"])
             elif row["verdict"] == "resume":
