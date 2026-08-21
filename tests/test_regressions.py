@@ -1910,6 +1910,30 @@ class TheIssueFormsExistAndAreShaped(unittest.TestCase):
         self.assertEqual(listed - {"new project"}, set(model.projects),
                          "the dropdown and state/projects/ disagree")
 
+    def test_a_template_only_declares_labels_the_repo_will_have(self):
+        """GitHub ACCEPTS a template naming a label the repository does not
+        have. It renders a perfect form and files the issue with NO label --
+        measured: the capture form was correct in every visible way and the
+        sidebar read "Labels — No labels", because neither `inbox` nor `task`
+        existed. `intake.py` drains BY LABEL, so the whole write path would
+        have looked healthy and drained nothing.
+
+        Whether a label exists is a fact about the remote, and this suite runs
+        offline; a test that shells out and skips without a network reports
+        clean by not running (`R-075`). So the SHAPE is checked here -- a
+        template may only name a label `tools/labels.py` declares -- and the
+        remote fact is checked by the Pages workflow, where there is a token."""
+        import labels as labels_mod
+        declared = labels_mod.declared(ROOT)
+        self.assertTrue(declared, "no template declares a label")     # R-075
+        for name, used in declared.items():
+            self.assertTrue(used, "%s declares an empty label list" % name)
+            for label in used:
+                self.assertIn(label, labels_mod.REQUIRED,
+                              "%s names %r, which tools/labels.py does not "
+                              "declare, so nothing will ever create it"
+                              % (name, label))
+
     def test_blank_issues_are_disabled(self):
         joined = "\n".join(self._lines("config.yml"))
         self.assertIn("blank_issues_enabled: false", joined,

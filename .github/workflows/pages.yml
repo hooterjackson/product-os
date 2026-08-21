@@ -52,6 +52,14 @@ jobs:
       - name: public/ must match a fresh generation
         run: python3 tools/publish.py --check
 
+      # A remote fact the offline suite cannot know. GitHub accepts a template
+      # naming a label the repo does not have, renders a perfect form, and
+      # files with no label -- and intake.py drains BY LABEL.
+      - name: Every label the issue forms declare must exist
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/labels.py --check
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: public
