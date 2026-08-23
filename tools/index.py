@@ -45,6 +45,7 @@ second. Nothing here ever reads a rollout end to end.
 import argparse
 import datetime
 import glob
+import hashlib
 import io
 import json
 import os
@@ -65,10 +66,26 @@ CLAUDE_PROJECTS = "~/.claude/projects"
 # The ONLY keys a shard thread record may carry. Anything not here is dropped
 # before writing and is an error in validate.py.
 THREAD_KEYS = {
-    "id", "tool", "title", "started", "last_active", "cwd", "branch",
-    "prompts", "items", "cited_unknown", "path", "files", "forks", "parent",
-    "verdict", "verdict_reason", "command",
+    "key", "tool", "title", "started", "last_active", "branch",
+    "prompts", "items", "cited_unknown", "files", "forks",
+    "verdict", "verdict_reason",
 }
+
+# The machine-local half. NEVER tracked: `id` is a private conversation
+# identifier, `command` embeds this machine's layout AND that id, and `path`
+# carries the home directory dash-encoded as `-Users-<name>-`, which is
+# precisely why the disclosure screen's `/Users/` pattern never saw it.
+#
+# Found live on the public remote: the tracked shard was 13.5 KB of exactly
+# this. `R-076` split `manual.yaml` for the same reason and the same lesson did
+# not reach here -- the redaction was applied to the GENERATED surface
+# (`api/threads.json`) and the AUTHORED source was left alone. Fifth route.
+LOCAL_KEYS = {"id", "command", "path", "cwd", "parent"}
+
+# A non-reversible handle joining the two halves. Not the id, and useless for
+# resuming -- it only says "these two records are the same chat".
+def thread_key(ident):
+    return hashlib.sha256((ident or "").encode("utf-8")).hexdigest()[:12]
 
 # --- resume or restart ------------------------------------------------------
 # The second question this tool exists to answer: which of these chats relates
@@ -475,11 +492,28 @@ def frozen_claim(text):
     return found.group(0) if found else None
 
 
+def split_thread(thread):
+    """(tracked, local). Two records, one chat, joined by a non-reversible key."""
+    ident = thread.get("id") or ""
+    thread = dict(thread, key=thread_key(ident))
+    tracked = {k: v for k, v in thread.items() if k in THREAD_KEYS}
+    local = {k: v for k, v in thread.items() if k in LOCAL_KEYS}
+    local["key"] = tracked["key"]
+    return tracked, local
+
+
+# `clean()` runs inside build() and used to strip to THREAD_KEYS, which now
+# excludes the local half -- so the split in main() found nothing left to
+# write. It keeps BOTH sets here and main() separates them, which is also the
+# only place that knows which file each half goes to.
+ALLOWED_ON_BUILD = THREAD_KEYS | LOCAL_KEYS
+
+
 def clean(thread):
     """Enforce the allowlist at the point of writing, not by convention."""
     out = {}
     for key, value in thread.items():
-        if key not in THREAD_KEYS:
+        if key not in ALLOWED_ON_BUILD:
             continue
         if FORBIDDEN_KEY.search(key):
             continue
@@ -594,11 +628,59 @@ def build(root, machine):
     return shard, stats, bound
 
 
+def ways_back(root, machine):
+    """What the dashboard cannot print, printed here.
+
+    The page says a resume command exists and names the machine holding it;
+    it cannot print the command itself, because `public/` is served to every
+    machine and the command embeds this one's paths and a session id. So the
+    page points at this, and this is the step that actually hands it over --
+    rather than at `index.py` with no arguments, which REBUILDS the index and
+    prints nothing you can paste.
+    """
+    path = os.path.join(root, "state", "threads", "by-machine",
+                        "%s.local.json" % machine)
+    if not os.path.exists(path):
+        sys.stderr.write(
+            "no local thread file on %s yet.\n"
+            "  cd %s && python3 tools/index.py\n"
+            "builds it, then re-run this.\n" % (machine, tilde(root)))
+        return 1
+    with open(path, "r", encoding="utf-8") as fh:
+        local = {row["key"]: row for row in json.load(fh).get("threads") or []}
+    shard_path = os.path.join(root, "state", "threads", "by-machine",
+                              "%s.json" % machine)
+    with open(shard_path, "r", encoding="utf-8") as fh:
+        threads = json.load(fh).get("threads") or []
+
+    shown = 0
+    for thread in sorted(threads, key=lambda t: t.get("last_active") or "",
+                         reverse=True):
+        row = local.get(thread.get("key")) or {}
+        if thread.get("verdict") != "resume":
+            continue
+        shown += 1
+        print("%s" % (thread.get("title") or thread.get("key")))
+        print("  %s" % (row.get("command")
+                        or "no verified command — open it from the app's own "
+                           "session picker"))
+        print()
+    if not shown:
+        print("Nothing is worth resuming on %s. Every indexed chat here reads "
+              "RESTART." % machine)
+    return 0
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--json", action="store_true")
+    parser.add_argument("--ways-back", action="store_true",
+                        help="print the resume command for each indexed chat")
     args = parser.parse_args(argv)
+
+    if args.ways_back:
+        return ways_back(_model.find_root(), new_mod.machine_id(_model.find_root()))
 
     root = _model.find_root()
     machine = new_mod.machine_id(root)
@@ -606,10 +688,28 @@ def main(argv=None):
 
     out_dir = os.path.join(root, "state", "threads", "by-machine")
     out_path = os.path.join(out_dir, "%s.json" % machine)
+    local_path = os.path.join(out_dir, "%s.local.json" % machine)
+
+    # SPLIT on write. The tracked half is metadata; the local half holds the
+    # session id, the resume command and this machine's paths, and is
+    # git-ignored. See LOCAL_KEYS.
+    local_rows = []
+    tracked_rows = []
+    for thread in shard["threads"]:
+        tracked, local = split_thread(thread)
+        tracked_rows.append(tracked)
+        if any(local.get(k) for k in LOCAL_KEYS):
+            local_rows.append(local)
+    shard["threads"] = tracked_rows
+
     if not args.dry_run:
         os.makedirs(out_dir, exist_ok=True)
         with open(out_path, "w", encoding="utf-8") as fh:
             json.dump(shard, fh, indent=2, sort_keys=True)
+            fh.write("\n")
+        with open(local_path, "w", encoding="utf-8") as fh:
+            json.dump({"machine": machine, "threads": local_rows}, fh,
+                      indent=2, sort_keys=True)
             fh.write("\n")
 
     if args.json:

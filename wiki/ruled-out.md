@@ -1514,3 +1514,46 @@ claim about the reader's filesystem, to a comparison with the reader's machine,
 to a sentence in stored data. **When a rule generalises, its guard has to
 generalise with it — a structural check cannot enforce a semantic rule**, and
 the gap between them is exactly where the next instance lives.
+
+## R-078 · An instruction that names what to run and not where
+**keywords:** instruction · command · cwd · repo-relative · directory · terminal · way-back · index · resume · shard · local · leak · split · published
+**source:** product-os `tools/surface.py:160` @ `3dc0c18` · 2026-08-23 · grade: measured
+
+**Marcelo was on the right machine, ran the command the page gave him, and got
+`can't open file <home>/tools/index.py`.** The instruction was repo-relative
+and nothing on the page said so. Audited across the whole surface: **34 of 35
+commands named WHAT to run and never WHERE.**
+
+It was wrong twice over, and the second half is the one worth keeping.
+`python3 tools/index.py` with no arguments **rebuilds the index and prints
+nothing you can paste** — so even run in the right directory it would not have
+produced the resume command it promised. That is the closures defect exactly:
+*the discovery step offered as though it were the action.* Two instances, two
+sections, one shape.
+
+**The fix is one emitter, not 34 edits.** `command_block()` always prints the
+working directory first, and on the published page that directory is
+`<your product-os clone>` rather than a path, because a page served to every
+machine cannot name one. `tools/index.py --ways-back` is the step that actually
+hands the command over.
+
+**Auditing it found a live leak, which is the more expensive half.** The
+TRACKED shard `state/threads/by-machine/<machine>.json` was **13.5 KB on the
+public remote** carrying a session id, `cd ~/Claude/product-os && claude -r
+<uuid>`, and the home directory dash-encoded as `-Users-<name>-`. `R-076` split
+`manual.yaml` for precisely this reason and the lesson never reached the thread
+index: **the redaction was applied to the generated surface
+(`api/threads.json`) and the authored source was left alone.** Fifth route,
+same class.
+
+Split like `manual.yaml`: the tracked half is metadata, `<machine>.local.json`
+is git-ignored and holds the id, command and paths, and they join on a
+12-character hash that cannot resume anything. `E-LOCAL-HALF-TRACKED` fails the
+gate if the local half is ever committed.
+
+**Why nothing caught it.** `check_public_is_machine_neutral` walks `public/`.
+`E-PUBLIC-HOME-DIR` exists and matches `-Users-` — scoped to `public/`. The
+disclosure screen's `home-path` is `/Users/` with slashes and never saw the
+dash form. Three guards, all correct, all pointed one directory away from where
+the data actually lived. **A guard aimed at the generated surface cannot see
+the authored one, and the authored one is where the source of truth is.**

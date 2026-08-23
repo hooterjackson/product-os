@@ -19,3 +19,7 @@ state/threads/manual.local.yaml
 
 # Local preview config — a port choice, not part of the product.
 .claude/
+
+# The machine-local half of a thread shard: session ids, resume commands and
+# this machine's paths. Never tracked — see index.py LOCAL_KEYS.
+state/threads/by-machine/*.local.json

@@ -24,7 +24,7 @@
         "threads_bound_to_items": 5,
         "unreadable_files": 0
       },
-      "generated": "2026-08-21",
+      "generated": "2026-08-23",
       "machine": "work-laptop",
       "redacted": [
         "command",
@@ -53,13 +53,14 @@
             "POS-011",
             "POS-012"
           ],
-          "last_active": "2026-08-21T17:20:19.380Z",
-          "prompts": 16,
+          "key": "705af7bc2ec0",
+          "last_active": "2026-08-23T20:34:52.472Z",
+          "prompts": 20,
           "started": "2026-08-20T21:07:54.725Z",
           "title": "Tool rebuild around refined model",
           "tool": "claude-code",
           "verdict": "resume",
-          "verdict_reason": "last active 2026-08-21, and nothing has landed in product-os since"
+          "verdict_reason": "last active 2026-08-23, and nothing has landed in product-os since"
         },
         {
           "branch": "main",
@@ -80,13 +81,14 @@
             "POS-011",
             "POS-012"
           ],
-          "last_active": "2026-08-21T17:08:11.882Z",
-          "prompts": 123,
+          "key": "788b3ce995fb",
+          "last_active": "2026-08-23T20:24:04.657Z",
+          "prompts": 133,
           "started": "2026-08-18T23:29:52.603Z",
           "title": "BOOTSTRAP.md setup plan",
           "tool": "claude-code",
           "verdict": "restart",
-          "verdict_reason": "123 prompts \u2014 long enough that its early context is noise"
+          "verdict_reason": "133 prompts \u2014 long enough that its early context is noise"
         },
         {
           "branch": "claude/lucid-mclaren-2df227",
@@ -145,6 +147,7 @@
             "SITE-002",
             "SITE-003"
           ],
+          "key": "6b0c0de94a96",
           "last_active": "2026-08-19T23:43:21.029Z",
           "prompts": 5,
           "started": "2026-08-19T22:23:57.784Z",
@@ -172,6 +175,7 @@
             "POS-011",
             "POS-012"
           ],
+          "key": "98d16253916f",
           "last_active": "2026-08-19T23:42:56.106Z",
           "prompts": 19,
           "started": "2026-08-19T17:36:50.201Z",
@@ -188,6 +192,7 @@
           "items": [
             "POS-001"
           ],
+          "key": "6ef48bd547b7",
           "last_active": "2026-08-19T17:34:36.885Z",
           "prompts": 1,
           "started": "2026-08-19T17:34:36.842Z",
@@ -214,6 +219,7 @@
           "files": 1,
           "forks": 0,
           "items": [],
+          "key": "ff4f3a1d5887",
           "last_active": "2026-08-18T23:29:10.837Z",
           "prompts": 12,
           "started": "2026-08-18T22:28:57.624Z",
@@ -228,6 +234,7 @@
           "files": 418,
           "forks": 417,
           "items": [],
+          "key": "fc0f56cd35f3",
           "last_active": "2026-08-03T01:00:51.871Z",
           "prompts": 0,
           "started": "2026-07-22T19:51:16.300Z",
@@ -242,6 +249,7 @@
           "files": 1,
           "forks": 0,
           "items": [],
+          "key": "21dff8bac4d6",
           "last_active": "2026-07-29T05:54:27.369Z",
           "prompts": 28,
           "started": "2026-07-20T18:34:37.554Z",
@@ -256,6 +264,7 @@
           "files": 5,
           "forks": 4,
           "items": [],
+          "key": "24b2e127a40e",
           "last_active": "2026-07-24T11:52:39.751Z",
           "prompts": 0,
           "started": "2026-07-24T11:14:06.883Z",
@@ -270,6 +279,7 @@
           "files": 1,
           "forks": 0,
           "items": [],
+          "key": "7d6e1bd17c5a",
           "last_active": "2026-07-23T16:46:34.659Z",
           "prompts": 0,
           "started": "2026-07-23T16:45:16.200Z",
@@ -284,6 +294,7 @@
           "files": 681,
           "forks": 680,
           "items": [],
+          "key": "3b8b0045ce5d",
           "last_active": "2026-07-22T19:50:28.232Z",
           "prompts": 0,
           "started": "2026-07-13T01:53:28.210Z",
@@ -298,6 +309,7 @@
           "files": 1,
           "forks": 0,
           "items": [],
+          "key": "5197ddcc031f",
           "last_active": "2026-07-21T02:36:10.650Z",
           "prompts": 0,
           "started": "2026-07-21T02:35:46.635Z",
@@ -312,6 +324,7 @@
           "files": 1,
           "forks": 0,
           "items": [],
+          "key": "3ff274d19a4a",
           "last_active": "2026-07-20T21:02:21.204Z",
           "prompts": 0,
           "started": "2026-07-20T21:00:58.606Z",
@@ -326,6 +339,7 @@
           "files": 1,
           "forks": 0,
           "items": [],
+          "key": "7c147ff9a8a9",
           "last_active": "2026-07-13T02:01:26.548Z",
           "prompts": 0,
           "started": "2026-07-13T01:53:35.735Z",
@@ -340,6 +354,7 @@
           "files": 1,
           "forks": 0,
           "items": [],
+          "key": "d0f173b0e831",
           "last_active": "2026-06-10T01:06:53.351Z",
           "prompts": 16,
           "started": "2026-06-09T22:26:58.666Z",
@@ -353,6 +368,63 @@
         "claude-code": 8,
         "codex": 7
       }
+    },
+    "work-laptop.local": {
+      "machine": "work-laptop",
+      "redacted": [
+        "command",
+        "id",
+        "parent",
+        "path",
+        "cwd"
+      ],
+      "threads": [
+        {
+          "key": "705af7bc2ec0"
+        },
+        {
+          "key": "788b3ce995fb"
+        },
+        {
+          "key": "6b0c0de94a96"
+        },
+        {
+          "key": "98d16253916f"
+        },
+        {
+          "key": "6ef48bd547b7"
+        },
+        {
+          "key": "ff4f3a1d5887"
+        },
+        {
+          "key": "fc0f56cd35f3"
+        },
+        {
+          "key": "21dff8bac4d6"
+        },
+        {
+          "key": "24b2e127a40e"
+        },
+        {
+          "key": "7d6e1bd17c5a"
+        },
+        {
+          "key": "3b8b0045ce5d"
+        },
+        {
+          "key": "5197ddcc031f"
+        },
+        {
+          "key": "3ff274d19a4a"
+        },
+        {
+          "key": "7c147ff9a8a9"
+        },
+        {
+          "key": "d0f173b0e831"
+        }
+      ]
     }
   },
   "freshness": {
@@ -368,7 +440,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -381,7 +453,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -394,7 +466,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -407,7 +479,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -420,7 +492,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -433,7 +505,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -446,7 +518,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -459,7 +531,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -472,7 +544,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -485,7 +557,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -498,7 +570,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -511,7 +583,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -524,7 +596,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -537,7 +609,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -550,7 +622,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -563,7 +635,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -576,7 +648,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -589,7 +661,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -602,7 +674,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -615,7 +687,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -628,7 +700,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -641,10 +713,10 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "reason": "last active 2026-08-23, and nothing has landed in product-os since",
         "title": "Tool rebuild around refined model",
         "tool": "claude-code",
         "verdict": "resume"
@@ -653,7 +725,7 @@
         "command": null,
         "id": null,
         "machine": "work-laptop",
-        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "reason": "133 prompts \u2014 long enough that its early context is noise",
         "title": "BOOTSTRAP.md setup plan",
         "tool": "claude-code",
         "verdict": "restart"
@@ -661,7 +733,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -672,7 +744,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19, and nothing has landed in product-os since",
@@ -683,7 +755,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19, and nothing has landed in product-os since",
@@ -696,10 +768,10 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "reason": "last active 2026-08-23, and nothing has landed in product-os since",
         "title": "Tool rebuild around refined model",
         "tool": "claude-code",
         "verdict": "resume"
@@ -708,7 +780,7 @@
         "command": null,
         "id": null,
         "machine": "work-laptop",
-        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "reason": "133 prompts \u2014 long enough that its early context is noise",
         "title": "BOOTSTRAP.md setup plan",
         "tool": "claude-code",
         "verdict": "restart"
@@ -716,7 +788,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -727,7 +799,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19, and nothing has landed in product-os since",
@@ -740,10 +812,10 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "reason": "last active 2026-08-23, and nothing has landed in product-os since",
         "title": "Tool rebuild around refined model",
         "tool": "claude-code",
         "verdict": "resume"
@@ -752,7 +824,7 @@
         "command": null,
         "id": null,
         "machine": "work-laptop",
-        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "reason": "133 prompts \u2014 long enough that its early context is noise",
         "title": "BOOTSTRAP.md setup plan",
         "tool": "claude-code",
         "verdict": "restart"
@@ -760,7 +832,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -771,7 +843,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19, and nothing has landed in product-os since",
@@ -784,10 +856,10 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "reason": "last active 2026-08-23, and nothing has landed in product-os since",
         "title": "Tool rebuild around refined model",
         "tool": "claude-code",
         "verdict": "resume"
@@ -796,7 +868,7 @@
         "command": null,
         "id": null,
         "machine": "work-laptop",
-        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "reason": "133 prompts \u2014 long enough that its early context is noise",
         "title": "BOOTSTRAP.md setup plan",
         "tool": "claude-code",
         "verdict": "restart"
@@ -804,7 +876,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -815,7 +887,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19, and nothing has landed in product-os since",
@@ -828,10 +900,10 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "reason": "last active 2026-08-23, and nothing has landed in product-os since",
         "title": "Tool rebuild around refined model",
         "tool": "claude-code",
         "verdict": "resume"
@@ -840,7 +912,7 @@
         "command": null,
         "id": null,
         "machine": "work-laptop",
-        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "reason": "133 prompts \u2014 long enough that its early context is noise",
         "title": "BOOTSTRAP.md setup plan",
         "tool": "claude-code",
         "verdict": "restart"
@@ -848,7 +920,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -859,7 +931,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19, and nothing has landed in product-os since",
@@ -872,10 +944,10 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "reason": "last active 2026-08-23, and nothing has landed in product-os since",
         "title": "Tool rebuild around refined model",
         "tool": "claude-code",
         "verdict": "resume"
@@ -884,7 +956,7 @@
         "command": null,
         "id": null,
         "machine": "work-laptop",
-        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "reason": "133 prompts \u2014 long enough that its early context is noise",
         "title": "BOOTSTRAP.md setup plan",
         "tool": "claude-code",
         "verdict": "restart"
@@ -892,7 +964,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -903,7 +975,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19, and nothing has landed in product-os since",
@@ -916,10 +988,10 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "reason": "last active 2026-08-23, and nothing has landed in product-os since",
         "title": "Tool rebuild around refined model",
         "tool": "claude-code",
         "verdict": "resume"
@@ -928,7 +1000,7 @@
         "command": null,
         "id": null,
         "machine": "work-laptop",
-        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "reason": "133 prompts \u2014 long enough that its early context is noise",
         "title": "BOOTSTRAP.md setup plan",
         "tool": "claude-code",
         "verdict": "restart"
@@ -936,7 +1008,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -947,7 +1019,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19, and nothing has landed in product-os since",
@@ -960,10 +1032,10 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "reason": "last active 2026-08-23, and nothing has landed in product-os since",
         "title": "Tool rebuild around refined model",
         "tool": "claude-code",
         "verdict": "resume"
@@ -972,7 +1044,7 @@
         "command": null,
         "id": null,
         "machine": "work-laptop",
-        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "reason": "133 prompts \u2014 long enough that its early context is noise",
         "title": "BOOTSTRAP.md setup plan",
         "tool": "claude-code",
         "verdict": "restart"
@@ -980,7 +1052,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -991,7 +1063,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19, and nothing has landed in product-os since",
@@ -1004,10 +1076,10 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "reason": "last active 2026-08-23, and nothing has landed in product-os since",
         "title": "Tool rebuild around refined model",
         "tool": "claude-code",
         "verdict": "resume"
@@ -1016,7 +1088,7 @@
         "command": null,
         "id": null,
         "machine": "work-laptop",
-        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "reason": "133 prompts \u2014 long enough that its early context is noise",
         "title": "BOOTSTRAP.md setup plan",
         "tool": "claude-code",
         "verdict": "restart"
@@ -1024,7 +1096,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -1035,7 +1107,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19, and nothing has landed in product-os since",
@@ -1048,10 +1120,10 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "reason": "last active 2026-08-23, and nothing has landed in product-os since",
         "title": "Tool rebuild around refined model",
         "tool": "claude-code",
         "verdict": "resume"
@@ -1060,7 +1132,7 @@
         "command": null,
         "id": null,
         "machine": "work-laptop",
-        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "reason": "133 prompts \u2014 long enough that its early context is noise",
         "title": "BOOTSTRAP.md setup plan",
         "tool": "claude-code",
         "verdict": "restart"
@@ -1068,7 +1140,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -1079,7 +1151,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19, and nothing has landed in product-os since",
@@ -1092,10 +1164,10 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "reason": "last active 2026-08-23, and nothing has landed in product-os since",
         "title": "Tool rebuild around refined model",
         "tool": "claude-code",
         "verdict": "resume"
@@ -1104,7 +1176,7 @@
         "command": null,
         "id": null,
         "machine": "work-laptop",
-        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "reason": "133 prompts \u2014 long enough that its early context is noise",
         "title": "BOOTSTRAP.md setup plan",
         "tool": "claude-code",
         "verdict": "restart"
@@ -1112,7 +1184,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -1123,7 +1195,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19, and nothing has landed in product-os since",
@@ -1136,10 +1208,10 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
-        "reason": "last active 2026-08-21, and nothing has landed in product-os since",
+        "reason": "last active 2026-08-23, and nothing has landed in product-os since",
         "title": "Tool rebuild around refined model",
         "tool": "claude-code",
         "verdict": "resume"
@@ -1148,7 +1220,7 @@
         "command": null,
         "id": null,
         "machine": "work-laptop",
-        "reason": "123 prompts \u2014 long enough that its early context is noise",
+        "reason": "133 prompts \u2014 long enough that its early context is noise",
         "title": "BOOTSTRAP.md setup plan",
         "tool": "claude-code",
         "verdict": "restart"
@@ -1156,7 +1228,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -1167,7 +1239,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19, and nothing has landed in product-os since",
@@ -1180,7 +1252,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -1193,7 +1265,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -1206,7 +1278,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -1219,7 +1291,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -1232,7 +1304,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -1245,7 +1317,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -1258,7 +1330,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",
@@ -1271,7 +1343,7 @@
       {
         "command": null,
         "id": null,
-        "instruction": "Recorded on work-laptop. Run `python3 tools/index.py` there to get the resume command \u2014 it is machine-local and is not published.",
+        "instruction": "Recorded on work-laptop. In your product-os clone THERE \u2014 not your home directory \u2014 run `python3 tools/index.py --ways-back`. That prints the resume command for every chat worth returning to. It is machine-local, so this page cannot print it.",
         "local_only": true,
         "machine": "work-laptop",
         "reason": "last active 2026-08-19; could NOT check whether work landed in its repo \u2014 resume, but re-read the brief first",

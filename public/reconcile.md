@@ -34,7 +34,8 @@ accurate is exactly what I am asking.
 - Last audit **2026-08-19**, over commits since 2026-08-10.
 - **153 commits were unattributed** at that audit — work no item claims. That number is a to-do list, not an error log.
 - **5 item(s) marked done on a machine's judgement**, which you have not confirmed: EL-004, POS-002, POS-003, POS-004, POS-005.
-- Thread index for **work-laptop** was built **2026-08-21** — chats since then are not in it.
+- Thread index for **work-laptop** was built **2026-08-23** — chats since then are not in it.
+- Thread index for **work-laptop.local** was built **never** — chats since then are not in it.
 
 ## What to do
 

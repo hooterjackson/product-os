@@ -310,6 +310,15 @@ class CoverageNumbersMustNotSilentlyCap(unittest.TestCase):
         self.assertIn('(%d since %s)', source)
 
 
+def tracked_shards():
+    """The tracked halves only. `<machine>.local.json` is git-ignored and holds
+    the session ids, resume commands and this machine's paths — it is not a
+    shard and does not carry a verdict."""
+    return [p for p in glob.glob(os.path.join(
+        ROOT, "state", "threads", "by-machine", "*.json"))
+        if not p.endswith(".local.json")]
+
+
 class ThreadIndexIsMetadataOnly(unittest.TestCase):
     """The shard is derived from 405 GiB of unredacted working conversation and
     this repo may go public. Two independent gates, and the CI one must not
@@ -343,8 +352,7 @@ class ThreadIndexIsMetadataOnly(unittest.TestCase):
         self.assertTrue(index_mod.tilde(os.path.expanduser("~/x")).startswith("~/"))
 
     def test_written_shard_carries_only_allowlisted_keys(self):
-        path = os.path.join(ROOT, "state", "threads", "by-machine")
-        shards = glob.glob(os.path.join(path, "*.json"))
+        shards = tracked_shards()
         if not shards:
             self.skipTest("no shard written yet")
         import validate as validate_mod
@@ -460,8 +468,7 @@ class ResumeCommandsAreVerifiedBeforePrinting(unittest.TestCase):
 
     def test_no_command_is_emitted_for_a_restart(self):
         import json as json_mod
-        shard = os.path.join(ROOT, "state", "threads", "by-machine")
-        for path in glob.glob(os.path.join(shard, "*.json")):
+        for path in tracked_shards():
             with open(path, encoding="utf-8") as fh:
                 data = json_mod.load(fh)
             for thread in data.get("threads") or []:
@@ -471,8 +478,7 @@ class ResumeCommandsAreVerifiedBeforePrinting(unittest.TestCase):
 
     def test_every_thread_carries_a_verdict_and_a_reason(self):
         import json as json_mod
-        shard = os.path.join(ROOT, "state", "threads", "by-machine")
-        files = glob.glob(os.path.join(shard, "*.json"))
+        files = tracked_shards()
         if not files:
             self.skipTest("no shard")
         for path in files:
@@ -2181,8 +2187,7 @@ class NoFrozenClaimReachesTheShard(unittest.TestCase):
 
     def test_the_committed_shards_carry_no_frozen_claim(self):
         import index as index_mod
-        shards = glob.glob(os.path.join(ROOT, "state", "threads",
-                                        "by-machine", "*.json"))
+        shards = tracked_shards()
         self.assertTrue(shards, "no shard to check")                  # R-075
         checked = 0
         for path in shards:
@@ -2421,6 +2426,106 @@ class TheChatsSectionNamesChatsNotItems(unittest.TestCase):
 def esc_html(text):
     import html as _html
     return _html.escape(str(text), quote=True)
+
+
+class EveryInstructionSaysWhereToRunIt(unittest.TestCase):
+    """Marcelo, on the right machine, ran the command the page told him to and
+    python answered `can't open file <home>/tools/index.py`. The instruction
+    was repo-relative and nothing said so.
+
+    Audited: 34 of the 35 commands on the page named WHAT and not WHERE. One
+    emitter fixes the class — `command_block()` always prints the working
+    directory first, and a published page says `<your product-os clone>`
+    because it cannot name one machine's path."""
+
+    def _commands(self):
+        import html as html_mod
+        with open(os.path.join(ROOT, "public", "index.html"),
+                  encoding="utf-8") as fh:
+            page = fh.read()
+        return [html_mod.unescape(re.sub("<[^>]+>", "", m)).strip()
+                for m in re.findall(r"<code[^>]*>(.*?)</code>", page, re.S)]
+
+    def test_every_runnable_command_states_its_directory(self):
+        runnable = [c for c in self._commands() if "python3" in c]
+        self.assertTrue(runnable, "no commands to check")             # R-075
+        for command in runnable:
+            self.assertTrue(command.startswith("cd "),
+                            "%r says what to run and not where" % command[:60])
+
+    def test_the_way_back_points_at_a_command_that_produces_something(self):
+        """`python3 tools/index.py` with no arguments REBUILDS the index and
+        prints nothing you can paste. --ways-back is the step that actually
+        hands over the resume command — the same defect as the closures row
+        offering the discovery command instead of the action."""
+        import kickoff as kickoff_mod
+        threads = kickoff_mod.all_threads(ROOT, kickoff_mod.load_manual(ROOT),
+                                          volatile=False)
+        notes = [t["instruction"] for t in threads if t.get("instruction")]
+        self.assertTrue(notes, "no instruction rendered")             # R-075
+        for note in notes:
+            self.assertIn("--ways-back", note)
+            self.assertIn("clone", note, "it still does not say where")
+
+    def test_ways_back_exists_and_reads_the_local_half(self):
+        with open(os.path.join(ROOT, "tools", "index.py"),
+                  encoding="utf-8") as fh:
+            source = fh.read()
+        self.assertIn("def ways_back(", source)
+        self.assertIn("--ways-back", source)
+        self.assertIn(".local.json", source)
+
+
+class TheThreadShardDoesNotPublishTheMachine(unittest.TestCase):
+    """Found live on the public remote: the TRACKED shard was 13.5 KB carrying
+    a session id, a machine-local resume command, and the home directory
+    dash-encoded as `-Users-<name>-`.
+
+    `R-076` split `manual.yaml` for exactly this and the lesson never reached
+    the thread index — the redaction was applied to the GENERATED surface
+    (`api/threads.json`) and the AUTHORED source was left alone. Fifth route,
+    same class. The guards could not see it either: they walk `public/`."""
+
+    def _tracked(self):
+        return tracked_shards()
+
+    def test_the_tracked_shard_carries_none_of_the_local_half(self):
+        import index as index_mod
+        shards = self._tracked()
+        self.assertTrue(shards, "no shard to check")                  # R-075
+        for path in shards:
+            with open(path, encoding="utf-8") as fh:
+                raw = fh.read()
+            for pattern, what in (
+                    (r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}"
+                     r"-[0-9a-f]{12}", "a session id"),
+                    (r"cd ~", "a machine-local command"),
+                    (r"-Users-[a-z]", "the home directory")):
+                self.assertEqual(re.findall(pattern, raw), [],
+                                 "%s publishes %s" % (path, what))
+            with open(path, encoding="utf-8") as fh:
+                for thread in json.load(fh).get("threads") or []:
+                    self.assertEqual(
+                        sorted(set(thread) & index_mod.LOCAL_KEYS), [],
+                        "the tracked half carries local keys")
+
+    def test_the_two_halves_join_on_a_key_that_cannot_resume(self):
+        import index as index_mod
+        key = index_mod.thread_key("90f74a2a-0bfd-4ddd-a8de-e6d781c34d6a")
+        self.assertEqual(len(key), 12)
+        self.assertNotIn("-", key, "the key must not look like a session id")
+        self.assertNotEqual(key, "90f74a2a-0bf")
+
+    def test_the_gate_refuses_a_tracked_local_half(self):
+        with open(os.path.join(ROOT, "tools", "validate.py"),
+                  encoding="utf-8") as fh:
+            self.assertIn("E-LOCAL-HALF-TRACKED", fh.read())
+        self.assertFalse(
+            os.path.join("state", "threads", "by-machine",
+                         "work-laptop.local.json")
+            in subprocess.run(["git", "ls-files"], cwd=ROOT,
+                              stdout=subprocess.PIPE).stdout.decode(),
+            "the local half is tracked")
 
 
 if __name__ == "__main__":

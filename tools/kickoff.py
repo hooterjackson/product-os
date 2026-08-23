@@ -128,7 +128,7 @@ def threads_for(root, item_id, manual):
     shard_dir = os.path.join(root, "state", "threads", "by-machine")
     if os.path.isdir(shard_dir):
         for name in sorted(os.listdir(shard_dir)):
-            if not name.endswith(".json"):
+            if not name.endswith(".json") or name.endswith(".local.json"):
                 continue
             with open(os.path.join(shard_dir, name), "r", encoding="utf-8") as fh:
                 try:
@@ -141,11 +141,11 @@ def threads_for(root, item_id, manual):
                 paths.append({
                     "machine": shard.get("machine"),
                     "tool": thread.get("tool"),
-                    "title": thread.get("title") or thread.get("id"),
+                    "title": thread.get("title") or thread.get("key"),
                     "verdict": thread.get("verdict"),
                     "reason": thread.get("verdict_reason"),
-                    "command": thread.get("command"),
-                    "id": thread.get("id"),
+                    "command": local_ways_back(root).get(thread.get("key")),
+                    "id": None,
                 })
     for entry in manual.get(item_id.upper(), []):
         machine = entry.get("machine")
@@ -187,12 +187,18 @@ def redact(rows, volatile):
     run it -- so does `python3 tools/kickoff.py <ID>` on stdout. That is the
     same volatile/durable split as the freshness line.
     """
-    if volatile:
-        return rows
     out = []
     for row in rows:
         row = dict(row)
-        if row.get("command"):
+        if volatile:
+            out.append(row)
+            continue
+        # The invariant is about the VERDICT, not about the deletion. Keying it
+        # on "did we just strip a command" meant that once the command stopped
+        # being loaded at all -- after the shard was split -- there was nothing
+        # to strip, the branch never fired, and every resume rendered with a
+        # null way back again. The same bug, reached from the opposite side.
+        if row.get("verdict") == "resume" and not row.get("url"):
             # SUBSTITUTE, never delete. The way back is a three-value enum --
             # command, url, instruction -- and "the instruction is a value, not
             # a null". Stripping the command and leaving nothing produced
@@ -202,14 +208,38 @@ def redact(rows, volatile):
             row["command"] = None
             row["local_only"] = True
             row["instruction"] = (
-                "Recorded on %s. Run `python3 tools/index.py` there to get the "
-                "resume command — it is machine-local and is not published."
+                "Recorded on %s. In your product-os clone THERE — not your "
+                "home directory — run `python3 tools/index.py --ways-back`. "
+                "That prints the resume command for every chat worth "
+                "returning to. It is machine-local, so this page cannot "
+                "print it."
                 % (row.get("machine") or "the machine that indexed it"))
         # The session id is the identifier, not just the command that wraps
         # it. Nulling one and publishing the other leaves the private half on
         # the public surface -- which is how this got shipped the first time.
         row["id"] = None
         out.append(row)
+    return out
+
+
+def local_ways_back(root):
+    """key -> command, from the git-ignored half. Empty on any machine that has
+    not indexed, which is the honest answer there."""
+    out = {}
+    shard_dir = os.path.join(root, "state", "threads", "by-machine")
+    if not os.path.isdir(shard_dir):
+        return out
+    for name in sorted(os.listdir(shard_dir)):
+        if not name.endswith(".local.json"):
+            continue
+        with open(os.path.join(shard_dir, name), "r", encoding="utf-8") as fh:
+            try:
+                rows = json.load(fh).get("threads") or []
+            except ValueError:
+                continue
+        for row in rows:
+            if row.get("key"):
+                out[row["key"]] = row.get("command")
     return out
 
 
@@ -224,10 +254,11 @@ def all_threads(root, manual, volatile=False):
     item and not the chat.
     """
     out = []
+    ways = local_ways_back(root) if volatile else {}
     shard_dir = os.path.join(root, "state", "threads", "by-machine")
     if os.path.isdir(shard_dir):
         for name in sorted(os.listdir(shard_dir)):
-            if not name.endswith(".json"):
+            if not name.endswith(".json") or name.endswith(".local.json"):
                 continue
             with open(os.path.join(shard_dir, name), "r", encoding="utf-8") as fh:
                 try:
@@ -238,11 +269,11 @@ def all_threads(root, manual, volatile=False):
                 out.append({
                     "machine": shard.get("machine"),
                     "tool": thread.get("tool"),
-                    "title": thread.get("title") or thread.get("id"),
+                    "title": thread.get("title") or thread.get("key"),
                     "verdict": thread.get("verdict"),
                     "reason": thread.get("verdict_reason"),
-                    "command": thread.get("command"),
-                    "id": thread.get("id"),
+                    "command": ways.get(thread.get("key")),
+                    "id": None,
                     "items": thread.get("items") or [],
                     "last_active": (thread.get("last_active") or "")[:10],
                 })
@@ -404,9 +435,9 @@ def render(node, model, entries, stamp, repos_spec, root, manual,
             elif row.get("local_only"):
                 lines.append("  A verified way back exists on %s, but it names "
                              "that machine's paths and the session id, so it is "
-                             "not republished. Run `python3 tools/kickoff.py %s` "
-                             "there." % (row.get("machine") or "that machine",
-                                         node.id))
+                             "not republished. In your product-os clone THERE, "
+                             "run `python3 tools/kickoff.py %s`."
+                             % (row.get("machine") or "that machine", node.id))
             elif row.get("url"):
                 lines.append("  %s" % row["url"])
             elif row.get("web_only_elsewhere"):

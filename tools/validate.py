@@ -56,10 +56,19 @@ PROPOSAL_REF = re.compile(r"\bPROP-(\d{4})\b")
 # Thread shards are metadata only. Duplicated from index.py ON PURPOSE: a
 # shared constant would let one edit relax both gates at once, and the whole
 # point of this check is that it is independent of the tool that writes.
+# Updated 2026-08-23 alongside index.py's THREAD_KEYS, deliberately and by
+# hand. `id`, `command`, `path`, `cwd` and `parent` LEFT this set: they were
+# found live on the public remote inside the tracked shard -- a session id, a
+# machine-local resume command, and the home directory dash-encoded as
+# `-Users-<name>-`. They live in `<machine>.local.json`, which is git-ignored.
+#
+# This copy stays independent on purpose. A shared constant would let one edit
+# relax both gates at once, and the whole point of this check is that it is not
+# the tool that writes.
 SHARD_THREAD_KEYS = {
-    "id", "tool", "title", "started", "last_active", "cwd", "branch",
-    "prompts", "items", "cited_unknown", "path", "files", "forks", "parent",
-    "verdict", "verdict_reason", "command",
+    "key", "tool", "title", "started", "last_active", "branch",
+    "prompts", "items", "cited_unknown", "files", "forks",
+    "verdict", "verdict_reason",
 }
 FORBIDDEN_SHARD_KEY = re.compile(
     r"(?i)message|content|text|body|prompt_text|summary|snippet|excerpt")
@@ -489,6 +498,29 @@ class Validator(object):
 
     # -- driver -------------------------------------------------------------
 
+    def check_local_halves_are_never_tracked(self):
+        """Two files hold what must not be published, and both are git-ignored:
+        `state/threads/manual.local.yaml` and
+        `state/threads/by-machine/<machine>.local.json`.
+
+        This is the guard that would have caught the real thing. The tracked
+        shard was 13.5 KB on the public remote carrying a session id, a
+        machine-local resume command and the home directory dash-encoded as
+        `-Users-<name>-` — because `R-076`'s split was applied to `manual.yaml`
+        and the same lesson never reached the thread index. Redaction covered
+        the GENERATED surface and left the AUTHORED source alone.
+        """
+        tracked = set(self.tracked_files())
+        for path in sorted(glob.glob(os.path.join(
+                self.root, "state", "threads", "**", "*.local.*"),
+                recursive=True)):
+            rel = os.path.relpath(path, self.root)
+            if os.path.join(self.root, rel) in tracked or rel in tracked:
+                self.error("E-LOCAL-HALF-TRACKED", rel,
+                           "this file holds session ids, resume commands and "
+                           "this machine's paths. It is git-ignored for that "
+                           "reason and committing it publishes all three.")
+
     def check_manual_split(self):
         """The tracked pointer file records PRESENCE; the url lives in the
         git-ignored one.
@@ -530,6 +562,12 @@ class Validator(object):
         """
         pattern = os.path.join(self.root, "state", "threads", "by-machine", "*.json")
         for path in sorted(glob.glob(pattern)):
+            if path.endswith(".local.json"):
+                # The git-ignored half. It is SUPPOSED to hold the session id,
+                # the resume command and this machine's paths -- that is why it
+                # is not tracked. What matters is that it never BECOMES
+                # tracked, and check_local_halves_are_never_tracked does that.
+                continue
             try:
                 with open(path, "r", encoding="utf-8") as fh:
                     shard = json.load(fh)
@@ -758,6 +796,7 @@ class Validator(object):
         self.check_secrets()
         self.check_thread_shards()
         self.check_manual_split()
+        self.check_local_halves_are_never_tracked()
         self.check_public_surface()
         self.check_public_is_machine_neutral()
         self.check_commit_identities()

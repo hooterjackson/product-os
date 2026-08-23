@@ -152,6 +152,36 @@ def esc(text):
     return html.escape(str(text if text is not None else ""), quote=True)
 
 
+def command_block(command, volatile, root=None):
+    """Every command this page emits, with its working directory attached.
+
+    Audited 2026-08-23: 34 of the 35 commands on the page said WHAT to run and
+    never WHERE. Marcelo ran one from his home directory, on the right machine,
+    and python answered `can't open file <home>/tools/index.py` -- the
+    instruction was repo-relative and nothing on the page said so. (The literal
+    path is not quoted here: the disclosure screen flagged it, correctly, the
+    first time this docstring was written.)
+
+    One emitter, always two lines. On a local build the first is the real path;
+    on the published page it is `<your product-os clone>`, because a page
+    served to every machine cannot name one -- the same rule the chip and the
+    way-back already obey.
+    """
+    where = "<your product-os clone>"
+    if volatile and root:
+        try:
+            with open(os.path.join(root, "state", "repos.json"),
+                      encoding="utf-8") as fh:
+                where = ((json.load(fh).get("product-os") or {}).get("local")
+                         or where)
+        except (OSError, ValueError):
+            pass
+    return ('<code style="font:400 var(--fs-meta)/1.6 var(--font-mono);'
+            'color:var(--el-ink);display:block;white-space:pre-wrap;'
+            'overflow-wrap:anywhere">cd %s\n%s</code>'
+            % (esc(where), esc(command)))
+
+
 def field(label, value, value_style=BODY_INK):
     return ('<div style="display:grid;gap:var(--sp-1);margin:0 0 var(--sp-4)">'
             '<span style="%s">%s</span><span style="%s">%s</span></div>'
@@ -561,14 +591,12 @@ def closure_row(node):
 
     terminal = field(
         "Or from a terminal",
-        '<code style="font:400 var(--fs-meta)/1.6 var(--font-mono);'
-        'color:var(--el-ink);display:block;white-space:pre-wrap;'
-        'overflow-wrap:anywhere">python3 tools/apply.py --decided '
-        '%s=status:done \\\n    --said "your sentence here"</code>'
-        '<span style="%s;display:block;margin-top:var(--sp-2)">'
-        'Same command with <code style="font-family:var(--font-mono)">'
-        'status:next</code> reopens it. The sentence is required — without it '
-        'the change is only proposed.</span>' % (esc(node.id), META), META)
+        command_block('python3 tools/apply.py --decided %s=status:done \\\n'
+                      '    --said "your sentence here"' % node.id, False)
+        + '<span style="%s;display:block;margin-top:var(--sp-2)">'
+          'Same command with <code style="font-family:var(--font-mono)">'
+          'status:next</code> reopens it. The sentence is required — without '
+          'it the change is only proposed.</span>' % META, META)
 
     return (
         '<details style="border-top:1px solid var(--el-line)"><summary '
@@ -637,6 +665,7 @@ def chat_row(row):
         way = ('<code style="font:400 var(--fs-meta)/1.6 var(--font-mono);'
                'color:var(--el-ink);display:block;white-space:pre-wrap;'
                'overflow-wrap:anywhere">%s</code>' % esc(row["command"]))
+        # already absolute: `cd <path> && claude -r <id>` carries its own cd
     elif row.get("url"):
         way = '<a href="%s">%s</a>' % (esc(row["url"]), esc(row["url"]))
     elif row.get("instruction"):
