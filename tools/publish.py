@@ -479,8 +479,13 @@ def main(argv=None):
                     if not os.path.exists(b):
                         drift.append("missing: %s" % rel)
                         continue
-                    with open(a, encoding="utf-8") as fa, \
-                            open(b, encoding="utf-8") as fb:
+                    # BYTES, not text. This decoded as UTF-8 and crashed on
+                    # the first binary file the surface ever carried -- a PNG
+                    # favicon -- with `can't decode byte 0x89`. A drift check
+                    # that cannot read part of the surface cannot report on it,
+                    # and it failed loudly only by luck: one more except clause
+                    # anywhere above and it would have reported clean.
+                    with open(a, "rb") as fa, open(b, "rb") as fb:
                         if fa.read() != fb.read():
                             drift.append("stale: %s" % rel)
             for base, _dirs, files in os.walk(live):

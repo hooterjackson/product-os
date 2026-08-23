@@ -986,7 +986,11 @@ class PublishedBytesDoNotMoveWithTheCalendar(unittest.TestCase):
                 if not (os.path.exists(a) and os.path.exists(b)):
                     drift.append("%s exists on only one date" % rel)
                     continue
-                with open(a, encoding="utf-8") as fa, open(b, encoding="utf-8") as fb:
+                # BYTES. Reading the surface as text crashed on the first
+                # binary file it ever carried (the PNG favicon) -- the same
+                # assumption publish.py --check made, in the test written to
+                # police it.
+                with open(a, "rb") as fa, open(b, "rb") as fb:
                     if fa.read() != fb.read():
                         drift.append(rel)
             self.assertEqual(drift[:8], [],
@@ -2770,6 +2774,65 @@ class TheFaviconIsDiscoveredNotAssumed(unittest.TestCase):
                 self.assertTrue(in_source,
                                 "public/assets/%s has no source — it is an "
                                 "orphan the next publish deletes" % name)
+
+
+class TheSurfaceCanCarryABinaryFile(unittest.TestCase):
+    """The favicon was the first non-text file `public/` ever held, and two
+    checks assumed text: `publish.py --check` and the calendar test written to
+    police it both decoded UTF-8 and died on `can't decode byte 0x89`.
+
+    They failed loudly, which was luck. One `except UnicodeDecodeError` in
+    either — a plausible thing to write when a decode blows up — and the drift
+    check would have skipped every binary file and reported clean. A guard that
+    cannot read part of the surface cannot report on it."""
+
+    def test_the_drift_check_compares_bytes(self):
+        """Asserted POSITIVELY. The absence form named the very string it was
+        searching for, so this file matched itself — the same self-reference as
+        `MENTION_RE` matching `_MENTION_RE` and the docstring that quoted the
+        path it forbade. Three times now: a guard written as "this string must
+        not appear" tends to contain that string."""
+        for path in (os.path.join(ROOT, "tools", "publish.py"),
+                     os.path.join(ROOT, "tests", "test_regressions.py")):
+            with open(path, encoding="utf-8") as fh:
+                source = fh.read()
+            self.assertIn('open(a, "rb") as fa', source,
+                          "%s does not compare the surface as bytes"
+                          % os.path.basename(path))
+
+    def test_a_binary_asset_survives_a_round_trip(self):
+        """publish, re-publish, and require the bytes to be identical — the
+        property the whole check exists for, exercised on the binary path."""
+        import _model as model_mod
+        import publish as publish_mod
+        import surface as surface_mod
+        icon = surface_mod.favicon(ROOT)
+        if icon is None:
+            self.skipTest("no favicon source on this machine")
+        target = tempfile.mkdtemp(prefix="po-bin-")
+        try:
+            publish_mod.generate(ROOT, model_mod.Model.load(ROOT), target)
+            fresh = os.path.join(target, "assets", icon[0])
+            live = os.path.join(ROOT, "public", "assets", icon[0])
+            self.assertTrue(os.path.exists(fresh), "the icon was not emitted")
+            with open(fresh, "rb") as fa, open(live, "rb") as fb:
+                self.assertEqual(fa.read(), fb.read(),
+                                 "the binary asset does not round-trip")
+        finally:
+            shutil.rmtree(target, ignore_errors=True)
+
+    def test_the_icon_is_derived_from_a_master_that_is_kept(self):
+        """The shipped icon is a crop of the supplied artwork, so the master
+        stays in the repo and the derivation is a script rather than a memory
+        of what was typed into sips once."""
+        for name in ("favicon-source.png", "refresh-favicon.py", "favicon.md"):
+            self.assertTrue(
+                os.path.exists(os.path.join(ROOT, "tools", "assets", name)),
+                "%s is missing — the icon could not be re-derived" % name)
+        with open(os.path.join(ROOT, "tools", "assets", "favicon.md"),
+                  encoding="utf-8") as fh:
+            note = fh.read()
+        self.assertIn("777 x 713", note, "the measurement is not recorded")
 
 
 if __name__ == "__main__":
