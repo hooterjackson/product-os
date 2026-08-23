@@ -2721,5 +2721,56 @@ class AResumeCommandRunsInTHISShell(unittest.TestCase):
         self.assertIn("RESTART", out, "it never says what the others are")
 
 
+class TheFaviconIsDiscoveredNotAssumed(unittest.TestCase):
+    """A favicon is optional, and both states have to be coherent.
+
+    Absent: no `<link rel="icon">` at all, because a link to a 404 is worse
+    than no icon — the browser retries it on every load and the tab shows the
+    default either way.
+
+    Present: SOURCE in tools/assets/ and copied out by the generator, never
+    hand-placed under public/. `publish.py --check` reports anything the
+    generator did not produce as `orphan:` and the next publish deletes it —
+    the same rule that governs the stylesheets and a Pages CNAME."""
+
+    def test_the_page_and_the_assets_agree(self):
+        import surface as surface_mod
+        icon = surface_mod.favicon(ROOT)
+        with open(os.path.join(ROOT, "public", "index.html"),
+                  encoding="utf-8") as fh:
+            page = fh.read()
+        linked = re.search(r'<link rel="icon"[^>]*href="assets/([^"]+)"', page)
+        if icon is None:
+            self.assertIsNone(linked,
+                              "the page links an icon with no source file")
+            return
+        self.assertIsNotNone(linked, "a favicon source exists and is unlinked")
+        self.assertEqual(linked.group(1), icon[0])
+        self.assertTrue(os.path.exists(
+            os.path.join(ROOT, "public", "assets", icon[0])),
+            "the icon is linked and was never copied out")
+
+    def test_the_declared_type_matches_the_extension(self):
+        import surface as surface_mod
+        icon = surface_mod.favicon(ROOT)
+        if icon is None:
+            self.skipTest("no favicon source yet; this asserts nothing to hide")
+        self.assertEqual(
+            surface_mod.FAVICON_TYPE[os.path.splitext(icon[0])[1]], icon[1])
+
+    def test_it_is_never_hand_placed_under_public(self):
+        """The trap that already caught the stylesheets once."""
+        import surface as surface_mod
+        for name in surface_mod.FAVICONS:
+            in_public = os.path.exists(os.path.join(ROOT, "public", "assets",
+                                                    name))
+            in_source = os.path.exists(os.path.join(ROOT, "tools", "assets",
+                                                    name))
+            if in_public:
+                self.assertTrue(in_source,
+                                "public/assets/%s has no source — it is an "
+                                "orphan the next publish deletes" % name)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

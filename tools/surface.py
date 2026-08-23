@@ -819,6 +819,7 @@ document.addEventListener('keydown', function (ev) {
 
 
 def render(root, model, volatile=False):
+    icon = favicon(root)
     stamp = _context.read_stamp(root)
     entries = _context.parse_register(root)
     with open(os.path.join(root, "state", "repos.json"), encoding="utf-8") as fh:
@@ -837,6 +838,8 @@ def render(root, model, volatile=False):
         '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">',
         '<meta name="viewport" content="width=device-width, initial-scale=1">',
         "<title>Product OS</title>",
+        ('<link rel="icon" type="%s" href="assets/%s">' % (icon[1], icon[0]))
+        if icon else "",
         '<link rel="stylesheet" href="assets/tokens.css">',
         '<link rel="stylesheet" href="assets/product-os-theme.css">',
         "</head><body>",
@@ -869,6 +872,27 @@ def render(root, model, volatile=False):
 # it is emitted here, never dropped in by hand.
 ASSETS = ("tokens.css", "product-os-theme.css")
 
+# The favicon is OPTIONAL and discovered, not assumed. If the source file is
+# not there the page links nothing and the assets directory holds nothing --
+# which is the state the site is in today, and is honest rather than a dangling
+# <link> to a 404.
+#
+# It is SOURCE in tools/assets/ and copied out like the stylesheets, for the
+# reason a hand-placed file cannot survive here: `publish.py --check` reports
+# anything the generator did not produce as `orphan:` and the next publish
+# deletes it.
+FAVICONS = ("favicon.svg", "favicon.png", "favicon.ico")
+FAVICON_TYPE = {".svg": "image/svg+xml", ".png": "image/png",
+                ".ico": "image/x-icon"}
+
+
+def favicon(root):
+    """(filename, mime) for the first favicon source present, or None."""
+    for name in FAVICONS:
+        if os.path.exists(os.path.join(root, "tools", "assets", name)):
+            return name, FAVICON_TYPE[os.path.splitext(name)[1]]
+    return None
+
 
 def generate(root, model, target, volatile=False):
     path = os.path.join(target, "index.html")
@@ -880,6 +904,10 @@ def generate(root, model, target, volatile=False):
     for name in ASSETS:
         shutil.copyfile(os.path.join(root, "tools", "assets", name),
                         os.path.join(out, name))
+    icon = favicon(root)
+    if icon:
+        shutil.copyfile(os.path.join(root, "tools", "assets", icon[0]),
+                        os.path.join(out, icon[0]))
     return path
 
 

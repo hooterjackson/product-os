@@ -438,6 +438,7 @@ def generate(root, model, target, volatile=False):
 
 def advertised(model):
     """Every path this surface promises. Used by the CI link check."""
+    icon = surface_mod.favicon(model.root)
     paths = ["index.html", "assets/tokens.css", "assets/product-os-theme.css",
              "llms.txt", "api/index.json", "api/now.json",
              "api/threads.json", "api/unconfirmed.json",
