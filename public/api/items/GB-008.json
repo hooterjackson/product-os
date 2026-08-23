@@ -32,6 +32,6 @@
       "gimbal-bench"
     ],
     "status": "next",
-    "title": "Z-M3 \u2014 Zigbee bring-up as a light"
+    "title": "Bring the fixture up on the radio and prove it still behaves like a light (Z-M3)"
   }
 }

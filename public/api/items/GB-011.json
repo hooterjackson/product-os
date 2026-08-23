@@ -30,6 +30,6 @@
       "gimbal-bench"
     ],
     "status": "next",
-    "title": "Z-M6 \u2014 telemetry attributes and the chunked dump"
+    "title": "Report telemetry over the radio, including the long dumps (Z-M6)"
   }
 }

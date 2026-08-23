@@ -26,9 +26,9 @@ portfolio into context.
 
 - `GB-001` Finish the M5 fault ring: a real fault storm, and the brownout case
 - `GB-014` Un-park Zigbee — the decision D15 leaves open · gate external
-- `GB-005` Z-M1 — variant, partitions and the c-patch signing scaffold
-- `GB-006` Z-M0 — the §9.1 mailbox primitive
-- `GB-008` Z-M3 — Zigbee bring-up as a light
+- `GB-005` Prepare the radio build: memory layout, and a stub for signing updates (Z-M1)
+- `GB-006` Add the single-slot mailbox the radio and the safety loop pass messages through (Z-M0)
+- `GB-008` Bring the fixture up on the radio and prove it still behaves like a light (Z-M3)
 - `GB-002` Rescue D1-D11 off formd-t1 and commit them
 - `Q-001` Does Spot Mode (Auto/Hold/Manual) survive gate A?
 - `GB-004` M6 on hardware: the motor-silent limb, MUTE-CLEAR, and the armed lane

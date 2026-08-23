@@ -23,9 +23,9 @@ accurate is exactly what I am asking.
 1. `GB-001` — Finish the M5 fault ring: a real fault storm, and the brownout case
 2. `HAI-001` — Rotate the GPU box's Linux password
 3. `GB-014` — Un-park Zigbee — the decision D15 leaves open · gate external
-4. `GB-005` — Z-M1 — variant, partitions and the c-patch signing scaffold
-5. `GB-006` — Z-M0 — the §9.1 mailbox primitive
-6. `GB-008` — Z-M3 — Zigbee bring-up as a light
+4. `GB-005` — Prepare the radio build: memory layout, and a stub for signing updates (Z-M1)
+5. `GB-006` — Add the single-slot mailbox the radio and the safety loop pass messages through (Z-M0)
+6. `GB-008` — Bring the fixture up on the radio and prove it still behaves like a light (Z-M3)
 7. `GB-002` — Rescue D1-D11 off formd-t1 and commit them
 8. `Q-001` — Does Spot Mode (Auto/Hold/Manual) survive gate A?
 

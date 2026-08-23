@@ -2607,6 +2607,14 @@ class NoMilestoneCodeReachesTheReadingText(unittest.TestCase):
 
     CODE = re.compile(r"\b[A-Z]-[A-Z]?\d+\b")
 
+    # A trailing parenthetical HANDLE is allowed and a leading code is not.
+    # "Z-M1 — variant, partitions and the c-patch signing scaffold" is opaque;
+    # "Prepare the radio build: memory layout, and a stub for signing updates
+    # (Z-M1)" reads in English and keeps the link to ZIGBEE-PHASE-PLAN.md.
+    # Marcelo kept the handle deliberately, so the guard has to encode the
+    # distinction rather than ban the characters.
+    HANDLE = re.compile(r"\s*\([^()]*\)\s*$")
+
     def test_the_guard_matches_the_shape_it_is_meant_to(self):
         for bad in ("Z-M1", "Z-M0", "D-15", "R-077"):
             self.assertIsNotNone(self.CODE.search(bad), bad)
@@ -2618,16 +2626,99 @@ class NoMilestoneCodeReachesTheReadingText(unittest.TestCase):
         """The allowlist is what makes this honest: these are the titles
         Marcelo has not yet approved a rewrite for. It shrinks as he does."""
         import _model as model_mod
-        pending = {"GB-005", "GB-006", "GB-007", "GB-008", "GB-009",
-                   "GB-010", "GB-011", "EL-004"}
+        # Empty: Marcelo approved all eight rewrites on 2026-08-23 ("the
+        # updated versions are much better"), applied through apply.py so the
+        # sentence is on the record. The list shrinking to nothing is the
+        # guard tightening, which is what it was for.
+        pending = set()
         model = model_mod.Model.load(ROOT)
         self.assertGreater(len(model.items), 20, "the scan did not run")
+        def leads_with_jargon(title):
+            body = self.HANDLE.sub("", title)
+            return bool(self.CODE.search(body)) or "§" in body
+
         offenders = sorted(n.id for n in model.items.values()
-                           if n.id not in pending
-                           and (self.CODE.search(n.title) or "§" in n.title))
+                           if n.id not in pending and leads_with_jargon(n.title))
         self.assertEqual(offenders, [],
-                         "a milestone code or section reference is in a title "
-                         "outside the pending set")
+                         "a milestone code or section reference is in the "
+                         "READING text of a title, not just its handle")
+
+    def test_a_leading_code_is_still_rejected(self):
+        """Proven both ways, or the allowance swallows the rule."""
+        def leads(title):
+            return bool(self.CODE.search(self.HANDLE.sub("", title))) \
+                or "§" in self.HANDLE.sub("", title)
+        self.assertTrue(leads("Z-M1 — variant, partitions and the scaffold"))
+        self.assertTrue(leads("Z-M0 — the §9.1 mailbox primitive"))
+        self.assertFalse(leads("Prepare the radio build: memory layout (Z-M1)"))
+        self.assertFalse(leads("Rotate the GPU box's Linux password"))
+
+
+class AResumeCommandRunsInTHISShell(unittest.TestCase):
+    """`zsh: command not found: claude`.
+
+    `resume_command()` checked `shutil.which("claude")` and stored the BARE
+    name. That check passed in the process that built the index and the command
+    was then printed into an interactive shell where `~/.local/bin` is not on
+    PATH. Verifying in one environment and running in another is the same shape
+    as verifying on one machine and reading on another.
+
+    `codex` was already addressed by absolute path for exactly this reason —
+    `test_codex_is_addressed_by_full_path_since_it_is_not_on_path` — and
+    `claude` was left bare on the assumption it is always on PATH. One rule,
+    applied to one of two."""
+
+    def test_the_stored_command_names_a_resolvable_binary(self):
+        import index as index_mod
+        path = os.path.join(ROOT, "state", "threads", "by-machine",
+                            "%s.local.json" % index_mod.new_mod.machine_id(ROOT)
+                            if hasattr(index_mod, "new_mod") else "")
+        path = glob.glob(os.path.join(ROOT, "state", "threads", "by-machine",
+                                      "*.local.json"))
+        if not path:
+            self.skipTest("no local half on this machine")
+        checked = 0
+        for shard in path:
+            with open(shard, encoding="utf-8") as fh:
+                for row in json.load(fh).get("threads") or []:
+                    command = row.get("command")
+                    if not command:
+                        continue
+                    checked += 1
+                    binary = command.split("&&")[-1].strip().split()[0]
+                    self.assertTrue(
+                        binary.startswith(("/", "~/")),
+                        "%r is a bare name — it resolves only in a shell whose "
+                        "PATH happens to carry it" % binary)
+                    self.assertTrue(
+                        os.path.exists(os.path.expanduser(binary)),
+                        "%s does not exist" % binary)
+        self.assertGreater(checked, 0, "no command to check")         # R-075
+
+    def test_ways_back_reverifies_rather_than_trusting_the_index(self):
+        with open(os.path.join(ROOT, "tools", "index.py"),
+                  encoding="utf-8") as fh:
+            source = fh.read()
+        block = source[source.index("def ways_back("):]
+        block = block[:block.index("def main(")]
+        self.assertIn("shutil.which", block,
+                      "--ways-back trusts a check made at build time")
+        self.assertIn("does not resolve ", block,
+                      "--ways-back does not say when a stored command has "
+                      "gone stale")
+
+    def test_the_output_says_what_to_do_with_it(self):
+        """It printed titles and commands and never said they reopen a chat
+        with its history — "how do I hop back into one" was not answerable
+        from the output."""
+        proc = subprocess.run(
+            [sys.executable, os.path.join(ROOT, "tools", "index.py"),
+             "--ways-back"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+            cwd=ROOT)
+        out = proc.stdout.decode()
+        self.assertIn("Paste one of these into a terminal", out)
+        self.assertIn("where it left off", out)
+        self.assertIn("RESTART", out, "it never says what the others are")
 
 
 if __name__ == "__main__":

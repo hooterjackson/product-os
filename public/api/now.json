@@ -108,7 +108,7 @@
         "gimbal-bench"
       ],
       "status": "next",
-      "title": "Z-M1 \u2014 variant, partitions and the c-patch signing scaffold"
+      "title": "Prepare the radio build: memory layout, and a stub for signing updates (Z-M1)"
     },
     {
       "backlog_position": 5,
@@ -135,7 +135,7 @@
         "gimbal-bench"
       ],
       "status": "next",
-      "title": "Z-M0 \u2014 the \u00a79.1 mailbox primitive"
+      "title": "Add the single-slot mailbox the radio and the safety loop pass messages through (Z-M0)"
     },
     {
       "backlog_position": 6,
@@ -164,7 +164,7 @@
         "gimbal-bench"
       ],
       "status": "next",
-      "title": "Z-M3 \u2014 Zigbee bring-up as a light"
+      "title": "Bring the fixture up on the radio and prove it still behaves like a light (Z-M3)"
     },
     {
       "backlog_position": 7,
@@ -634,7 +634,7 @@
         "gimbal-bench"
       ],
       "status": "next",
-      "title": "Z-M2 \u2014 the rollback ladder, D15's ruled first radio commit"
+      "title": "Build the rollback ladder, so a bad radio update can be backed out (Z-M2)"
     },
     {
       "backlog_position": 22,
@@ -745,7 +745,7 @@
         "gimbal-bench"
       ],
       "status": "next",
-      "title": "Z-M4 \u2014 commissioning gesture and the reset-call choice"
+      "title": "Decide how the fixture is commissioned, and what a reset actually resets (Z-M4)"
     },
     {
       "backlog_position": 26,
@@ -772,7 +772,7 @@
         "gimbal-bench"
       ],
       "status": "next",
-      "title": "Z-M5 \u2014 the deployed \u00a74.1 motion predicate"
+      "title": "Prove the deployed fixture only moves when it is meant to (Z-M5)"
     },
     {
       "backlog_position": 27,
@@ -799,7 +799,7 @@
         "gimbal-bench"
       ],
       "status": "next",
-      "title": "Z-M6 \u2014 telemetry attributes and the chunked dump"
+      "title": "Report telemetry over the radio, including the long dumps (Z-M6)"
     }
   ],
   "counts": {

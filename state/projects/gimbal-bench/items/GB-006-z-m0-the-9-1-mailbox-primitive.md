@@ -1,7 +1,7 @@
 ---
 {
   "id": "GB-006",
-  "title": "Z-M0 — the §9.1 mailbox primitive",
+  "title": "Add the single-slot mailbox the radio and the safety loop pass messages through (Z-M0)",
   "project": "gimbal-bench",
   "status": "next",
   "lane": "firmware",
@@ -33,7 +33,7 @@
   ],
   "parent_ruling": "DEC-015",
   "created": "2026-08-19",
-  "updated": "2026-08-20"
+  "updated": "2026-08-23"
 }
 ---
 

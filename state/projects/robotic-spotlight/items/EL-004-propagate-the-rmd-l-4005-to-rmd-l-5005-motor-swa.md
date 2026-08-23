@@ -1,7 +1,7 @@
 ---
 {
   "id": "EL-004",
-  "title": "Propagate the RMD-L-4005 to RMD-L-5005 motor swap sitewide",
+  "title": "Update every document that still names the old motor (EL-004 · RMD-L-4005 → 5005)",
   "project": "robotic-spotlight",
   "status": "done",
   "lane": "hardware",
@@ -48,7 +48,7 @@
   ],
   "parent_ruling": null,
   "created": "2026-08-19",
-  "updated": "2026-08-20",
+  "updated": "2026-08-23",
   "completed": "2026-07-21",
   "closed_origin": "inferred"
 }

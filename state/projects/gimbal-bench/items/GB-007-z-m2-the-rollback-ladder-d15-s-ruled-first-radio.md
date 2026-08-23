@@ -1,7 +1,7 @@
 ---
 {
   "id": "GB-007",
-  "title": "Z-M2 — the rollback ladder, D15's ruled first radio commit",
+  "title": "Build the rollback ladder, so a bad radio update can be backed out (Z-M2)",
   "project": "gimbal-bench",
   "status": "next",
   "lane": "firmware",
@@ -34,7 +34,7 @@
   ],
   "parent_ruling": "DEC-101",
   "created": "2026-08-19",
-  "updated": "2026-08-20"
+  "updated": "2026-08-23"
 }
 ---
 

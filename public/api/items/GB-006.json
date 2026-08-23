@@ -30,6 +30,6 @@
       "gimbal-bench"
     ],
     "status": "next",
-    "title": "Z-M0 \u2014 the \u00a79.1 mailbox primitive"
+    "title": "Add the single-slot mailbox the radio and the safety loop pass messages through (Z-M0)"
   }
 }

@@ -1,7 +1,7 @@
 ---
 {
   "id": "GB-010",
-  "title": "Z-M5 — the deployed §4.1 motion predicate",
+  "title": "Prove the deployed fixture only moves when it is meant to (Z-M5)",
   "project": "gimbal-bench",
   "status": "next",
   "lane": "firmware",
@@ -34,7 +34,7 @@
   ],
   "parent_ruling": "DEC-015",
   "created": "2026-08-19",
-  "updated": "2026-08-20"
+  "updated": "2026-08-23"
 }
 ---
 

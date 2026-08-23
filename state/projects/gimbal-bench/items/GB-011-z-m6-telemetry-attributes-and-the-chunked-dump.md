@@ -1,7 +1,7 @@
 ---
 {
   "id": "GB-011",
-  "title": "Z-M6 — telemetry attributes and the chunked dump",
+  "title": "Report telemetry over the radio, including the long dumps (Z-M6)",
   "project": "gimbal-bench",
   "status": "next",
   "lane": "firmware",
@@ -32,7 +32,7 @@
   ],
   "parent_ruling": "DEC-015",
   "created": "2026-08-19",
-  "updated": "2026-08-20"
+  "updated": "2026-08-23"
 }
 ---
 

@@ -1,7 +1,7 @@
 ---
 {
   "id": "GB-009",
-  "title": "Z-M4 — commissioning gesture and the reset-call choice",
+  "title": "Decide how the fixture is commissioned, and what a reset actually resets (Z-M4)",
   "project": "gimbal-bench",
   "status": "next",
   "lane": "firmware",
@@ -32,7 +32,7 @@
   ],
   "parent_ruling": "DEC-015",
   "created": "2026-08-19",
-  "updated": "2026-08-20"
+  "updated": "2026-08-23"
 }
 ---
 

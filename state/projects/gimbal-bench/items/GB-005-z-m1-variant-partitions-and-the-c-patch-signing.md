@@ -1,7 +1,7 @@
 ---
 {
   "id": "GB-005",
-  "title": "Z-M1 — variant, partitions and the c-patch signing scaffold",
+  "title": "Prepare the radio build: memory layout, and a stub for signing updates (Z-M1)",
   "project": "gimbal-bench",
   "status": "next",
   "lane": "firmware",
@@ -34,7 +34,7 @@
   ],
   "parent_ruling": "DEC-015",
   "created": "2026-08-19",
-  "updated": "2026-08-20"
+  "updated": "2026-08-23"
 }
 ---
 

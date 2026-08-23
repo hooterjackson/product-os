@@ -112,10 +112,22 @@ def resume_command(thread):
     if not ident:
         return None
     if tool == "claude-code":
-        if not shutil.which(CLAUDE_BIN):
+        # The RESOLVED path, not the bare name. `codex` is already addressed by
+        # full path because it is not on PATH, and `claude` was left as a bare
+        # word on the assumption that it always is. It is not: it lives in
+        # ~/.local/bin, which this repo's tools inherit and an interactive zsh
+        # here does not. The command verified fine when the index was BUILT --
+        # a different process, a different PATH -- and then printed into a
+        # shell that answered `zsh: command not found: claude`.
+        #
+        # Verifying in one environment and running in another is the same shape
+        # as verifying on one machine and reading on another. Store what will
+        # actually run.
+        resolved = shutil.which(CLAUDE_BIN)
+        if not resolved:
             return None
         cwd = thread.get("cwd")
-        return "cd %s && %s -r %s" % (cwd or "~", CLAUDE_BIN, ident)
+        return "cd %s && %s -r %s" % (cwd or "~", tilde(resolved), ident)
     if tool == "codex":
         if not os.path.exists(CODEX_BIN):
             return None
@@ -654,20 +666,52 @@ def ways_back(root, machine):
         threads = json.load(fh).get("threads") or []
 
     shown = 0
+    header = False
     for thread in sorted(threads, key=lambda t: t.get("last_active") or "",
                          reverse=True):
         row = local.get(thread.get("key")) or {}
         if thread.get("verdict") != "resume":
             continue
+        if not header:
+            # It printed a bare list of titles and commands and never said what
+            # to do with them. "How do I hop back into one" was not answerable
+            # from the output.
+            print("Paste one of these into a terminal. It reopens that chat "
+                  "where it left off,")
+            print("with its whole history — you are not starting over.\n")
+            header = True
         shown += 1
+        command = row.get("command")
+        # Re-verified HERE, not trusted from the index. The binary that existed
+        # when the shard was written may not exist now, and may not be on the
+        # PATH of the shell reading this -- which is exactly how a command that
+        # passed its check at build time printed `command not found`.
+        if command:
+            binary = command.split("&&")[-1].strip().split()[0]
+            expanded = os.path.expanduser(binary)
+            if not (os.path.exists(expanded) or shutil.which(binary)):
+                command = None
+                stale = binary
         print("%s" % (thread.get("title") or thread.get("key")))
-        print("  %s" % (row.get("command")
-                        or "no verified command — open it from the app's own "
-                           "session picker"))
+        if command:
+            print("  %s" % command)
+        elif row.get("command"):
+            print("  the recorded command names %s, which does not resolve "
+                  "here any more." % stale)
+            print("  Re-run `python3 tools/index.py` in this shell to rebuild "
+                  "it, or open the chat from the app's session picker.")
+        else:
+            print("  no verified command — open it from the app's own session "
+                  "picker")
         print()
     if not shown:
         print("Nothing is worth resuming on %s. Every indexed chat here reads "
-              "RESTART." % machine)
+              "RESTART — start a new one and copy the task's kickoff prompt "
+              "from the dashboard instead." % machine)
+    else:
+        print("%d chat(s) worth returning to. The rest read RESTART: their "
+              "model of the repo is behind, so a fresh chat with the task's "
+              "kickoff prompt beats reopening them." % shown)
     return 0
 
 

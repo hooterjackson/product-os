@@ -30,6 +30,6 @@
       "gimbal-bench"
     ],
     "status": "next",
-    "title": "Z-M1 \u2014 variant, partitions and the c-patch signing scaffold"
+    "title": "Prepare the radio build: memory layout, and a stub for signing updates (Z-M1)"
   }
 }

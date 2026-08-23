@@ -1,7 +1,7 @@
 ---
 {
   "id": "GB-008",
-  "title": "Z-M3 — Zigbee bring-up as a light",
+  "title": "Bring the fixture up on the radio and prove it still behaves like a light (Z-M3)",
   "project": "gimbal-bench",
   "status": "next",
   "lane": "firmware",
@@ -34,7 +34,7 @@
   ],
   "parent_ruling": "DEC-015",
   "created": "2026-08-19",
-  "updated": "2026-08-20"
+  "updated": "2026-08-23"
 }
 ---
 

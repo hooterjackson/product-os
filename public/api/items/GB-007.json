@@ -31,6 +31,6 @@
       "gimbal-bench"
     ],
     "status": "next",
-    "title": "Z-M2 \u2014 the rollback ladder, D15's ruled first radio commit"
+    "title": "Build the rollback ladder, so a bad radio update can be backed out (Z-M2)"
   }
 }
