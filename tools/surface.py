@@ -68,6 +68,7 @@ import os
 import sys
 
 import shutil
+import urllib.parse
 
 import _context
 import _fm
@@ -506,49 +507,106 @@ def add_controls(model):
         % (ISSUES, ISSUES))
 
 
+def issue_url(template, label, title, **fields):
+    """A pre-filled GitHub issue. The page holds no token, so this is how a
+    decision leaves it -- under his own sign-in, on any device."""
+    query = {"template": template, "labels": label, "title": title}
+    query.update({k: v for k, v in fields.items() if v})
+    return "%s?%s" % (ISSUES, urllib.parse.urlencode(query))
+
+
+def closure_row(node):
+    """One closure, one judgement, and both ways out reachable from a phone.
+
+    The row used to print `backlog.py --unconfirmed`. That LISTS the five and
+    confirms nothing -- the discovery command offered as though it were the
+    action, so the way out was a two-step presented as a one-step and the step
+    it showed did nothing. The real command is what `backlog.py` itself prints
+    at the foot of that listing, and the row knows its own id, so it is
+    rendered here already parameterised.
+
+    `--said` is not ceremony. `apply.py` routes on it: with his sentence a
+    decided field APPLIES, without one it is only proposed. It is what makes
+    this his decision rather than a rubber stamp on a machine's guess, and the
+    audit keeps the sentence. So the form's one required field is that
+    sentence, and the terminal form shows it too.
+    """
+    found = node.get("evidence_found") or []
+    evidence = ", ".join(str(e.get("sha") or e.get("path")) for e in found[:3])
+    claim = "%s — %s. Closed %s. Evidence: %s" % (
+        node.id, node.title, node.get("completed") or "date unrecorded",
+        evidence or "NONE recorded")
+
+    def link(verdict, label, sub):
+        return (
+            '<a href="%s" style="display:flex;align-items:center;'
+            'justify-content:space-between;min-height:48px;border:1px solid %s;'
+            'padding:0 var(--sp-4);font:400 var(--fs-chrome)/1 '
+            'var(--font-mono);letter-spacing:0.12em;text-transform:uppercase;'
+            'color:%s"><span>%s</span>'
+            '<span style="color:var(--el-ink-3)">%s</span></a>'
+            % (esc(issue_url("confirm.yml", "confirm",
+                             "%s — %s" % (node.id, sub), task=node.id,
+                             verdict=verdict, evidence=claim)),
+               "var(--el-amber)" if sub == "confirm" else "var(--el-line-2)",
+               "var(--el-amber)" if sub == "confirm" else "var(--el-ink-2)",
+               label, sub))
+
+    ways = ('<div style="display:grid;gap:var(--sp-3);margin:0 0 var(--sp-4)">'
+            '<span style="%s">Your way out — either one, from anywhere</span>'
+            '%s%s</div>'
+            % (MICRO,
+               link("Confirm - it was finished", "It was right", "confirm"),
+               link("Reopen - it was not", "It was not — reopen it", "reopen")))
+
+    terminal = field(
+        "Or from a terminal",
+        '<code style="font:400 var(--fs-meta)/1.6 var(--font-mono);'
+        'color:var(--el-ink);display:block;white-space:pre-wrap;'
+        'overflow-wrap:anywhere">python3 tools/apply.py --decided '
+        '%s=status:done \\\n    --said "your sentence here"</code>'
+        '<span style="%s;display:block;margin-top:var(--sp-2)">'
+        'Same command with <code style="font-family:var(--font-mono)">'
+        'status:next</code> reopens it. The sentence is required — without it '
+        'the change is only proposed.</span>' % (esc(node.id), META), META)
+
+    return (
+        '<details style="border-top:1px solid var(--el-line)"><summary '
+        'style="display:flex;gap:var(--sp-3);align-items:baseline;'
+        'padding:var(--sp-4) 0;min-height:44px">'
+        '<span style="font:400 var(--fs-chrome)/1.5 var(--font-mono);'
+        'letter-spacing:0.06em;color:var(--el-ink-3);flex:none">%s</span>'
+        '<span style="flex:1;font:400 var(--fs-body)/1.45 var(--font-sans);'
+        'color:var(--el-ink)">%s</span></summary>'
+        '<div style="padding:var(--sp-1) 0 var(--sp-5)">%s%s%s</div></details>'
+        % (esc(node.id), esc(node.title),
+           field("What it claims",
+                 esc("Closed %s · evidence %s"
+                     % (node.get("completed") or "?", evidence or "none")),
+                 META),
+           ways, terminal))
+
+
 def closures(model):
-    """A closure row is a disclosure. Closed, the IDs. Open, the title, the date
-    and that row's own way out with its real ID in it -- never a template."""
+    """A closure row is a disclosure. Closed, the ids. Open, what it claims and
+    that row's own way out with its real id in it -- never a template."""
     rows = sorted([n for n in model.nodes.values()
                    if n.status == "done"
                    and n.get("closed_origin") != "his-word"],
                   key=lambda n: _fm.sort_key(n.id))
     if not rows:
         return ""
-    out = ['<section id="closures" style="%s"><div style="display:flex;'
-           'align-items:baseline;gap:var(--sp-2);margin:0 0 var(--sp-4)">'
-           '<span style="%s">Closed without you · %d</span></div>'
-           % (SECTION, CHROME, len(rows))]
-    out.append('<p style="%s;margin:0 0 var(--sp-4);max-width:46ch">A machine '
-               'decided these were finished. You have confirmed none of them.'
-               '</p>' % BODY)
-    for node in rows:
-        found = node.get("evidence_found") or []
-        evidence = ", ".join(str(e.get("sha") or e.get("path"))
-                             for e in found[:3]) or "none recorded"
-        out.append(
-            '<details style="border-top:1px solid var(--el-line)"><summary '
-            'style="display:flex;gap:var(--sp-3);align-items:baseline;'
-            'padding:var(--sp-4) 0;min-height:44px">'
-            '<span style="font:400 var(--fs-chrome)/1.5 var(--font-mono);'
-            'letter-spacing:0.06em;color:var(--el-ink-3);flex:none">%s</span>'
-            '<span style="flex:1;font:400 var(--fs-body)/1.45 '
-            'var(--font-sans);color:var(--el-ink)">%s</span></summary>'
-            '<div style="padding:var(--sp-1) 0 var(--sp-5)">%s%s</div>'
-            '</details>'
-            % (esc(node.id), esc(node.title),
-               field("Closed", esc("%s · evidence %s"
-                                   % (node.get("completed") or "?", evidence)),
-                     META),
-               field("Your way out",
-                     'Confirm it was right, or reopen it. From a terminal in '
-                     'your product-os clone — the command is repo-relative, so '
-                     'it is the same wherever that is: '
-                     '<code style="font-family:var(--font-mono);'
-                     'font-size:var(--fs-meta)">python3 tools/backlog.py '
-                     '--unconfirmed</code>', BODY)))
-    out.append("</section>")
-    return "".join(out)
+    return (
+        '<section id="closures" style="%s"><div style="display:flex;'
+        'align-items:baseline;gap:var(--sp-2);margin:0 0 var(--sp-4)">'
+        '<span style="%s">Closed without you · %d</span></div>'
+        '<p style="%s;margin:0 0 var(--sp-5);max-width:46ch">A machine decided '
+        'these were finished. You have confirmed none of them. '
+        '<strong>Each is its own call</strong> — five separate judgements, not '
+        'one, because batching them would turn five decisions into one '
+        'shrug.</p>%s</section>'
+        % (SECTION, CHROME, len(rows), BODY,
+           "".join(closure_row(n) for n in rows)))
 
 
 def chats(root, model, manual, machine):

@@ -1,0 +1,44 @@
+name: Confirm or reopen a closure
+description: A machine decided a task was finished. This is you agreeing, or not.
+labels:
+  - confirm
+body:
+  - type: markdown
+    attributes:
+      value: >
+        The ID and the evidence below are filled in from the row you tapped.
+        You are judging them, not retyping them. The only thing to write is the
+        last field.
+  - type: input
+    id: task
+    attributes:
+      label: Task
+    validations:
+      required: true
+  - type: dropdown
+    id: verdict
+    attributes:
+      label: Was it right?
+      options:
+        - Confirm - it was finished
+        - Reopen - it was not
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: What the machine is claiming
+      description: Its own words. Change nothing here.
+    validations:
+      required: false
+  - type: textarea
+    id: said
+    attributes:
+      label: In your words
+      description: >
+        This becomes the --said sentence on the record. It is not ceremony:
+        it is what makes this your decision rather than a rubber stamp on a
+        machine's guess, and the audit keeps it.
+      placeholder: yes, the motor swap shipped - I saw it on the bench
+    validations:
+      required: true

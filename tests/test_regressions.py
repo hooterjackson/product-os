@@ -2237,5 +2237,103 @@ class TheSurfaceNameIsExplainedCorrectly(unittest.TestCase):
                       "the one recorded")
 
 
+class AClosureCanBeDisposedOfFromAPhone(unittest.TestCase):
+    """The test Marcelo set: land on the closures section on a phone and
+    dispose of one — either way — without opening a terminal.
+
+    It failed twice over. The row rendered `backlog.py --unconfirmed`, which
+    LISTS the five and confirms nothing: the discovery command offered as
+    though it were the action, so the way out was a two-step presented as a
+    one-step and the step it showed did nothing. And the phone path did not
+    exist at all — `confirm` was reserved in labels.py, declared by no
+    template, absent from the remote. The write path was designed and stopped."""
+
+    def _page(self):
+        with open(os.path.join(ROOT, "public", "index.html"),
+                  encoding="utf-8") as fh:
+            return fh.read()
+
+    def _links(self):
+        return sorted(set(re.findall(r'issues/new\?[^"]*confirm\.yml[^"]*',
+                                     self._page())))
+
+    def test_every_closure_offers_both_ways_out_without_a_terminal(self):
+        import _model as model_mod
+        model = model_mod.Model.load(ROOT)
+        rows = [n for n in model.nodes.values()
+                if n.status == "done"
+                and n.get("closed_origin") != "his-word"]
+        self.assertTrue(rows, "no unconfirmed closures to check")     # R-075
+        page = self._page()
+        for node in rows:
+            for verdict in ("Confirm", "Reopen"):
+                self.assertIn("task=%s" % node.id, page,
+                              "%s has no pre-filled way out" % node.id)
+            self.assertEqual(
+                len([u for u in self._links() if "task=%s" % node.id in u]), 2,
+                "%s does not offer BOTH confirm and reopen" % node.id)
+
+    def test_the_page_no_longer_shows_the_discovery_command(self):
+        """`--unconfirmed` lists; it does not decide."""
+        self.assertNotIn("backlog.py --unconfirmed", self._page())
+
+    def test_the_terminal_form_is_the_action_and_carries_the_row_s_id(self):
+        import _model as model_mod
+        model = model_mod.Model.load(ROOT)
+        page = self._page()
+        for node in model.nodes.values():
+            if node.status != "done" or node.get("closed_origin") == "his-word":
+                continue
+            self.assertIn("--decided %s=status:done" % node.id, page,
+                          "%s shows an unparameterised command" % node.id)
+        self.assertIn("status:next", page, "reopen is not reachable")
+
+    def test_the_url_params_match_the_template_exactly(self):
+        """A param naming a field the template does not have, or a dropdown
+        value that is not one of its options, does not pre-fill — it is
+        DROPPED, and the form renders looking fine. Same silent shape as a
+        label the repo does not have."""
+        import urllib.parse
+        with open(os.path.join(ROOT, ".github", "ISSUE_TEMPLATE",
+                               "confirm.yml"), encoding="utf-8") as fh:
+            template = fh.read()
+        ids = set(re.findall(r"^\s*id:\s*(\S+)", template, re.M))
+        options = {ln.strip("- ").strip() for ln in template.splitlines()
+                   if ln.startswith("        - ")}
+        links = self._links()
+        self.assertGreaterEqual(len(links), 2, "the scan did not run")  # R-075
+        for link in links:
+            query = urllib.parse.parse_qs(
+                link.replace("&amp;", "&").split("?", 1)[1])
+            unknown = set(query) - ids - {"template", "labels", "title"}
+            self.assertEqual(unknown, set(),
+                             "%s names fields the template lacks" % unknown)
+            self.assertIn(query["verdict"][0], options,
+                          "the dropdown value is not one of its options")
+            self.assertTrue(query.get("evidence"),
+                            "he would be judging with nothing in front of him")
+
+    def test_the_form_asks_for_his_sentence_and_requires_it(self):
+        """`--said` is what makes this HIS decision: apply.py APPLIES a decided
+        field on his word and only PROPOSES without one. A button posting a
+        bare "confirmed" strips exactly what the guard preserves."""
+        with open(os.path.join(ROOT, ".github", "ISSUE_TEMPLATE",
+                               "confirm.yml"), encoding="utf-8") as fh:
+            template = fh.read()
+        self.assertIn("id: said", template)
+        free = re.findall(r"type: textarea\n\s+id: (\S+)", template)
+        required = template.count("required: true")
+        self.assertIn("said", free)
+        self.assertEqual(required, 3,
+                         "task, verdict and the sentence are required; the "
+                         "evidence he is judging is not")
+
+    def test_the_section_says_each_is_its_own_call(self):
+        page = self._page()
+        self.assertIn("its own call", page,
+                      "five trips reads as friction unless the repetition is "
+                      "declared deliberate")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
