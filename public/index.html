@@ -2,24 +2,51 @@
 
 Read https://raw.githubusercontent.com/hooterjackson/product-os/main/public/llms.txt and follow it.
 
-What it believes right now:
-  GB-001 Finish the M5 fault ring: a real fault storm, and the brownout case
-  HAI-001 Rotate the GPU box&#x27;s Linux password
-  GB-014 Un-park Zigbee — the decision D15 leaves open
-  GB-005 Z-M1 — variant, partitions and the c-patch signing scaffold
-  GB-006 Z-M0 — the §9.1 mailbox primitive
-  GB-008 Z-M3 — Zigbee bring-up as a light
-  EL-004 closed by a machine, unconfirmed
-  POS-002 closed by a machine, unconfirmed
-  POS-003 closed by a machine, unconfirmed
-  POS-004 closed by a machine, unconfirmed
-  POS-005 closed by a machine, unconfirmed
-  home-ai-infra has no repository — its status is my word only
+WHAT IT BELIEVES RIGHT NOW — 6 projects, 27 open tasks. Everything below is as of the last audit.
+
+engineering-site — live at engineering.engineered.lighting; stale in both directions.
+  Nothing open.
+
+gimbal-bench — M5 fault ring layers one and two measured; Zigbee parked (D15).
+  Last worked 19 Aug.
+  17 open, top 3:
+    GB-001  Finish the M5 fault ring: a real fault storm, and the brownout case
+    GB-014  Un-park Zigbee — the decision D15 leaves open
+    GB-005  Z-M1 — variant, partitions and the c-patch signing scaffold
+    (14 more in this project not listed here — ask if you need them)
+
+home-ai-infra — provisioned; credential hygiene outstanding.
+  No repository, so its status is my word only.
+  1 open:
+    HAI-001  Rotate the GPU box&#x27;s Linux password
+
+home-app — one squashed snapshot; no usable timeline.
+  1 open:
+    APP-001  Give HomeApp an evidence rule that does not depend on git history
+
+product-os — slice 1a-minus.
+  Last worked 19 Aug.
+  8 open, top 3:
+    POS-008  Surface inferred closures, record the public decision
+    POS-010  Kickoff prompts and thread return paths
+    POS-011  The remaining action artifacts: reconcile, attach, connect-repo, capture
+    (5 more in this project not listed here — ask if you need them)
+
+robotic-spotlight — bench proven; LED head unordered.
+  Nothing open.
+
+CLOSED BY A MACHINE, NEVER CONFIRMED BY ME — 5:
+  EL-004  Propagate the RMD-L-4005 to RMD-L-5005 motor swap sitewide
+  POS-002  Point PROJECT-STATE.md at product-os
+  POS-003  Build /audit: re-check priorities against reality
+  POS-004  apply.py: distinguish who decided, not just what changed
+  POS-005  Thread indexer: bind chats to items, metadata only
 
 Tell me what actually happened since 2026-08-19. Then hand back:
   1. status changes, each with the SHA or path that proves it
   2. candidates you derived, each with its evidence
-  3. a rewritten TL;DR — five things, under 1 KB
+  3. for each project I mentioned: one plain sentence on where it now stands,
+     in my words where I gave them, and a new `phase` line if it changed
 
 Anything you cannot prove, say so and leave it open. Do not close a task I have not confirmed.</pre></div><div style="display:grid;gap:var(--sp-1);margin:0 0 var(--sp-4)"><span style="font:400 var(--fs-micro)/1 var(--font-mono);letter-spacing:0.14em;text-transform:uppercase;color:var(--el-ink-3)">Where to paste it</span><span style="font:400 var(--fs-body)/1.45 var(--font-sans);color:var(--el-ink-2)">Any chat window, including this phone. The prompt carries no path — it reads the repo over the web, so nothing needs to be cloned.</span></div><div style="display:grid;gap:var(--sp-1);margin:0 0 var(--sp-4)"><span style="font:400 var(--fs-micro)/1 var(--font-mono);letter-spacing:0.14em;text-transform:uppercase;color:var(--el-ink-3)">What happens next</span><span style="font:400 var(--fs-body)/1.45 var(--font-sans);color:var(--el-ink-2)">It answers with status changes, derived candidates and a new TL;DR. From a chat you carry the answer back; from the Mac it writes them itself. Either way this page shows them the next time it is built.</span></div></div></details></section><section style="padding:var(--sp-6) 0;border-top:1px solid var(--el-line)"><div style="display:flex;align-items:baseline;gap:var(--sp-2);margin:0 0 var(--sp-1)"><span style="font:400 var(--fs-chrome)/1.4 var(--font-mono);letter-spacing:0.14em;text-transform:uppercase;color:var(--el-ink-3)">Backlog</span></div><div style="display:grid;gap:0;margin-top:var(--sp-5)"><details style="border-top:1px solid var(--el-line)"><summary style="display:flex;gap:var(--sp-3);align-items:baseline;padding:var(--sp-4) 0;min-height:44px"><span style="flex:1;font:400 var(--fs-body-l)/1.4 var(--font-mono);letter-spacing:0.02em;color:var(--el-ink)">gimbal-bench</span><span style="font:400 var(--fs-meta)/1.4 var(--font-mono);color:var(--el-ink-3);text-align:right">last worked 19 Aug · 17 open</span></summary><div style="display:grid;gap:var(--sp-4);padding:0 0 var(--sp-6)"><div style="display:grid;gap:var(--sp-1);margin:0 0 var(--sp-4)"><span style="font:400 var(--fs-micro)/1 var(--font-mono);letter-spacing:0.14em;text-transform:uppercase;color:var(--el-ink-3)">What it is</span><span style="font:400 var(--fs-body)/1.5 var(--font-sans);color:var(--el-ink);text-wrap:pretty">Firmware and a commissioning bench that can prove, from a record, that the fixture stays a light.</span></div><div style="display:grid;gap:var(--sp-1);margin:0 0 var(--sp-4)"><span style="font:400 var(--fs-micro)/1 var(--font-mono);letter-spacing:0.14em;text-transform:uppercase;color:var(--el-ink-3)">Where it is</span><span style="font:400 var(--fs-body)/1.5 var(--font-sans);color:var(--el-ink);text-wrap:pretty">M5 fault ring layers one and two measured; Zigbee parked (D15)</span></div><div style="display:grid;gap:var(--sp-1);margin:0 0 var(--sp-4)"><span style="font:400 var(--fs-micro)/1 var(--font-mono);letter-spacing:0.14em;text-transform:uppercase;color:var(--el-ink-3)">Last session</span><span style="font:400 var(--fs-body)/1.5 var(--font-sans);color:var(--el-ink);text-wrap:pretty">Wrote this item&#x27;s return path by hand. `state/threads/manual.yaml` now carries a `GB-004:` line pointing at the web chat that ran the bench work. That chat has no transcript on disk, so `tools/index.py` was never going to find it — it is the first entry the file has ever held.</span></div><div style="display:grid;gap:0;margin-top:var(--sp-2)"><span style="font:400 var(--fs-micro)/1 var(--font-mono);letter-spacing:0.14em;text-transform:uppercase;color:var(--el-ink-3);padding-bottom:var(--sp-2)">17 open</span><details style="border-top:1px solid var(--el-line)"><summary style="display:flex;gap:var(--sp-3);align-items:flex-start;padding:var(--sp-4) 0;min-height:44px"><span style="font:400 var(--fs-chrome)/1.5 var(--font-mono);letter-spacing:0.06em;color:var(--el-ink-3);flex:none;padding-top:var(--sp-1)">GB-001</span><span style="flex:1;font:400 var(--fs-body-l)/1.45 var(--font-sans);color:var(--el-ink);text-wrap:pretty">Finish the M5 fault ring: a real fault storm, and the brownout case</span><span role="button" tabindex="0" aria-label="Copy the prompt" data-copy="" style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:var(--sp-1);min-height:44px;min-width:82px;justify-content:center;border:1px solid var(--el-line-2);padding:var(--sp-2) var(--sp-3)"><span style="font:400 var(--fs-chrome)/1 var(--font-mono);letter-spacing:0.1em;text-transform:uppercase;color:var(--el-amber)">Copy<span data-copied-slot=""></span></span><span style="font:400 var(--fs-micro)/1 var(--font-mono);letter-spacing:0.08em;text-transform:uppercase;color:var(--el-ink-3);white-space:nowrap">on formd-t1</span></span></summary><div style="padding:var(--sp-1) 0 var(--sp-6)"><div style="display:grid;gap:var(--sp-1);margin:0 0 var(--sp-4)"><span style="font:400 var(--fs-micro)/1 var(--font-mono);letter-spacing:0.14em;text-transform:uppercase;color:var(--el-ink-3)">What this does</span><span style="font:400 var(--fs-body)/1.45 var(--font-sans);color:var(--el-ink-2)">Hands a chat this task, what has already been ruled out for it, and how stale that knowledge is.</span></div><div style="display:grid;gap:var(--sp-1);margin:0 0 var(--sp-4)"><span style="font:400 var(--fs-micro)/1 var(--font-mono);letter-spacing:0.14em;text-transform:uppercase;color:var(--el-ink-3)">Already ruled out · 4</span><div style="display:grid;gap:0"><div style="display:grid;gap:var(--sp-1);padding:var(--sp-3) 0;border-top:1px solid var(--el-line)"><span style="font:400 var(--fs-meta)/1.4 var(--font-mono);color:var(--el-ink)">R-034 · Any flash or NVS write on a fault path</span><span style="font:400 var(--fs-label)/1.5 var(--font-sans);color:var(--el-ink-3)">**No fault path touches flash.** An NVS commit erases a page and can block for tens of milliseconds; the stop budget is 50 ms and does not negotiate.</span></div><div style="display:grid;gap:var(--sp-1);padding:var(--sp-3) 0;border-top:1px solid var(--el-line)"><span style="font:400 var(--fs-meta)/1.4 var(--font-mono);color:var(--el-ink)">R-035 · Restoring the fault ring from flash whenever flash has a copy</span><span style="font:400 var(--fs-label)/1.5 var(--font-sans);color:var(--el-ink-3)">`mirrorRestore()` returns immediately **unless layer one came back empty**.</span></div><div style="display:grid;gap:var(--sp-1);padding:var(--sp-3) 0;border-top:1px solid var(--el-line)"><span style="font:400 var(--fs-meta)/1.4 var(--font-mono);color:var(--el-ink)">R-039 · Un-parking Zigbee before the fault ring and the drills</span><span style="font:400 var(--fs-label)/1.5 var(--font-sans);color:var(--el-ink-3)">**Zigbee is ruled (D3) and parked (D15). Not dead, not next.** Both halves matter; either one alone gets the priority wrong in an opposite direction.</span></div><div style="display:grid;gap:var(--sp-1);padding:var(--sp-3) 0;border-top:1px solid var(--el-line)"><span style="font:400 var(--fs-meta)/1.4 var(--font-mono);color:var(--el-ink)">R-040 · Tombstoning `spot-bench.yaml` wholesale</span><span style="font:400 var(--fs-label)/1.5 var(--font-sans);color:var(--el-ink-3)">The file names exactly what survives D3:</span></div></div></div><div style="display:grid;gap:var(--sp-1);margin:0 0 var(--sp-4)"><span style="font:400 var(--fs-micro)/1 var(--font-mono);letter-spacing:0.14em;text-transform:uppercase;color:var(--el-ink-3)">The prompt</span><span style="font:400 var(--fs-meta)/1.5 var(--font-mono);color:var(--el-ink-3)">last audit 2026-08-19 · 153 commits unattributed then</span><pre data-prompt="" style="margin:0;font:400 var(--fs-meta)/1.6 var(--font-mono);color:var(--el-ink);background:var(--el-panel);border:1px solid var(--el-line);padding:var(--sp-4);white-space:pre-wrap;overflow-wrap:anywhere">Cite GB-001 in your first message.
 

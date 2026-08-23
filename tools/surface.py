@@ -284,22 +284,77 @@ def daily_action(root, model, stamp, unconfirmed, volatile):
     """An action sits at the foot of the thing it acts on -- the TL;DR it
     rewrites -- one tap from landing, and NOT as a section, which would put it
     in the reading order competing with the audit's own output."""
+    # PROJECT-MAJOR, and every count stated.
+    #
+    # This was a flat list of ids capped at `backlog()[:6]` — 6 of 27 open
+    # items, with the other 21 unmentioned. A chat reading it believed it had
+    # the whole picture and reconciled against a quarter of one. That is the
+    # "no silent caps" rule broken inside the artifact the entire tool exists
+    # to produce.
+    #
+    # The Backlog section directly above it is already project-major and reads
+    # fine, so the prompt uses the same shape: phase, last worked, open count,
+    # the top few, and the remainder said out loud.
+    ordered = model.backlog()
+    by_project = {}
+    for node in ordered:
+        by_project.setdefault(node.project, []).append(node)
+
     lines = ["You are updating Product OS.", "",
              "Read https://raw.githubusercontent.com/%s/main/public/llms.txt "
-             "and follow it." % REPO, "", "What it believes right now:"]
-    for node in model.backlog()[:6]:
-        lines.append("  %s %s" % (node.id, node.title))
-    for node in sorted(unconfirmed, key=lambda n: _fm.sort_key(n.id)):
-        lines.append("  %s closed by a machine, unconfirmed" % node.id)
-    for slug, project in sorted(model.projects.items()):
+             "and follow it." % REPO, "",
+             "WHAT IT BELIEVES RIGHT NOW — %d projects, %d open tasks. "
+             "Everything below is as of the last audit."
+             % (len(model.projects), len(ordered)), ""]
+
+    for slug in sorted(model.projects):
+        project = model.projects[slug]
+        nodes = by_project.get(slug, [])
+        handoff = _context.last_handoff(nodes) if nodes else None
+        head = "%s — %s" % (slug, (project.get("phase") or "").strip()
+                            or "no phase recorded")
+        lines.append(head.rstrip(". ") + ".")
+        notes = []
+        if handoff:
+            notes.append("Last worked %s" % short_date(handoff["date"]))
         if not (project.get("repos") or []):
-            lines.append("  %s has no repository — its status is my word only"
-                         % slug)
+            notes.append("no repository, so its status is my word only")
+        if notes:
+            # Not .capitalize() -- it lowercases the rest, which turned
+            # "Last worked 19 Aug" into "19 aug".
+            joined = "; ".join(notes)
+            lines.append("  %s%s." % (joined[:1].upper(), joined[1:]))
+        if not nodes:
+            lines.append("  Nothing open.")
+        else:
+            top = nodes[:3]
+            lines.append("  %d open%s:" % (len(nodes),
+                                           ", top %d" % len(top)
+                                           if len(nodes) > len(top) else ""))
+            for node in top:
+                lines.append("    %s  %s" % (node.id, node.title))
+            if len(nodes) > len(top):
+                # The bound, stated. A count that is not said is a cap.
+                lines.append("    (%d more in this project not listed here — "
+                             "ask if you need them)" % (len(nodes) - len(top)))
+        lines.append("")
+
+    if unconfirmed:
+        lines.append("CLOSED BY A MACHINE, NEVER CONFIRMED BY ME — %d:"
+                     % len(unconfirmed))
+        for node in sorted(unconfirmed, key=lambda n: _fm.sort_key(n.id)):
+            lines.append("  %s  %s" % (node.id, node.title))
+        lines.append("")
+
     since = (stamp or {}).get("date") or "the beginning"
-    lines += ["", "Tell me what actually happened since %s. Then hand back:" % since,
+    lines += ["Tell me what actually happened since %s. Then hand back:" % since,
               "  1. status changes, each with the SHA or path that proves it",
               "  2. candidates you derived, each with its evidence",
-              "  3. a rewritten TL;DR — five things, under 1 KB", "",
+              "  3. for each project I mentioned: one plain sentence on where "
+              "it now stands,",
+              "     in my words where I gave them, and a new `phase` line if "
+              "it changed",
+              "",
               "Anything you cannot prove, say so and leave it open. "
               "Do not close a task I have not confirmed."]
     prompt = "\n".join(lines)

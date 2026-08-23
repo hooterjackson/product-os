@@ -2528,5 +2528,107 @@ class TheThreadShardDoesNotPublishTheMachine(unittest.TestCase):
             "the local half is tracked")
 
 
+class TheBeliefBlockStatesItsOwnBounds(unittest.TestCase):
+    """`for node in model.backlog()[:6]` shipped 6 of 27 open tasks and said
+    nothing about the other 21, so a chat reading the prompt believed it had
+    the whole picture and reconciled against a quarter of one.
+
+    That is the "no silent caps" rule broken inside the artifact the entire
+    tool exists to produce — the same rule `audit.py` obeys when it prints
+    group D and declares its page cap."""
+
+    def _prompt(self):
+        import html as html_mod
+        with open(os.path.join(ROOT, "public", "index.html"),
+                  encoding="utf-8") as fh:
+            page = fh.read()
+        raw = re.search(r'<pre data-prompt=""[^>]*>(.*?)</pre>', page, re.S)
+        return html_mod.unescape(re.sub("<[^>]+>", "", raw.group(1)))
+
+    def test_it_names_the_totals_it_is_summarising(self):
+        import _model as model_mod
+        model = model_mod.Model.load(ROOT)
+        prompt = self._prompt()
+        self.assertIn("%d projects" % len(model.projects), prompt)
+        self.assertIn("%d open tasks" % len(model.backlog()), prompt)
+
+    def test_every_truncation_says_how_much_it_left_out(self):
+        import _model as model_mod
+        model = model_mod.Model.load(ROOT)
+        prompt = self._prompt()
+        counts = {}
+        for node in model.backlog():
+            counts[node.project] = counts.get(node.project, 0) + 1
+        checked = 0
+        for slug, total in counts.items():
+            if total <= 3:
+                continue
+            checked += 1
+            self.assertIn("(%d more in this project not listed here"
+                          % (total - 3), prompt,
+                          "%s truncates %d silently" % (slug, total - 3))
+        self.assertGreater(checked, 0, "no project truncates")        # R-075
+
+    def test_it_is_project_major_and_carries_the_phase(self):
+        """`phase` is a project field, already in his words, already on the
+        dashboard, and was absent from the prompt entirely."""
+        import _model as model_mod
+        model = model_mod.Model.load(ROOT)
+        prompt = self._prompt()
+        for slug, project in model.projects.items():
+            self.assertIn(slug, prompt, "%s is missing" % slug)
+            phase = (project.get("phase") or "").strip()
+            if phase:
+                self.assertIn(phase.rstrip(". "), prompt,
+                              "%s ships without its phase" % slug)
+
+    def test_a_project_with_no_repo_says_so_in_the_prompt(self):
+        self.assertIn("my word only", self._prompt())
+
+    def test_the_ask_back_is_per_project(self):
+        """He asked for his updates returned per product. A single rewritten
+        TL;DR is a competing summary; the project lines are the thing, and the
+        TL;DR becomes a by-product of them."""
+        prompt = self._prompt()
+        self.assertIn("for each project I mentioned", prompt)
+        self.assertIn("`phase` line if it changed", prompt)
+        self.assertNotIn("rewritten TL;DR", prompt)
+
+
+class NoMilestoneCodeReachesTheReadingText(unittest.TestCase):
+    """Third time jargon has come back. The plain-English rewrites from the
+    design's round five only ever existed in the MOCK — the generator renders
+    raw `title` from state/, so `Z-M1`, `§9.1` and `D15` are live in the
+    backlog rows and in the prompt.
+
+    Scoped to the reading text, not to prompts' code blocks: a chat working in
+    the firmware needs the real names, and the two registers are split by
+    audience deliberately."""
+
+    CODE = re.compile(r"\b[A-Z]-[A-Z]?\d+\b")
+
+    def test_the_guard_matches_the_shape_it_is_meant_to(self):
+        for bad in ("Z-M1", "Z-M0", "D-15", "R-077"):
+            self.assertIsNotNone(self.CODE.search(bad), bad)
+        for good in ("GB-001", "HAI-001", "POS-012", "2026-08-21"):
+            self.assertIsNone(self.CODE.search(good),
+                              "%s is a task id, not a milestone code" % good)
+
+    def test_task_titles_are_readable(self):
+        """The allowlist is what makes this honest: these are the titles
+        Marcelo has not yet approved a rewrite for. It shrinks as he does."""
+        import _model as model_mod
+        pending = {"GB-005", "GB-006", "GB-007", "GB-008", "GB-009",
+                   "GB-010", "GB-011", "EL-004"}
+        model = model_mod.Model.load(ROOT)
+        self.assertGreater(len(model.items), 20, "the scan did not run")
+        offenders = sorted(n.id for n in model.items.values()
+                           if n.id not in pending
+                           and (self.CODE.search(n.title) or "§" in n.title))
+        self.assertEqual(offenders, [],
+                         "a milestone code or section reference is in a title "
+                         "outside the pending set")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
