@@ -193,14 +193,72 @@ def redact(rows, volatile):
     for row in rows:
         row = dict(row)
         if row.get("command"):
+            # SUBSTITUTE, never delete. The way back is a three-value enum --
+            # command, url, instruction -- and "the instruction is a value, not
+            # a null". Stripping the command and leaving nothing produced
+            # exactly the state the enum was written to forbid: a RESUME label
+            # with nothing under it. The machine comes from the row's own
+            # field, never from the reader's.
             row["command"] = None
             row["local_only"] = True
+            row["instruction"] = (
+                "Recorded on %s. Run `python3 tools/index.py` there to get the "
+                "resume command — it is machine-local and is not published."
+                % (row.get("machine") or "the machine that indexed it"))
         # The session id is the identifier, not just the command that wraps
         # it. Nulling one and publishing the other leaves the private half on
         # the public surface -- which is how this got shipped the first time.
         row["id"] = None
         out.append(row)
     return out
+
+
+def all_threads(root, manual, volatile=False):
+    """Every indexed chat, ONCE, newest first.
+
+    `threads_for()` answers "which chats touch this task" and is right for a
+    kickoff prompt. The dashboard asks the opposite question -- "what was I
+    doing in each chat" -- and looping items over threads rendered one chat
+    once per item it cites. One thread here cites FIFTY, so 15 chats became 52
+    rows whose primary label was an item id, because the loop's subject was the
+    item and not the chat.
+    """
+    out = []
+    shard_dir = os.path.join(root, "state", "threads", "by-machine")
+    if os.path.isdir(shard_dir):
+        for name in sorted(os.listdir(shard_dir)):
+            if not name.endswith(".json"):
+                continue
+            with open(os.path.join(shard_dir, name), "r", encoding="utf-8") as fh:
+                try:
+                    shard = json.load(fh)
+                except ValueError:
+                    continue
+            for thread in shard.get("threads") or []:
+                out.append({
+                    "machine": shard.get("machine"),
+                    "tool": thread.get("tool"),
+                    "title": thread.get("title") or thread.get("id"),
+                    "verdict": thread.get("verdict"),
+                    "reason": thread.get("verdict_reason"),
+                    "command": thread.get("command"),
+                    "id": thread.get("id"),
+                    "items": thread.get("items") or [],
+                    "last_active": (thread.get("last_active") or "")[:10],
+                })
+    for key, entries in sorted(manual.items()):
+        for entry in entries:
+            out.append({
+                "machine": entry.get("machine"), "tool": "web",
+                "title": "a web chat, recorded by hand", "verdict": "resume",
+                "reason": "no transcript exists on disk; this pointer is the "
+                          "only record of it",
+                "command": None, "id": None, "items": [key],
+                "url": entry.get("url"), "last_active": entry.get("recorded") or "",
+            })
+    out.sort(key=lambda r: (r.get("last_active") or "", r.get("title") or ""),
+             reverse=True)
+    return redact(out, volatile)
 
 
 def render(node, model, entries, stamp, repos_spec, root, manual,

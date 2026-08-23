@@ -609,32 +609,93 @@ def closures(model):
            "".join(closure_row(n) for n in rows)))
 
 
-def chats(root, model, manual, machine):
-    """Which task, which machine, resume-or-restart with its reason, and the way
-    back. Empty on day one and it must SAY so -- every indexed thread binds to a
-    task the cutover archives, so `none indexed` is the true answer, not a bug."""
+def chat_row(row):
+    """One chat. The title leads, the ids are a handle, and the way back is
+    never a null.
+
+    Every field here was already in the data and dropped in the render: the
+    title, the verdict, the machine, the items. What rendered instead was the
+    indexer's caveat -- four sentences across fifteen chats, each true of many
+    and descriptive of none, saying what the INDEXER could not do rather than
+    what the CHAT was about. The same failure the TL;DR had before it was
+    rewritten, one section down.
+    """
+    verdict = (row.get("verdict") or "").upper()
+    # Luminance, not hue. RESUME is worth returning to, so it is the brighter
+    # of the two; no red, no green.
+    tone = "var(--el-ink)" if verdict == "RESUME" else "var(--el-ink-3)"
+
+    items = row.get("items") or []
+    if items:
+        shown = ", ".join(sorted(items, key=_fm.sort_key)[:3])
+        touches = "touches %s%s" % (
+            shown, ", +%d more" % (len(items) - 3) if len(items) > 3 else "")
+    else:
+        touches = "cites no task — it will not appear on any of them"
+
+    if row.get("command"):
+        way = ('<code style="font:400 var(--fs-meta)/1.6 var(--font-mono);'
+               'color:var(--el-ink);display:block;white-space:pre-wrap;'
+               'overflow-wrap:anywhere">%s</code>' % esc(row["command"]))
+    elif row.get("url"):
+        way = '<a href="%s">%s</a>' % (esc(row["url"]), esc(row["url"]))
+    elif row.get("instruction"):
+        way = '<span style="%s">%s</span>' % (BODY, esc(row["instruction"]))
+    elif verdict == "RESTART":
+        way = ('<span style="%s">Start a new chat. Its context is behind the '
+               'repo, so there is nothing to return to — copy the task\'s '
+               'kickoff prompt instead.</span>' % BODY)
+    else:
+        # Unrepresentable by construction: a resume with nowhere to go.
+        way = ('<span style="%s">No way back was found when this index ran. '
+               'Open it from the app\'s own session picker.</span>' % BODY)
+
+    return (
+        '<details style="border-top:1px solid var(--el-line)"><summary '
+        'style="display:flex;gap:var(--sp-3);align-items:flex-start;'
+        'padding:var(--sp-4) 0;min-height:44px">'
+        '<span style="flex:1;display:grid;gap:var(--sp-1)">'
+        '<span style="font:400 var(--fs-body-l)/1.4 var(--font-sans);'
+        'color:var(--el-ink);text-wrap:pretty">%s</span>'
+        '<span style="%s">%s · %s%s</span></span>'
+        '<span style="flex:none;font:400 var(--fs-micro)/1 var(--font-mono);'
+        'letter-spacing:0.1em;text-transform:uppercase;color:%s;'
+        'border:1px solid var(--el-line);padding:var(--sp-2) var(--sp-3)">%s'
+        '</span></summary>'
+        '<div style="padding:var(--sp-1) 0 var(--sp-5)">%s%s%s</div></details>'
+        % (esc(row.get("title") or "untitled"), META, esc(row.get("tool") or "chat"),
+           esc(row.get("machine") or "unknown machine"),
+           " · last active %s" % esc(short_date(row["last_active"]))
+           if row.get("last_active") else "",
+           tone, esc(verdict or "?"),
+           field("What it touched", esc(touches), BODY_INK),
+           field("The way back", way, BODY),
+           field("Why this verdict", esc(row.get("reason") or "not recorded"),
+                 META)))
+
+
+def chats(root, manual):
+    """One row per CHAT, newest first -- not one per (task, chat) pair.
+
+    Item-major rendering turned 15 chats into 52 rows, because a thread citing
+    fifty tasks rendered fifty times, and made the row's primary label an item
+    id rather than the chat's own name.
+    """
+    rows = kickoff_mod.all_threads(root, manual, volatile=False)
     out = ['<section style="%s"><div style="display:flex;align-items:baseline;'
-           'gap:var(--sp-2);margin:0 0 var(--sp-4)"><span style="%s">Chats'
-           '</span></div>' % (SECTION, CHROME)]
-    any_row = False
-    for node in model.backlog():
-        rows = kickoff_mod.redact(
-            kickoff_mod.threads_for(root, node.id, manual), volatile=False)
-        for row in rows:
-            any_row = True
-            way = row.get("reason") or ""
-            out.append(
-                '<div style="display:grid;gap:var(--sp-1);padding:var(--sp-3) '
-                '0;border-top:1px solid var(--el-line)">'
-                '<span style="%s">%s · %s · %s</span>'
-                '<span style="%s">%s</span></div>'
-                % (META, esc(node.id), esc(row.get("tool") or "chat"),
-                   esc(row.get("machine") or "—"), BODY, esc(way)))
-    if not any_row:
+           'gap:var(--sp-2);margin:0 0 var(--sp-4)"><span style="%s">Chats · %d'
+           '</span></div>' % (SECTION, CHROME, len(rows))]
+    if not rows:
         out.append('<p style="%s;margin:0;max-width:46ch">None indexed. '
-                   'Starting fresh is correct — nothing here has been bound to '
-                   'a chat yet, which is a cold start and not a fault.</p>'
-                   % BODY)
+                   'Starting fresh is correct — nothing has been bound to a '
+                   'chat yet, which is a cold start and not a fault.</p>' % BODY)
+    else:
+        resume = sum(1 for r in rows if (r.get("verdict") or "") == "resume")
+        out.append('<p style="%s;margin:0 0 var(--sp-4);max-width:46ch">%d '
+                   'worth returning to, %d better restarted. Every chat here '
+                   'was indexed from a transcript on the machine that ran '
+                   'it.</p>' % (BODY, resume, len(rows) - resume))
+        out += [chat_row(r) for r in rows]
     out.append("</section>")
     return "".join(out)
 
@@ -707,7 +768,7 @@ def render(root, model, volatile=False):
         backlog(root, model, entries, stamp, repos_spec, manual, machine,
                 volatile),
         closures(model),
-        chats(root, model, manual, machine),
+        chats(root, manual),
         '<p style="%s;margin:var(--sp-8) 0 0">This page reads. It never writes '
         '— every action leaves through a chat or a GitHub issue under your own '
         'sign-in, and it holds no token.</p>' % META,

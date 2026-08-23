@@ -2335,5 +2335,93 @@ class AClosureCanBeDisposedOfFromAPhone(unittest.TestCase):
                       "declared deliberate")
 
 
+class TheChatsSectionNamesChatsNotItems(unittest.TestCase):
+    """Measured before the rewrite: 15 chats rendered as 52 rows, 4 distinct
+    sentences across all of them, 0 titles, 0 verdict badges, 0 ways back.
+
+    Every one of those fields was already in the row dict and dropped by the
+    renderer. What rendered instead was the indexer's caveat — true of many
+    threads, descriptive of none — which says what the INDEXER could not do
+    rather than what the CHAT was about."""
+
+    def _section(self):
+        with open(os.path.join(ROOT, "public", "index.html"),
+                  encoding="utf-8") as fh:
+            page = fh.read()
+        return page[page.index(">Chats ·"):]
+
+    def test_one_row_per_chat_not_per_task_it_cites(self):
+        """A thread citing 50 tasks rendered 50 times, and that is also why the
+        row's primary label was an item id: the loop's subject was the item."""
+        import kickoff as kickoff_mod
+        threads = kickoff_mod.all_threads(ROOT, kickoff_mod.load_manual(ROOT),
+                                          volatile=False)
+        self.assertTrue(threads, "no threads to check")               # R-075
+        badges = re.findall(r">(RESUME|RESTART)<", self._section())
+        self.assertEqual(len(badges), len(threads),
+                         "%d rows for %d chats" % (len(badges), len(threads)))
+
+    def test_the_title_leads_and_the_ids_are_a_handle(self):
+        import kickoff as kickoff_mod
+        section = self._section()
+        threads = kickoff_mod.all_threads(ROOT, kickoff_mod.load_manual(ROOT),
+                                          volatile=False)
+        for thread in threads:
+            self.assertIn(esc_html(thread["title"]), section,
+                          "%r is in the data and not on the page"
+                          % thread["title"])
+
+    def test_the_verdict_is_rendered(self):
+        """resume vs restart is the one thing that says whether a chat is worth
+        returning to, and it was carried in the data and dropped."""
+        section = self._section()
+        for verdict in ("RESUME", "RESTART"):
+            self.assertIn(">%s<" % verdict, section)
+
+    def test_every_resume_has_a_way_back_and_it_is_never_a_null(self):
+        """The enum is command · url · instruction, and "the instruction is a
+        value, not a null". Redaction correctly strips the machine-local
+        command; leaving nothing in its place produced exactly the state the
+        enum forbids. It SUBSTITUTES now."""
+        import kickoff as kickoff_mod
+        threads = kickoff_mod.all_threads(ROOT, kickoff_mod.load_manual(ROOT),
+                                          volatile=False)
+        resumes = [t for t in threads if t.get("verdict") == "resume"]
+        self.assertTrue(resumes, "no resume verdict to check")        # R-075
+        for thread in resumes:
+            self.assertTrue(
+                thread.get("command") or thread.get("url")
+                or thread.get("instruction"),
+                "%r is RESUME with nowhere to go" % thread["title"])
+
+    def test_the_instruction_names_the_rows_machine_not_the_readers(self):
+        import kickoff as kickoff_mod
+        threads = kickoff_mod.all_threads(ROOT, kickoff_mod.load_manual(ROOT),
+                                          volatile=False)
+        for thread in threads:
+            note = thread.get("instruction")
+            if note:
+                self.assertIn(thread["machine"], note)
+                self.assertNotIn("this machine", note)
+
+    def test_the_reasons_actually_differ(self):
+        """Four sentences across fifteen chats described none of them."""
+        import kickoff as kickoff_mod
+        threads = kickoff_mod.all_threads(ROOT, kickoff_mod.load_manual(ROOT),
+                                          volatile=False)
+        reasons = {t.get("reason") for t in threads}
+        self.assertGreater(len(reasons), len(threads) // 2,
+                           "%d distinct reasons for %d chats — generic again"
+                           % (len(reasons), len(threads)))
+
+    def test_no_machine_local_command_is_published(self):
+        self.assertNotIn("claude -r", self._section())
+
+
+def esc_html(text):
+    import html as _html
+    return _html.escape(str(text), quote=True)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
