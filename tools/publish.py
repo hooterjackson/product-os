@@ -405,7 +405,7 @@ def generate(root, model, target, volatile=False):
                 "return_paths": {
                     node.id: kickoff_mod.redact(
                         kickoff_mod.threads_for(root, node.id, redacted),
-                        volatile)
+                        volatile, root)
                     for node in sorted(model.nodes.values(),
                                        key=lambda n: _fm.sort_key(n.id))
                     if kickoff_mod.threads_for(root, node.id, manual)},

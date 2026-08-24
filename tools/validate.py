@@ -693,6 +693,35 @@ class Validator(object):
     DASH_HOME = re.compile(r"-Users-[a-z][a-z0-9_-]*-")
     SHELL_FENCE = re.compile(r"^\s*```\s*(bash|sh|shell|console)?\s*$")
 
+    # 900, measured. The attribution and the path are separated by the
+    # Copy button's inline styles -- 563 characters in the rendered block --
+    # so 400 rejected a correctly attributed command. Wide enough for one
+    # block's markup, far narrower than a section.
+    ATTRIBUTION_WINDOW = 900
+
+    def _attributed(self, text, line, number):
+        """Is this rooted path a FACT ABOUT A NAMED MACHINE?
+
+        `cd ~/Claude/product-os` bare is a claim about the reader's filesystem
+        and is forbidden. The same string under "On work-laptop:" is a fact
+        about a machine the page names, and is the only way the page can hand
+        him something pasteable — he pasted the second half of a prose sentence
+        twice and landed in his home directory both times.
+
+        This is the same distinction the chip already makes: `on formd-t1` is
+        durable, `elsewhere` is a comparison. Registered machines only, from
+        state/machines/, so a typo'd name does not launder a path.
+        """
+        import _context
+        ids = [m for m in _context.machines(self.root) if m]
+        if not ids:
+            return False
+        at = text.find(line)
+        if at < 0:
+            return False
+        window = text[max(0, at - self.ATTRIBUTION_WINDOW):at]
+        return any(name in window for name in ids)
+
     def check_public_is_machine_neutral(self):
         """`public/` is committed and served to every machine, so nothing in it
         may tell a reader to run something against THIS one.
@@ -751,6 +780,8 @@ class Validator(object):
                     if not (in_shell or line.lstrip().startswith("$ ")):
                         continue
                     hit = self.ROOTED.search(line)
+                    if hit and self._attributed(text, line, number):
+                        continue
                     if hit:
                         self.error("E-PUBLIC-LOCAL-PATH", rel,
                                    "a command naming this machine's layout: "

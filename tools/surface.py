@@ -152,6 +152,29 @@ def esc(text):
     return html.escape(str(text if text is not None else ""), quote=True)
 
 
+def copyable(command, label=None):
+    """A command with a Copy button. He should not have to select a command out
+    of a paragraph, and the way-back was a PARAGRAPH -- so command_block()'s
+    `cd` line never reached it and he pasted the second line alone, twice,
+    landing in his home directory both times."""
+    return (
+        '<div style="display:grid;gap:var(--sp-2)">'
+        '<div style="display:flex;align-items:center;justify-content:'
+        'space-between;gap:var(--sp-3)">'
+        '<span style="%s">%s</span>'
+        '<span role="button" tabindex="0" data-copy-block="" '
+        'aria-label="Copy the command" style="flex:none;border:1px solid '
+        'var(--el-line-2);padding:var(--sp-2) var(--sp-3);font:400 '
+        'var(--fs-chrome)/1 var(--font-mono);letter-spacing:0.1em;'
+        'text-transform:uppercase;color:var(--el-amber)">Copy'
+        '<span data-copied-slot=""></span></span></div>'
+        '<code style="font:400 var(--fs-meta)/1.6 var(--font-mono);'
+        'color:var(--el-ink);background:var(--el-panel);border:1px solid '
+        'var(--el-line);padding:var(--sp-3);display:block;white-space:pre-wrap;'
+        'overflow-wrap:anywhere">%s</code></div>'
+        % (MICRO, esc(label or "Command"), esc(command)))
+
+
 def command_block(command, volatile, root=None):
     """Every command this page emits, with its working directory attached.
 
@@ -766,7 +789,11 @@ def chat_row(row):
     elif row.get("url"):
         way = '<a href="%s">%s</a>' % (esc(row["url"]), esc(row["url"]))
     elif row.get("instruction"):
-        way = '<span style="%s">%s</span>' % (BODY, esc(row["instruction"]))
+        way = '<span style="%s;display:block;margin-bottom:var(--sp-3)">%s' \
+              '</span>' % (BODY, esc(row["instruction"]))
+        if row.get("instruction_command"):
+            way += copyable(row["instruction_command"],
+                            "On %s" % row["instruction_machine"])
     elif verdict == "RESTART":
         way = ('<span style="%s">Start a new chat. Its context is behind the '
                'repo, so there is nothing to return to — copy the task\'s '
@@ -831,6 +858,21 @@ def chats(root, manual):
 SCRIPT = """
 // The whole JS budget: copy, and the age renderer. Disclosure is <details>.
 document.addEventListener('click', function (ev) {
+  // Copy THIS block: the command sitting next to the button. Distinct from
+  // [data-copy], which copies the row's whole prompt.
+  var block = ev.target.closest('[data-copy-block]');
+  if (block) {
+    var code = block.closest('div').parentNode.querySelector('code');
+    if (code) {
+      navigator.clipboard.writeText(code.textContent).then(function () {
+        var slot = block.querySelector('[data-copied-slot]');
+        if (!slot) return;
+        slot.textContent = ' \u00b7 copied';
+        setTimeout(function () { slot.textContent = ''; }, 2000);
+      });
+    }
+    return;
+  }
   var el = ev.target.closest('[data-copy]');
   if (!el) return;
   var row = el.closest('details');
@@ -845,7 +887,7 @@ document.addEventListener('click', function (ev) {
 });
 document.addEventListener('keydown', function (ev) {
   if (ev.key !== 'Enter' && ev.key !== ' ') return;
-  var el = ev.target.closest('[data-copy]');
+  var el = ev.target.closest('[data-copy], [data-copy-block]');
   if (el) { ev.preventDefault(); el.click(); }
 });
 // The bytes carry the date; the browser renders the age. publish --check

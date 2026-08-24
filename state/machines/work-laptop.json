@@ -1,7 +1,8 @@
 {
-  "id": "work-laptop",
   "hostname": "MLKXRRW1494F",
+  "id": "work-laptop",
+  "note": "This Mac. product-os and the engineered-lighting clone live here. It has never touched the bench. `product_os` is where the checkout is: a fact about THIS machine, which is why a page can print it attributed to work-laptop without claiming anything about whoever is reading.",
   "os": "darwin",
-  "registered": "2026-08-18",
-  "note": "This Mac. product-os and the engineered-lighting clone live here. It has never touched the bench."
+  "product_os": "~/Claude/product-os",
+  "registered": "2026-08-18"
 }

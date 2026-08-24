@@ -1,8 +1,12 @@
 {
-  "id": "formd-t1",
+  "holds_uncommitted": [
+    "D1-D11 decision ledger",
+    "the numbered task ledger"
+  ],
   "hostname": "formd-t1",
+  "id": "formd-t1",
+  "note": "The bench PC. Owns COM3/COM4, runs the commissioning console and every flash. Checkout at C:\\Claude\\gimbal-bench. Registered as data only -- product-os is not installed there yet, so `product_os` is null and no command can be offered for it, which is why bench-gated items cannot be actioned from this Mac.",
   "os": "windows",
-  "registered": "2026-08-18",
-  "note": "The bench PC. Owns COM3/COM4, runs the commissioning console and every flash. Checkout at C:\\Claude\\gimbal-bench. Registered as data only -- product-os is not installed there yet, which is why bench-gated items cannot be actioned from this Mac.",
-  "holds_uncommitted": ["D1-D11 decision ledger", "the numbered task ledger"]
+  "product_os": null,
+  "registered": "2026-08-18"
 }

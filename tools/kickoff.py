@@ -160,7 +160,7 @@ def threads_for(root, item_id, manual):
     return paths
 
 
-def redact(rows, volatile):
+def redact(rows, volatile, root=None):
     """Strip the machine-local way back when this is going to be COMMITTED.
 
     A resume command is `cd ~/Claude/product-os && claude -r <uuid>`. Both
@@ -204,13 +204,23 @@ def redact(rows, volatile):
             # field, never from the reader's.
             row["command"] = None
             row["local_only"] = True
+            machine = row.get("machine") or "the machine that indexed it"
+            checkout = ((_context.machines(root).get(machine) or {}).get(
+                "product_os") if root else None)
+            row["instruction_machine"] = machine
+            # The COMMAND, not a paragraph about it. He pasted the second half
+            # of a sentence twice and landed in his home directory both times.
+            row["instruction_command"] = (
+                "cd %s\npython3 tools/index.py --ways-back" % checkout
+                if checkout else None)
             row["instruction"] = (
-                "Recorded on %s. In your product-os clone THERE — not your "
-                "home directory — run `python3 tools/index.py --ways-back`. "
-                "That prints the resume command for every chat worth "
-                "returning to. It is machine-local, so this page cannot "
-                "print it."
-                % (row.get("machine") or "the machine that indexed it"))
+                "This chat lives on %s. Run this there — it prints the resume "
+                "command for every chat worth returning to. The command itself "
+                "is machine-local, so this page cannot print it." % machine
+                if checkout else
+                "This chat lives on %s, and product-os is not installed there, "
+                "so there is no command to give you. Open it from the app's "
+                "own session picker." % machine)
         # The session id is the identifier, not just the command that wraps
         # it. Nulling one and publishing the other leaves the private half on
         # the public surface -- which is how this got shipped the first time.
@@ -283,7 +293,7 @@ def all_threads(root, manual, volatile=False):
             })
     out.sort(key=lambda r: (r.get("last_active") or "", r.get("title") or ""),
              reverse=True)
-    return redact(out, volatile)
+    return redact(out, volatile, root)
 
 
 def render(node, model, entries, stamp, repos_spec, root, manual,
@@ -292,7 +302,7 @@ def render(node, model, entries, stamp, repos_spec, root, manual,
     repos = node.get("repos") or []
     machine = node.get("machine_affinity")
     gate = node.get("gate") or "none"
-    returns = redact(threads_for(root, node.id, manual), volatile)
+    returns = redact(threads_for(root, node.id, manual), volatile, root)
 
     lines = [
         "Cite %s in your first message." % node.id,

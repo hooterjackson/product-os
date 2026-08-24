@@ -430,3 +430,30 @@ def tracked_shards(root):
     return [os.path.join(shard_dir, name)
             for name in sorted(os.listdir(shard_dir))
             if name.endswith(".json") and not name.endswith(".local.json")]
+
+
+def machines(root):
+    """Registered machines, by id. `product_os` is where the checkout lives on
+    that machine, or None if it is not installed there.
+
+    A path here is a FACT ABOUT A NAMED MACHINE, not a claim about whoever is
+    reading. That is the distinction the whole surface runs on: `on formd-t1`
+    is durable, `elsewhere` is a comparison. So a page may print
+    `cd ~/Claude/product-os` when it says "on work-laptop" first, and may not
+    print it bare.
+    """
+    out = {}
+    base = os.path.join(root, "state", "machines")
+    if not os.path.isdir(base):
+        return out
+    for name in sorted(os.listdir(base)):
+        if not name.endswith(".json"):
+            continue
+        try:
+            with open(os.path.join(base, name), "r", encoding="utf-8") as fh:
+                spec = json.load(fh)
+        except (OSError, ValueError):
+            continue
+        if spec.get("id"):
+            out[spec["id"]] = spec
+    return out

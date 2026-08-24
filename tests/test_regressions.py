@@ -2057,7 +2057,16 @@ class TheDashboardIsReadOnlyAndSaysWhatItKnows(unittest.TestCase):
                 chip in ("needs the repo", "no repo") or chip.startswith("on "),
                 "%r is a comparison with the reader's machine, not a fact"
                 % chip)
-        self.assertNotIn("cd ~", page)
+        # A rooted path is allowed ONLY when attributed to a named machine:
+        # "On work-laptop:" then `cd ~/Claude/product-os` is a FACT about a
+        # machine the page names; a bare `cd ~/...` is a claim about the
+        # reader's filesystem. E-PUBLIC-LOCAL-PATH enforces the same rule.
+        import _context as ctx
+        for match in re.finditer(r"cd ~[^<\"]*", page):
+            before = page[max(0, match.start() - 900):match.start()]
+            self.assertTrue(
+                any(m in before for m in ctx.machines(ROOT)),
+                "%r names no machine" % match.group(0)[:40])
         self.assertNotIn("C:\\", page)
 
     def test_the_page_is_byte_identical_on_a_machine_with_no_clones(self):
@@ -2467,9 +2476,17 @@ class EveryInstructionSaysWhereToRunIt(unittest.TestCase):
                                           volatile=False)
         notes = [t["instruction"] for t in threads if t.get("instruction")]
         self.assertTrue(notes, "no instruction rendered")             # R-075
-        for note in notes:
-            self.assertIn("--ways-back", note)
-            self.assertIn("clone", note, "it still does not say where")
+        import kickoff as kickoff_mod
+        rows = [t for t in kickoff_mod.all_threads(
+            ROOT, kickoff_mod.load_manual(ROOT), volatile=False)
+            if t.get("instruction")]
+        for row in rows:
+            self.assertIn(row["instruction_machine"], row["instruction"],
+                          "the instruction does not name its machine")
+            if row.get("instruction_command"):
+                self.assertIn("--ways-back", row["instruction_command"])
+                self.assertTrue(row["instruction_command"].startswith("cd "),
+                                "the command does not say where to run it")
 
     def test_ways_back_exists_and_reads_the_local_half(self):
         with open(os.path.join(ROOT, "tools", "index.py"),
@@ -2907,6 +2924,63 @@ class EveryOpenTaskCanBeClosed(unittest.TestCase):
         """A rule that only appears after you have tapped through is a rule you
         meet too late."""
         self.assertIn("Done needs something you can click", self._page())
+
+
+class TheWayBackIsCopyableNotProse(unittest.TestCase):
+    """He ran the command from his home directory twice, on the right machine,
+    and got `can't open file <home>/tools/index.py` both times.
+
+    command_block() had already given every command its `cd` line — but the
+    way-back was a PARAGRAPH with the command in backticks, so it never got the
+    treatment, and selecting a command out of a sentence gets you the half you
+    can see. It is a two-line block with a Copy button now."""
+
+    def test_the_command_is_a_block_with_a_copy_button(self):
+        with open(os.path.join(ROOT, "public", "index.html"),
+                  encoding="utf-8") as fh:
+            page = fh.read()
+        self.assertIn("data-copy-block", page,
+                      "no command is copyable on its own")
+        self.assertIn("querySelector('code')", page,
+                      "the copy handler cannot find a command block")
+
+    def test_it_carries_both_lines(self):
+        import kickoff as kickoff_mod
+        rows = [t for t in kickoff_mod.all_threads(
+            ROOT, kickoff_mod.load_manual(ROOT), volatile=False)
+            if t.get("instruction_command")]
+        self.assertTrue(rows, "no way-back command rendered")         # R-075
+        for row in rows:
+            command = row["instruction_command"]
+            self.assertIn("\n", command, "the cd and the command are one line")
+            self.assertTrue(command.startswith("cd "))
+            self.assertIn("--ways-back", command)
+
+    def test_the_path_comes_from_the_machine_record(self):
+        """`state/machines/<id>.json` says where the checkout is on THAT
+        machine. A fact about a named machine, which is why the page may print
+        it — the same reason `on formd-t1` is durable and `elsewhere` is not."""
+        import _context as ctx
+        machines = ctx.machines(ROOT)
+        self.assertTrue(machines, "no machines registered")           # R-075
+        import kickoff as kickoff_mod
+        for row in kickoff_mod.all_threads(ROOT,
+                                           kickoff_mod.load_manual(ROOT),
+                                           volatile=False):
+            if not row.get("instruction_command"):
+                continue
+            here = machines.get(row["instruction_machine"]) or {}
+            self.assertIn(here.get("product_os") or "\0",
+                          row["instruction_command"])
+
+    def test_a_machine_without_a_checkout_offers_no_command(self):
+        """formd-t1 has product-os `null`. A row bound there must say so rather
+        than invent a path — the same refusal as `no repo`."""
+        import _context as ctx
+        bench = ctx.machines(ROOT).get("formd-t1")
+        self.assertIsNotNone(bench, "formd-t1 is not registered")
+        self.assertIsNone(bench.get("product_os"),
+                          "formd-t1 claims a checkout it does not have")
 
 
 if __name__ == "__main__":
