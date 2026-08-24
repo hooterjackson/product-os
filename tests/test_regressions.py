@@ -18,6 +18,7 @@ import datetime
 import glob
 import re
 import json
+import inspect
 import os
 import shutil
 import subprocess
@@ -3255,6 +3256,140 @@ class TheIssueFormsOfferTheProjectsThatExist(unittest.TestCase):
         unanchored scan read it as a project named "type: textarea"."""
         findings = self._validator()
         self.assertFalse([f for f in findings if "type:" in f.message])
+
+
+class EveryFormThePageLinksToHasAConsumer(unittest.TestCase):
+    """He attributed a chat from his phone. The issue opened, correctly
+    labelled, with the right handle and project in its body -- and the chat did
+    not move, because nothing on any machine read it.
+
+    The write path was built in halves and only the first half shipped. A
+    button that files a request into a queue with no consumer is worse than no
+    button: it looks like it worked, so the failure is silent and the user
+    blames themselves."""
+
+    def _linked_templates(self):
+        page = os.path.join(ROOT, "public", "index.html")
+        with open(page, encoding="utf-8") as fh:
+            html = fh.read()
+        found = set(re.findall(r"template=([a-z]+\.yml)", html))
+        self.assertGreaterEqual(len(found), 3,                        # R-075
+                                "found %d form links on the page — a scan "
+                                "that finds none proves nothing" % len(found))
+        return found
+
+    def test_every_linked_form_exists(self):
+        for template in self._linked_templates():
+            self.assertTrue(
+                os.path.exists(os.path.join(ROOT, ".github", "ISSUE_TEMPLATE",
+                                            template)),
+                "the page links to %s and it does not exist" % template)
+
+    def test_every_linked_form_has_a_handler(self):
+        """The test that would have caught it."""
+        import intake as intake_mod
+        import labels as labels_mod
+        declared = labels_mod.declared(ROOT)
+        for template in self._linked_templates():
+            for label in declared.get(template, []):
+                self.assertIn(label, intake_mod.HANDLERS,
+                              "%s files a %r issue and intake.py has no "
+                              "handler for it — the button does nothing"
+                              % (template, label))
+
+    def test_every_handler_has_a_form(self):
+        """The other direction. A handler for a label nothing files is dead
+        code that reads as coverage."""
+        import intake as intake_mod
+        import labels as labels_mod
+        filed = {l for labels in labels_mod.declared(ROOT).values()
+                 for l in labels}
+        self.assertEqual(set(intake_mod.HANDLERS) - filed, set())
+
+    def test_the_workflow_drains_on_an_issue_event(self):
+        with open(os.path.join(ROOT, ".github", "workflows", "pages.yml"),
+                  encoding="utf-8") as fh:
+            flow = fh.read()
+        self.assertIn("issues:", flow)
+        self.assertIn("tools/intake.py", flow)
+        # A push made with GITHUB_TOKEN does not trigger another workflow, so
+        # a separate intake workflow would commit and never deploy.
+        self.assertEqual(len(re.findall(r"^  intake:$", flow, re.M)), 1)
+        self.assertIn("ref: main", flow,
+                      "the gate would check out the pre-drain commit")
+
+
+class TheIntakeRefusesAnythingNotHisWord(unittest.TestCase):
+    """This repo is public and its issue forms are world-writable: any GitHub
+    user can open one and the template URL applies the label for them. The
+    label is not a permission. Issue text reaches a task title, then a kickoff
+    prompt, then a chat with repo write access."""
+
+    def test_association_and_login_are_both_required(self):
+        import intake as intake_mod
+        for assoc, login, ok in [
+                ("OWNER", "hooterjackson", True),
+                ("OWNER", "attacker", False),
+                ("COLLABORATOR", "hooterjackson", False),
+                ("NONE", "attacker", False),
+                (None, "hooterjackson", False)]:
+            verdict, _why = intake_mod.trusted(
+                {"user": {"login": login}, "author_association": assoc})
+            self.assertEqual(verdict, ok,
+                             "assoc=%r login=%r" % (assoc, login))
+
+    def test_comments_are_never_read(self):
+        import intake as intake_mod
+        source = inspect.getsource(intake_mod)
+        self.assertNotIn("/comments", source,
+                         "a stranger commenting on his issue is the same "
+                         "attack one layer down")
+
+    def test_the_body_is_parsed_by_rendered_label_not_field_id(self):
+        """GitHub renders a form as `### <Label>`. The field id never appears,
+        so a parser keyed on ids silently returns nothing for every field."""
+        import intake as intake_mod
+        parsed = intake_mod.fields(
+            "### Its handle\n\n21dff8bac4d6\n\n### Which project\n\n"
+            "gimbal-bench\n\n### Anything else\n\n_No response_")
+        self.assertEqual(parsed, {"Its handle": "21dff8bac4d6",
+                                  "Which project": "gimbal-bench"})
+
+    def test_a_handle_that_is_not_a_handle_is_refused(self):
+        import intake as intake_mod
+        for handle in ("../../etc/passwd", "", "ZZZZ", "21dff8bac4d6 x"):
+            _out, why = intake_mod.do_attribute(
+                ROOT, {"Its handle": handle, "Which project": "gimbal-bench"},
+                {})
+            self.assertTrue(why, "%r was accepted as a chat handle" % handle)
+
+    def test_an_unknown_project_is_refused(self):
+        import intake as intake_mod
+        _out, why = intake_mod.do_attribute(
+            ROOT, {"Its handle": "21dff8bac4d6",
+                   "Which project": "ghost-project"}, {})
+        self.assertIn("unknown project", why or "")
+
+    def test_closing_without_evidence_is_refused_for_him_too(self):
+        """An AUTHORITY guard asks who decided. A TRUTH guard asks whether it
+        is provable, and that one does not bend for the owner."""
+        import intake as intake_mod
+        _out, why = intake_mod.do_close(
+            ROOT, {"Task": "GB-001", "What happened": "Done - it shipped"},
+            {"title": "t"})
+        self.assertIn("evidence", (why or "").lower())
+
+    def test_creating_a_project_is_not_something_a_form_can_do(self):
+        import intake as intake_mod
+        _out, why = intake_mod.do_task(
+            ROOT, {"Project": "new project"}, {"title": "a task"})
+        self.assertTrue(why)
+
+    def test_an_unreachable_github_is_not_an_empty_queue(self):
+        import intake as intake_mod
+        source = inspect.getsource(intake_mod.open_issues)
+        self.assertIn("None, err", source.replace(" ", "") .replace("None,err",
+                                                                    "None, err"))
 
 
 if __name__ == "__main__":

@@ -21,6 +21,17 @@ name: Pages
 on:
   push:
     branches: [main]
+  # A write filed from a phone arrives as an ISSUE, and until this trigger
+  # existed nothing read it: Marcelo attributed a chat, the issue opened
+  # correctly, and the chat did not move. A button that files into a queue with
+  # no consumer is worse than no button — it looks like it worked.
+  #
+  # The drain lives HERE rather than in its own workflow because a push made
+  # with GITHUB_TOKEN does not trigger another workflow run. A separate intake
+  # workflow would commit the change and never deploy it — the same defect one
+  # layer further along.
+  issues:
+    types: [opened, labeled, reopened]
   workflow_dispatch:
 
 permissions:
@@ -35,11 +46,65 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Drain first, so the gate tests the state the issue just changed.
+  intake:
+    if: >-
+      github.event_name == 'issues' &&
+      github.event.issue.author_association == 'OWNER' &&
+      github.event.issue.user.login == 'hooterjackson'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Defence in depth. The `if:` above stops a stranger's issue starting
+      # this job at all; intake.py re-checks author AND association on every
+      # issue it reads, because the label is not a permission — this repo is
+      # public and its issue forms are world-writable.
+      - name: Drain the issues into state
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          python3 tools/intake.py
+          code=$?
+          set -e
+          # 1 means something was REFUSED — a normal outcome that must not stop
+          # the site deploying. 2 means GitHub was unreachable, and "I could
+          # not look" must never pass as "nothing waiting".
+          if [ "$code" -ge 2 ]; then exit "$code"; fi
+          if [ "$code" -eq 1 ]; then
+            echo "::warning::intake refused at least one issue — see the log"
+          fi
+
+      - name: Commit whatever it changed
+        run: |
+          python3 tools/publish.py
+          if git diff --quiet; then echo "nothing changed"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Drain issue #${{ github.event.issue.number }}"
+          git push
+
   gate:
+    needs: [intake]
+    # `always()` so a push event still runs this with intake SKIPPED. A FAILED
+    # intake stops here: deploying a surface built from a half-applied write is
+    # worse than deploying yesterday's.
+    if: always() && needs.intake.result != 'failure'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
+          # `main`, not the event ref: on an issues event the default ref is
+          # the branch head from BEFORE intake pushed, so the gate would test
+          # and deploy a surface without the change that triggered it.
+          ref: main
           # check_authority and check_commit_identities read history; a shallow
           # clone makes them pass by seeing nothing, which is R-075's shape.
           fetch-depth: 0

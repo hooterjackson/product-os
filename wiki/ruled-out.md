@@ -1635,3 +1635,51 @@ that ran outside every known repo does not publish its title by default" is
 derivable — but it would also silence the personal chats he may well want
 attributed, and choosing between those is taste.
 
+
+---
+
+## R-080 · A write path built in halves, with only the first half shipped
+
+**Keywords:** intake, issues, github, forms, labels, write path, phone,
+attribute, dashboard, drain, workflow, actions
+
+Marcelo attributed a chat from his phone. The form opened, the dropdown
+listed his projects, he picked one and hit Create. The issue was filed
+correctly — right label, right handle, right project in the body — **and the
+chat did not move**, because nothing on any machine read it. `intake.py` was
+Phase 4 of the plan; the buttons shipped in Phase 2.
+
+**A button that files a request into a queue with no consumer is worse than no
+button.** It looks like it worked, so the failure is silent, and the user is
+left to conclude they filled the form in wrong. There were five of these on
+the page — attribute, capture, task, confirm, close — and he happened to press
+the one that mattered to him first.
+
+The plan had this exact rule and applied it one level too narrowly:
+*"a RESUME with no way to resume is a dead end wearing a green label."* That
+was written about the chat rows and turned into a per-row check. **The general
+form — every control the page offers must reach something that acts on it —
+was never made mechanical**, so five controls in a different section walked
+straight past it.
+
+`test_every_linked_form_has_a_handler` closes it in the general form: scrape
+`template=*.yml` out of the rendered page, resolve each to the labels it
+declares, and assert `intake.HANDLERS` covers every one. Verified by removing
+each of the five handlers in turn — all five caught. The reverse direction is
+asserted too, because a handler for a label nothing files is dead code that
+reads as coverage.
+
+**Draining has to happen where the issue is filed, not where the clone is.**
+The point of the issue path is that it works from a phone with no terminal, so
+requiring `python3 tools/intake.py` on a laptop reintroduces the thing it was
+built to avoid — a fix that only works on the machine the user is not holding.
+The drain runs in Actions on the `issues` event.
+
+**It lives inside `pages.yml` rather than in its own workflow**, and that is
+not tidiness. A push made with `GITHUB_TOKEN` does not trigger another workflow
+run, so a separate intake workflow would commit the change and never deploy
+it — the same defect one layer further along, and harder to see. For the same
+reason the gate checks out `ref: main` explicitly: on an `issues` event the
+default ref is the branch head from *before* intake pushed, so the gate would
+test and deploy a surface without the change that triggered it.
+
