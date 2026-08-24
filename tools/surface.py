@@ -431,6 +431,7 @@ def task_row(node, model, entries, stamp, repos_spec, root, manual, machine,
                   "The chat works in the repo the task names and writes a "
                   "handoff when it stops. Nothing here changes until the next "
                   "audit reads that.", BODY)
+    body += close_it(node)
     body += field("Tied to", esc("%s · %s" % (node.project, node.id)), META)
 
     return (
@@ -445,6 +446,47 @@ def task_row(node, model, entries, stamp, repos_spec, root, manual, machine,
         '<div style="padding:var(--sp-1) 0 var(--sp-6)">%s</div></details>'
         % (esc(node.id), esc(node.title), copy_control(chip(node, verdict, volatile)),
            body))
+
+
+def close_it(node):
+    """Two exits, on every open task. There was none.
+
+    The closures section handles what a MACHINE closed and he has not
+    confirmed. Nothing handled the ordinary case: he did the work, or he
+    decided not to. A backlog you can only add to is a list that grows.
+
+    `done` and `won't do` are different acts and the system already treats them
+    differently — `done` needs evidence you can click and that guard holds for
+    him too, while dropping needs only a reason. So they are two links, not one
+    with a toggle, and the form says which needs what.
+    """
+    def link(outcome, label, sub, accent):
+        return (
+            '<a href="%s" style="display:flex;align-items:center;'
+            'justify-content:space-between;min-height:48px;border:1px solid %s;'
+            'padding:0 var(--sp-4);font:400 var(--fs-chrome)/1 '
+            'var(--font-mono);letter-spacing:0.12em;text-transform:uppercase;'
+            'color:%s"><span>%s</span>'
+            '<span style="color:var(--el-ink-3)">%s</span></a>'
+            % (esc(issue_url("close.yml", "close",
+                             "%s — %s" % (node.id, sub), task=node.id,
+                             outcome=outcome)),
+               accent, accent, label, sub))
+
+    return field(
+        "Close it",
+        '<span style="%s;display:block;margin-bottom:var(--sp-3)">Done needs '
+        'something you can click — a SHA, a path, a dated note. Dropping needs '
+        'only a reason.</span>'
+        '<span style="display:grid;gap:var(--sp-3)">%s%s</span>%s'
+        % (BODY,
+           link("Done - it shipped", "It is done", "done",
+                "var(--el-amber)"),
+           link("Won't do - dropping it", "Won't do", "drop",
+                "var(--el-line-2)"),
+           command_block('python3 tools/apply.py --evidence %s=<SHA> '
+                         '--status %s=done \\\n    --said "your sentence"'
+                         % (node.id, node.id), False)), BODY)
 
 
 def _context_clip(text, limit=190):

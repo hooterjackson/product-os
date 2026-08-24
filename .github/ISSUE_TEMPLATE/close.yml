@@ -1,0 +1,48 @@
+name: Close a task
+description: It shipped, or you have decided not to do it.
+labels:
+  - close
+body:
+  - type: markdown
+    attributes:
+      value: >
+        The task is filled in from the row you tapped. **If you pick "Done",
+        the evidence field is required** — a commit SHA, a file path or a dated
+        note. Nothing is done here without something you can click, and that
+        rule holds for you too. Dropping it needs no evidence, only a reason.
+  - type: input
+    id: task
+    attributes:
+      label: Task
+    validations:
+      required: true
+  - type: dropdown
+    id: outcome
+    attributes:
+      label: What happened
+      options:
+        - Done - it shipped
+        - Won't do - dropping it
+    validations:
+      required: true
+  - type: input
+    id: evidence
+    attributes:
+      label: What proves it
+      description: >
+        Required for "Done". A commit SHA, a path, or a dated note. Leave empty
+        if you are dropping it.
+      placeholder: 19dd790
+    validations:
+      required: false
+  - type: textarea
+    id: said
+    attributes:
+      label: In your words
+      description: >
+        Why. This is the --said sentence on the record — for a drop it is the
+        whole justification, and it is what a future session reads instead of
+        re-deriving the decision.
+      placeholder: shipped in the rebuild; the dashboard renders it
+    validations:
+      required: true

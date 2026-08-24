@@ -2858,5 +2858,56 @@ class TheSurfaceCanCarryABinaryFile(unittest.TestCase):
         self.assertIn("777 x 713", note, "the measurement is not recorded")
 
 
+class EveryOpenTaskCanBeClosed(unittest.TestCase):
+    """There was no way to close a task. The closures section handles what a
+    MACHINE closed and he has not confirmed; nothing handled the ordinary case
+    — he did the work, or he decided not to. A backlog you can only add to is
+    a list that grows."""
+
+    def _page(self):
+        with open(os.path.join(ROOT, "public", "index.html"),
+                  encoding="utf-8") as fh:
+            return fh.read()
+
+    def test_every_open_task_offers_both_exits(self):
+        import _model as model_mod
+        model = model_mod.Model.load(ROOT)
+        page = self._page()
+        links = set(re.findall(r'issues/new\?[^"]*close\.yml[^"]*', page))
+        tasks = model.backlog()
+        self.assertTrue(tasks, "no open tasks to check")               # R-075
+        for node in tasks:
+            mine = [u for u in links if "task=%s" % node.id in u]
+            self.assertEqual(len(mine), 2,
+                             "%s does not offer both done and won't-do"
+                             % node.id)
+
+    def test_done_and_drop_are_distinct_acts(self):
+        """`done` needs evidence you can click and that guard holds for him
+        too; dropping needs only a reason. Two links, not one with a toggle."""
+        import urllib.parse
+        import html as html_mod
+        outcomes = set()
+        for link in set(re.findall(r'issues/new\?[^"]*close\.yml[^"]*',
+                                   self._page())):
+            query = urllib.parse.parse_qs(
+                html_mod.unescape(link).split("?", 1)[1])
+            outcomes.add(query["outcome"][0])
+        self.assertEqual(len(outcomes), 2, "the two exits are not distinct")
+
+    def test_the_form_says_which_exit_needs_evidence(self):
+        with open(os.path.join(ROOT, ".github", "ISSUE_TEMPLATE", "close.yml"),
+                  encoding="utf-8") as fh:
+            template = fh.read()
+        self.assertIn("evidence field is required", template)
+        self.assertIn("id: evidence", template)
+        self.assertIn("id: said", template)
+
+    def test_the_page_says_it_too_rather_than_only_the_form(self):
+        """A rule that only appears after you have tapped through is a rule you
+        meet too late."""
+        self.assertIn("Done needs something you can click", self._page())
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

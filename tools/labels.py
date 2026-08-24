@@ -43,6 +43,7 @@ REQUIRED = {
     "adopt": ("9C937F", "Adopt an audit recommendation into the backlog."),
     "dismiss": ("7D765F", "Dismiss a recommendation. It must not come back."),
     "confirm": ("D6E5F4", "Confirm a closure a machine made without him."),
+    "close": ("9C937F", "Close an open task — shipped, or decided against."),
 }
 
 TEMPLATE_DIR = os.path.join(".github", "ISSUE_TEMPLATE")
