@@ -12,9 +12,16 @@
 # metadata line; set the chat to `none` in `attribution.yaml` to drop it from
 # the page entirely.
 #
-# Seeded 2026-08-23 from the opening ask of each transcript still on this
-# machine. Nine of fifteen had none -- codex threads, or transcripts since
-# rotated away -- and those are absent here rather than guessed.
+# Seeded 2026-08-23 from the opening ask of each transcript on this machine.
+# Fourteen of fifteen had one; the fifteenth is absent here rather than
+# guessed, and its row falls back to the metadata line.
+#
+# TWO ARE DAY-JOB CHATS and their descriptions are deliberately unspecific.
+# Their opening asks name an employer product and an internal ticketing
+# workflow, and this file is rendered onto a world-readable page -- so what is
+# published says what KIND of work it was and nothing more. Marking them "not
+# one of my projects" in `attribution.yaml` removes them from the page
+# entirely; that is your call, not the tool's.
 
 705af7bc2ec0: "Rebuilding product-os around a refined model — deleting the scoring engine and dependency graph, and turning the tool into a read-only dashboard whose product is copyable prompts."
 788b3ce995fb: "The original build, straight from BOOTSTRAP.md — planned first, then written. 134 exchanges, and most of what this repo now is came out of it."
@@ -22,3 +29,12 @@
 ff4f3a1d5887: "Ideating the tool that became product-os — how the hardware site, the chats, and the priorities could stop being three separate places."
 21dff8bac4d6: "Building engineering.engineered.lighting: turning the seven-document Engineered Lighting research series into an MkDocs site."
 d0f173b0e831: "Training V-JEPA 2.1 to recognise household context — reading, cooking, working out — with pose detection, on the RTX 6000 box."
+
+98d16253916f: "Continuing the slice 1a-minus build under a stop hook that kept the session on POS-001."
+fc0f56cd35f3: "Picking up the genio handoff — implementing its guidance and governance layer from a written spec."
+3b8b0045ce5d: "Building a tool to turn a ChatGPT-researched list of Paulinho da Costa credits into an Apple Music playlist."
+7c147ff9a8a9: "The first pass at the Paulinho da Costa playlist tool, before the Apple Music side was worked out."
+5197ddcc031f: "Re-establishing what the smart home setup actually is, as context for later work."
+3ff274d19a4a: "Comparing Parallels against the other ways of running Windows on a Mac."
+24b2e127a40e: "Day-job work — parsing a product specification into structured requirements. Not portfolio work."
+7d6e1bd17c5a: "Day-job work — turning a discussion thread into a written ticket about an edge case. Not portfolio work."

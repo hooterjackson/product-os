@@ -2358,6 +2358,24 @@ class AClosureCanBeDisposedOfFromAPhone(unittest.TestCase):
                       "declared deliberate")
 
 
+def _visible_threads():
+    """Every chat the page is meant to render.
+
+    A chat marked "not one of my projects" is hidden deliberately -- two are,
+    because their model-generated titles named an employer's internal products
+    on a world-readable page. Counting those against the page would assert the
+    opposite of what that mechanism is for.
+    """
+    import _context as ctx
+    import _model as model_mod
+    import kickoff as kickoff_mod
+    model_mod.Model.load(ROOT)
+    attributed = ctx.attributions(ROOT)
+    return [t for t in kickoff_mod.all_threads(
+        ROOT, kickoff_mod.load_manual(ROOT), volatile=False)
+        if not ctx.is_dismissed(t, attributed)]
+
+
 class TheChatsSectionNamesChatsNotItems(unittest.TestCase):
     """Measured before the rewrite: 15 chats rendered as 52 rows, 4 distinct
     sentences across all of them, 0 titles, 0 verdict badges, 0 ways back.
@@ -2378,20 +2396,15 @@ class TheChatsSectionNamesChatsNotItems(unittest.TestCase):
     def test_one_row_per_chat_not_per_task_it_cites(self):
         """A thread citing 50 tasks rendered 50 times, and that is also why the
         row's primary label was an item id: the loop's subject was the item."""
-        import kickoff as kickoff_mod
-        threads = kickoff_mod.all_threads(ROOT, kickoff_mod.load_manual(ROOT),
-                                          volatile=False)
+        threads = _visible_threads()
         self.assertTrue(threads, "no threads to check")               # R-075
         badges = re.findall(r">(RESUME|RESTART)<", self._section())
         self.assertEqual(len(badges), len(threads),
                          "%d rows for %d chats" % (len(badges), len(threads)))
 
     def test_the_title_leads_and_the_ids_are_a_handle(self):
-        import kickoff as kickoff_mod
         section = self._section()
-        threads = kickoff_mod.all_threads(ROOT, kickoff_mod.load_manual(ROOT),
-                                          volatile=False)
-        for thread in threads:
+        for thread in _visible_threads():
             self.assertIn(esc_html(thread["title"]), section,
                           "%r is in the data and not on the page"
                           % thread["title"])
@@ -3002,11 +3015,37 @@ class ChatsLiveWithTheirProject(unittest.TestCase):
             return fh.read()
 
     def _threads(self):
+        """VISIBLE chats. A chat marked "not one of my projects" is hidden on
+        purpose, so counting it against the page asserts the opposite of what
+        that mechanism is for."""
+        import _context as ctx
         import _model as model_mod
         import kickoff as kickoff_mod
         model_mod.Model.load(ROOT)          # loads the prefix set
-        return kickoff_mod.all_threads(ROOT, kickoff_mod.load_manual(ROOT),
-                                       volatile=False)
+        attributed = ctx.attributions(ROOT)
+        return [t for t in kickoff_mod.all_threads(
+            ROOT, kickoff_mod.load_manual(ROOT), volatile=False)
+            if not ctx.is_dismissed(t, attributed)]
+
+    def test_a_hidden_chat_leaves_no_trace_on_the_page(self):
+        """Not merely absent from the list -- absent entirely. Two are hidden
+        because their model-generated TITLES named an employer's internal
+        products on a world-readable page."""
+        import _context as ctx
+        import kickoff as kickoff_mod
+        import _model as model_mod
+        model_mod.Model.load(ROOT)
+        attributed = ctx.attributions(ROOT)
+        hidden = [t for t in kickoff_mod.all_threads(
+            ROOT, kickoff_mod.load_manual(ROOT), volatile=False)
+            if ctx.is_dismissed(t, attributed)]
+        self.assertTrue(hidden, "nothing is hidden, so this proves nothing")
+        page = self._page()
+        for thread in hidden:
+            self.assertNotIn(thread["key"], page)
+            self.assertNotIn(thread["title"], page,
+                             "%r is hidden but its title still renders"
+                             % thread["title"])
 
     def test_each_chat_renders_exactly_once(self):
         """One thread cites tasks across SIX projects. Rendering it in each
@@ -3134,10 +3173,23 @@ class DescriptionsAreAuthoredNotDerived(unittest.TestCase):
         with open(os.path.join(ROOT, "public", "index.html"),
                   encoding="utf-8") as fh:
             page = fh.read()
+        import kickoff as kickoff_mod
+        import _model as model_mod
+        model_mod.Model.load(ROOT)
+        attributed = ctx.attributions(ROOT)
+        hidden = {t["key"] for t in kickoff_mod.all_threads(
+            ROOT, kickoff_mod.load_manual(ROOT), volatile=False)
+            if ctx.is_dismissed(t, attributed)}
+        self.assertTrue(set(written) - hidden, "every note is on a hidden chat")
         for key, note in written.items():
             head = note.split("—")[0].split(" - ")[0].strip()[:40]
-            self.assertIn(head, page,
-                          "note for %s never reaches the page" % key)
+            if key in hidden:
+                self.assertNotIn(head, page,
+                                 "note for hidden chat %s reaches the page"
+                                 % key)
+            else:
+                self.assertIn(head, page,
+                              "note for %s never reaches the page" % key)
 
     def test_archived_task_titles_resolve(self):
         """Twelve POS-* tasks left the model at the cutover and their chats

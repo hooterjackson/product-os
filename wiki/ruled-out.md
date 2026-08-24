@@ -1618,3 +1618,20 @@ design decision. `R-075` again, in code written the same hour as a test
 asserting `R-075`. It now raises if `state/archive/` exists and yields nothing,
 and catches only `FrontmatterError`, for the one prose file in there.
 
+**A model-generated TITLE is chat content, and `FORBIDDEN_KEY` never covered
+it.** Two rows on the published page named an employer's internal product and
+an internal ticketing workflow. Nothing in `notes.yaml` put them there — the
+titles came from the codex thread name, are generated from the conversation,
+and land in the tracked shard, because that guard screens field *names* and
+`title` is not one of them. **Sixth route in the class `R-076` names**, found
+by grepping the rendered page for the words the notes had been written
+carefully to avoid: the check aimed at the new route found the old one.
+
+Both are hidden via `attribution.yaml` (`none`), which is what *"not one of my
+projects"* is for, and it is one line to undo. **The durable question is
+Marcelo's, not the tool's:** every day-job chat here ran in
+`~/Documents/Codex/…`, outside every repo in `state/repos.json`, so "a chat
+that ran outside every known repo does not publish its title by default" is
+derivable — but it would also silence the personal chats he may well want
+attributed, and choosing between those is taste.
+

@@ -14,3 +14,19 @@
 # A chat citing a task id needs no line here: the project comes from the id's
 # prefix, and a prefix outlives the task, so archiving one does not orphan the
 # chats that were about it.
+
+# --- Set by the tool on 2026-08-23, not by Marcelo. Reverse by deleting. ---
+#
+# These two are day-job work, and their model-generated titles named an
+# employer's internal product and an internal ticketing workflow -- on a
+# world-readable page. Nothing in the notes file put them there: the TITLE is
+# generated from chat content and lands in the tracked shard, which
+# `FORBIDDEN_KEY` never covered because it screens field NAMES and `title` is
+# not one of them. Sixth route in the class R-076 names.
+#
+# Hiding them is what "not one of my projects" is for and it is one line to
+# undo. The durable question -- whether a title from a chat that ran outside
+# every known repo should be published at all by default -- has taste in it and
+# is yours, not the tool's. See R-079.
+24b2e127a40e: none
+7d6e1bd17c5a: none
