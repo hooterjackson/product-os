@@ -386,14 +386,11 @@ def generate(root, model, target, volatile=False):
     # identifier through the sibling field, which is this bug's whole shape.
     MACHINE_LOCAL = ("command", "id", "parent", "path", "cwd")
 
-    shard_dir = os.path.join(root, "state", "threads", "by-machine")
     shards = {}
-    if os.path.isdir(shard_dir):
-        for name in sorted(os.listdir(shard_dir)):
-            if not name.endswith(".json"):
-                continue
-            with open(os.path.join(shard_dir, name), "r",
-                      encoding="utf-8") as fh:
+    for path in _context.tracked_shards(root):
+        name = os.path.basename(path)
+        if True:
+            with open(path, "r", encoding="utf-8") as fh:
                 shard = json.load(fh)
             if not volatile:
                 shard = dict(shard)

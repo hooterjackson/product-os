@@ -125,12 +125,9 @@ def redact_manual(manual):
 def threads_for(root, item_id, manual):
     """Every return path for this item: indexed threads plus manual URLs."""
     paths = []
-    shard_dir = os.path.join(root, "state", "threads", "by-machine")
-    if os.path.isdir(shard_dir):
-        for name in sorted(os.listdir(shard_dir)):
-            if not name.endswith(".json") or name.endswith(".local.json"):
-                continue
-            with open(os.path.join(shard_dir, name), "r", encoding="utf-8") as fh:
+    for path in _context.tracked_shards(root):
+        if True:
+            with open(path, "r", encoding="utf-8") as fh:
                 try:
                     shard = json.load(fh)
                 except ValueError:
@@ -255,12 +252,9 @@ def all_threads(root, manual, volatile=False):
     """
     out = []
     ways = local_ways_back(root) if volatile else {}
-    shard_dir = os.path.join(root, "state", "threads", "by-machine")
-    if os.path.isdir(shard_dir):
-        for name in sorted(os.listdir(shard_dir)):
-            if not name.endswith(".json") or name.endswith(".local.json"):
-                continue
-            with open(os.path.join(shard_dir, name), "r", encoding="utf-8") as fh:
+    for path in _context.tracked_shards(root):
+        if True:
+            with open(path, "r", encoding="utf-8") as fh:
                 try:
                     shard = json.load(fh)
                 except ValueError:

@@ -2714,15 +2714,38 @@ class AResumeCommandRunsInTHISShell(unittest.TestCase):
     def test_the_output_says_what_to_do_with_it(self):
         """It printed titles and commands and never said they reopen a chat
         with its history — "how do I hop back into one" was not answerable
-        from the output."""
+        from the output.
+
+        Asserted against the SOURCE, because the local half is git-ignored: on
+        a machine that has never indexed — CI, every time — the command
+        correctly prints its no-file branch instead. The first version of this
+        test ran the command and asserted the populated wording, so it passed
+        here and failed on the runner. Machine-dependent, again, in a test.
+        """
+        with open(os.path.join(ROOT, "tools", "index.py"),
+                  encoding="utf-8") as fh:
+            block = fh.read()
+        block = block[block.index("def ways_back("):]
+        block = block[:block.index("def main(")]
+        for phrase in ("Paste one of these into a terminal",
+                       "where it left off", "RESTART",
+                       "no local thread file"):
+            self.assertIn(phrase, block,
+                          "--ways-back never says %r" % phrase)
+
+    def test_the_empty_branch_says_how_to_populate_it(self):
+        """The branch CI actually takes. It must not be a dead end either."""
         proc = subprocess.run(
             [sys.executable, os.path.join(ROOT, "tools", "index.py"),
              "--ways-back"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
             cwd=ROOT)
         out = proc.stdout.decode()
-        self.assertIn("Paste one of these into a terminal", out)
-        self.assertIn("where it left off", out)
-        self.assertIn("RESTART", out, "it never says what the others are")
+        if "no local thread file" in out:
+            self.assertIn("python3 tools/index.py", out,
+                          "it says there is nothing and not how to fix it")
+            self.assertIn("cd ", out, "it does not say where to run that")
+        else:
+            self.assertIn("Paste one of these into a terminal", out)
 
 
 class TheFaviconIsDiscoveredNotAssumed(unittest.TestCase):

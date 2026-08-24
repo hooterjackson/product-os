@@ -410,3 +410,23 @@ def pointer_rule(one_line=False):
     if one_line:
         return "%s %s" % (POINTER_RULE_PUBLIC, POINTER_RULE_LOCAL)
     return [POINTER_RULE_PUBLIC, POINTER_RULE_LOCAL]
+
+
+def tracked_shards(root):
+    """The TRACKED thread shards, never the git-ignored local halves.
+
+    Five call sites globbed `by-machine/*.json` independently and
+    `<machine>.local.json` matches that pattern. Two of them were fixed when
+    the shard was split and three were not, so `publish.py --check` drifted on
+    any machine that had never indexed -- CI every time -- because the local
+    file exists here and nowhere else.
+
+    A predicate spread across five call sites is five chances to get it wrong,
+    and it got it wrong three times out of five. One function now.
+    """
+    shard_dir = os.path.join(root, "state", "threads", "by-machine")
+    if not os.path.isdir(shard_dir):
+        return []
+    return [os.path.join(shard_dir, name)
+            for name in sorted(os.listdir(shard_dir))
+            if name.endswith(".json") and not name.endswith(".local.json")]

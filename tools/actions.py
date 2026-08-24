@@ -38,18 +38,13 @@ MANUAL_LOCAL = "state/threads/manual.local.yaml"
 
 def _shard_dates(root):
     out = {}
-    shard_dir = os.path.join(root, "state", "threads", "by-machine")
-    if not os.path.isdir(shard_dir):
-        return out
-    for name in sorted(os.listdir(shard_dir)):
-        if not name.endswith(".json"):
-            continue
+    for path in _context.tracked_shards(root):
         try:
-            with open(os.path.join(shard_dir, name), "r", encoding="utf-8") as fh:
+            with open(path, "r", encoding="utf-8") as fh:
                 shard = json.load(fh)
         except (OSError, ValueError):
             continue
-        out[name[:-5]] = shard.get("generated")
+        out[os.path.basename(path)[:-5]] = shard.get("generated")
     return out
 
 

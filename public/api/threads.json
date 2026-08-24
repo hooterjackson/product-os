@@ -368,63 +368,6 @@
         "claude-code": 8,
         "codex": 7
       }
-    },
-    "work-laptop.local": {
-      "machine": "work-laptop",
-      "redacted": [
-        "command",
-        "id",
-        "parent",
-        "path",
-        "cwd"
-      ],
-      "threads": [
-        {
-          "key": "705af7bc2ec0"
-        },
-        {
-          "key": "788b3ce995fb"
-        },
-        {
-          "key": "6b0c0de94a96"
-        },
-        {
-          "key": "98d16253916f"
-        },
-        {
-          "key": "6ef48bd547b7"
-        },
-        {
-          "key": "ff4f3a1d5887"
-        },
-        {
-          "key": "fc0f56cd35f3"
-        },
-        {
-          "key": "21dff8bac4d6"
-        },
-        {
-          "key": "24b2e127a40e"
-        },
-        {
-          "key": "7d6e1bd17c5a"
-        },
-        {
-          "key": "3b8b0045ce5d"
-        },
-        {
-          "key": "5197ddcc031f"
-        },
-        {
-          "key": "3ff274d19a4a"
-        },
-        {
-          "key": "7c147ff9a8a9"
-        },
-        {
-          "key": "d0f173b0e831"
-        }
-      ]
     }
   },
   "freshness": {
