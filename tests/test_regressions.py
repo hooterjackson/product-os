@@ -596,7 +596,9 @@ class InferredClosuresAreVisibleWhereHumansLook(unittest.TestCase):
 
     def test_closed_origin_is_derived_not_settable(self):
         applier = apply_mod.Applier(ROOT, dry_run=True)
-        applier.set_field("POS-003", "closed_origin", "his-word",
+        victim = next(n.id for n in applier.model.items.values()
+                      if n.status == "done")
+        applier.set_field(victim, "closed_origin", "his-word",
                           origin=apply_mod.HUMAN)
         self.assertEqual(applier.applied, [],
                          "an agent laundered its judgement into his word")
@@ -740,7 +742,10 @@ class PublishedStampsMustSurviveBeingPublished(unittest.TestCase):
         with open(os.path.join(root, "state", "repos.json"), encoding="utf-8") as fh:
             spec = {k: v for k, v in json.load(fh).items()
                     if not k.startswith("_")}
-        node = model.nodes["POS-001"]
+        # ANY live task. Naming one meant archiving it broke a test about
+        # freshness, which has nothing to do with that task — a fixture that
+        # names a specific id is a fixture with an expiry date.
+        node = model.backlog()[0]
         durable = _ctx.freshness(root, node, stamp, spec, volatile=False)
         self.assertNotIn("since the last audit", durable)
         self.assertIn("last audit", durable)

@@ -256,7 +256,7 @@
       "title": "M6 on hardware: the motor-silent limb, MUTE-CLEAR, and the armed lane"
     },
     {
-      "backlog_position": 11,
+      "backlog_position": 10,
       "closed_origin": null,
       "completed": null,
       "evidence_found": [],
@@ -283,7 +283,7 @@
       "title": "Does a mid-move retarget re-plan smoothly, or stop and restart?"
     },
     {
-      "backlog_position": 18,
+      "backlog_position": 12,
       "closed_origin": null,
       "completed": null,
       "evidence_found": [],
@@ -310,7 +310,7 @@
       "title": "Does a brownout preserve the RTC domain?"
     },
     {
-      "backlog_position": 21,
+      "backlog_position": 13,
       "closed_origin": null,
       "completed": null,
       "evidence_found": [],
@@ -338,7 +338,7 @@
       "title": "Build the rollback ladder, so a bad radio update can be backed out (Z-M2)"
     },
     {
-      "backlog_position": 22,
+      "backlog_position": 14,
       "closed_origin": null,
       "completed": null,
       "evidence_found": [],
@@ -366,7 +366,7 @@
       "title": "Gate L \u2014 the fixture joins and holds as a light"
     },
     {
-      "backlog_position": 23,
+      "backlog_position": 15,
       "closed_origin": null,
       "completed": null,
       "evidence_found": [],
@@ -394,7 +394,7 @@
       "title": "Stand up the HA-side Zigbee OTA server"
     },
     {
-      "backlog_position": 24,
+      "backlog_position": 16,
       "closed_origin": null,
       "completed": null,
       "evidence_found": [],
@@ -422,7 +422,7 @@
       "title": "Where do 300 liveness taps a second come from?"
     },
     {
-      "backlog_position": 25,
+      "backlog_position": 17,
       "closed_origin": null,
       "completed": null,
       "evidence_found": [],
@@ -449,7 +449,7 @@
       "title": "Decide how the fixture is commissioned, and what a reset actually resets (Z-M4)"
     },
     {
-      "backlog_position": 26,
+      "backlog_position": 18,
       "closed_origin": null,
       "completed": null,
       "evidence_found": [],
@@ -476,7 +476,7 @@
       "title": "Prove the deployed fixture only moves when it is meant to (Z-M5)"
     },
     {
-      "backlog_position": 27,
+      "backlog_position": 19,
       "closed_origin": null,
       "completed": null,
       "evidence_found": [],

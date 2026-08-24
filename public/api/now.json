@@ -280,33 +280,6 @@
       "completed": null,
       "evidence_found": [],
       "gate": "none",
-      "id": "POS-008",
-      "keywords": [
-        "brief",
-        "closure",
-        "confirmed",
-        "decision",
-        "disclosure",
-        "guarantee",
-        "inferred",
-        "public",
-        "stamp",
-        "visibility"
-      ],
-      "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/POS-008.md",
-      "lane": "infra",
-      "machine_affinity": null,
-      "project": "product-os",
-      "repos": [],
-      "status": "doing",
-      "title": "Surface inferred closures, record the public decision"
-    },
-    {
-      "backlog_position": 11,
-      "closed_origin": null,
-      "completed": null,
-      "evidence_found": [],
-      "gate": "none",
       "id": "Q-002",
       "keywords": [
         "0xa4",
@@ -329,160 +302,7 @@
       "title": "Does a mid-move retarget re-plan smoothly, or stop and restart?"
     },
     {
-      "backlog_position": 12,
-      "closed_origin": null,
-      "completed": null,
-      "evidence_found": [],
-      "gate": "none",
-      "id": "POS-010",
-      "keywords": [
-        "bootstrap",
-        "kickoff",
-        "manual",
-        "paste",
-        "prompt",
-        "resume",
-        "return-path",
-        "ruled-out",
-        "threads",
-        "url"
-      ],
-      "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/POS-010.md",
-      "lane": "infra",
-      "machine_affinity": null,
-      "project": "product-os",
-      "repos": [],
-      "status": "next",
-      "title": "Kickoff prompts and thread return paths"
-    },
-    {
-      "backlog_position": 13,
-      "closed_origin": null,
-      "completed": null,
-      "evidence_found": [],
-      "gate": "none",
-      "id": "POS-011",
-      "keywords": [
-        "action",
-        "artifact",
-        "attach",
-        "capture",
-        "connect-repo",
-        "manual-yaml",
-        "paste",
-        "reconcile",
-        "repos-json",
-        "scale"
-      ],
-      "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/POS-011.md",
-      "lane": "infra",
-      "machine_affinity": null,
-      "project": "product-os",
-      "repos": [],
-      "status": "next",
-      "title": "The remaining action artifacts: reconcile, attach, connect-repo, capture"
-    },
-    {
-      "backlog_position": 14,
-      "closed_origin": null,
-      "completed": null,
-      "evidence_found": [],
-      "gate": "none",
-      "id": "POS-007",
-      "keywords": [
-        "briefs",
-        "lead-time",
-        "leverage",
-        "parked",
-        "re-centre",
-        "restart",
-        "resume",
-        "software",
-        "threads",
-        "urgency"
-      ],
-      "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/POS-007.md",
-      "lane": "infra",
-      "machine_affinity": null,
-      "project": "product-os",
-      "repos": [],
-      "status": "next",
-      "title": "Re-centre on software: kill lead-time, park hardware, briefs and resume verdicts"
-    },
-    {
-      "backlog_position": 15,
-      "closed_origin": null,
-      "completed": null,
-      "evidence_found": [],
-      "gate": "none",
-      "id": "POS-009",
-      "keywords": [
-        "agnostic",
-        "api",
-        "bootstrap",
-        "brief",
-        "endpoint",
-        "fetch",
-        "https",
-        "json",
-        "link-integrity",
-        "llms-txt",
-        "paste"
-      ],
-      "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/POS-009.md",
-      "lane": "infra",
-      "machine_affinity": null,
-      "project": "product-os",
-      "repos": [],
-      "status": "next",
-      "title": "llms.txt and the JSON API: the agent-facing surface"
-    },
-    {
-      "backlog_position": 16,
-      "closed_origin": null,
-      "completed": null,
-      "evidence_found": [
-        {
-          "kind": "commit",
-          "path": null,
-          "repo": "product-os",
-          "sha": "093dbe9"
-        },
-        {
-          "kind": "commit",
-          "path": null,
-          "repo": "product-os",
-          "sha": "cdb5eb4"
-        }
-      ],
-      "gate": "none",
-      "id": "POS-012",
-      "keywords": [
-        "banner",
-        "closed-origin",
-        "concurrency",
-        "correction",
-        "drift",
-        "excerpt",
-        "one-tree",
-        "proposal",
-        "referential-integrity",
-        "register",
-        "ruled-out",
-        "two-agents",
-        "validate",
-        "visibility"
-      ],
-      "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/POS-012.md",
-      "lane": "infra",
-      "machine_affinity": null,
-      "project": "product-os",
-      "repos": [],
-      "status": "doing",
-      "title": "A correction is only real where it is read"
-    },
-    {
-      "backlog_position": 17,
+      "backlog_position": 11,
       "closed_origin": null,
       "completed": null,
       "evidence_found": [],
@@ -508,7 +328,7 @@
       "title": "Give HomeApp an evidence rule that does not depend on git history"
     },
     {
-      "backlog_position": 18,
+      "backlog_position": 12,
       "closed_origin": null,
       "completed": null,
       "evidence_found": [],
@@ -535,81 +355,7 @@
       "title": "Does a brownout preserve the RTC domain?"
     },
     {
-      "backlog_position": 19,
-      "closed_origin": null,
-      "completed": null,
-      "evidence_found": [],
-      "gate": "none",
-      "id": "POS-006",
-      "keywords": [
-        "clustering",
-        "coverage",
-        "evidence",
-        "gimbal-bench",
-        "group-d",
-        "items",
-        "paths",
-        "scaling",
-        "seed",
-        "unattributed"
-      ],
-      "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/POS-006.md",
-      "lane": "infra",
-      "machine_affinity": null,
-      "project": "product-os",
-      "repos": [],
-      "status": "doing",
-      "title": "Group D coverage: cluster 301 unattributed commits into items"
-    },
-    {
-      "backlog_position": 20,
-      "closed_origin": null,
-      "completed": null,
-      "evidence_found": [
-        {
-          "kind": "commit",
-          "path": null,
-          "repo": "product-os",
-          "sha": "8890b05"
-        },
-        {
-          "kind": "commit",
-          "path": null,
-          "repo": "product-os",
-          "sha": "8175094"
-        },
-        {
-          "kind": "commit",
-          "path": null,
-          "repo": "product-os",
-          "sha": "d04a029"
-        }
-      ],
-      "gate": "none",
-      "id": "POS-001",
-      "keywords": [
-        "bootstrap",
-        "hook",
-        "plugin",
-        "product-os",
-        "rank",
-        "ruled-out",
-        "seed",
-        "slice-1a",
-        "validate"
-      ],
-      "kickoff": "https://raw.githubusercontent.com/hooterjackson/product-os/main/public/kickoff/POS-001.md",
-      "lane": "infra",
-      "machine_affinity": "work-laptop",
-      "project": "product-os",
-      "repos": [
-        "product-os"
-      ],
-      "status": "doing",
-      "title": "Build product-os slice 1a-minus"
-    },
-    {
-      "backlog_position": 21,
+      "backlog_position": 13,
       "closed_origin": null,
       "completed": null,
       "evidence_found": [],
@@ -637,7 +383,7 @@
       "title": "Build the rollback ladder, so a bad radio update can be backed out (Z-M2)"
     },
     {
-      "backlog_position": 22,
+      "backlog_position": 14,
       "closed_origin": null,
       "completed": null,
       "evidence_found": [],
@@ -665,7 +411,7 @@
       "title": "Gate L \u2014 the fixture joins and holds as a light"
     },
     {
-      "backlog_position": 23,
+      "backlog_position": 15,
       "closed_origin": null,
       "completed": null,
       "evidence_found": [],
@@ -693,7 +439,7 @@
       "title": "Stand up the HA-side Zigbee OTA server"
     },
     {
-      "backlog_position": 24,
+      "backlog_position": 16,
       "closed_origin": null,
       "completed": null,
       "evidence_found": [],
@@ -721,7 +467,7 @@
       "title": "Where do 300 liveness taps a second come from?"
     },
     {
-      "backlog_position": 25,
+      "backlog_position": 17,
       "closed_origin": null,
       "completed": null,
       "evidence_found": [],
@@ -748,7 +494,7 @@
       "title": "Decide how the fixture is commissioned, and what a reset actually resets (Z-M4)"
     },
     {
-      "backlog_position": 26,
+      "backlog_position": 18,
       "closed_origin": null,
       "completed": null,
       "evidence_found": [],
@@ -775,7 +521,7 @@
       "title": "Prove the deployed fixture only moves when it is meant to (Z-M5)"
     },
     {
-      "backlog_position": 27,
+      "backlog_position": 19,
       "closed_origin": null,
       "completed": null,
       "evidence_found": [],
@@ -803,12 +549,12 @@
     }
   ],
   "counts": {
-    "active": 27,
-    "backlog": 27,
+    "active": 19,
+    "backlog": 19,
     "blocked": 0,
     "decisions": 10,
-    "done": 6,
-    "items": 41,
+    "done": 2,
+    "items": 29,
     "parked": 8,
     "unlisted": 0
   },

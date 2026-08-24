@@ -54,7 +54,7 @@ gimbal-bench · gate none · machine formd-t1
 
 _Last audited 2026-08-19. 153 commits were unattributed then._
 
-_5 item(s) are marked done on a machine's judgement, unconfirmed by him: EL-004, POS-002, POS-003, POS-004, POS-005._
+_1 item(s) are marked done on a machine's judgement, unconfirmed by him: EL-004._
 
 ## 5 · The five actions — the destination is part of the artifact
 

@@ -24,13 +24,6 @@ portfolio into context.
 
 ## Open here
 
-- `POS-008` Surface inferred closures, record the public decision
-- `POS-010` Kickoff prompts and thread return paths
-- `POS-011` The remaining action artifacts: reconcile, attach, connect-repo, capture
-- `POS-007` Re-centre on software: kill lead-time, park hardware, briefs and resume verdicts
-- `POS-009` llms.txt and the JSON API: the agent-facing surface
-- `POS-012` A correction is only real where it is read
-- `POS-006` Group D coverage: cluster 301 unattributed commits into items
-- `POS-001` Build product-os slice 1a-minus
+Nothing from this project is in the backlog right now.
 
 _Last audited 2026-08-19._

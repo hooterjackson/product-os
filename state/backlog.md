@@ -19,17 +19,9 @@ GB-008   # Z-M3 — Zigbee bring-up as a light
 GB-002   # Rescue D1-D11 off formd-t1 and commit them
 Q-001    # Does Spot Mode (Auto/Hold/Manual) survive gate A?
 GB-004   # M6 on hardware: the motor-silent limb, MUTE-CLEAR, and the armed lane
-POS-008  # Surface inferred closures, record the public decision
 Q-002    # Does a mid-move retarget re-plan smoothly, or stop and restart?
-POS-010  # Kickoff prompts and thread return paths
-POS-011  # The remaining action artifacts: reconcile, attach, connect-repo, capture
-POS-007  # Re-centre on software: kill lead-time, park hardware, briefs and resume verdicts
-POS-009  # llms.txt and the JSON API: the agent-facing surface
-POS-012  # A correction is only real where it is read
 APP-001  # Give HomeApp an evidence rule that does not depend on git history
 Q-003    # Does a brownout preserve the RTC domain?
-POS-006  # Group D coverage: cluster 301 unattributed commits into items
-POS-001  # Build product-os slice 1a-minus
 GB-007   # Z-M2 — the rollback ladder, D15's ruled first radio commit
 GB-012   # Gate L — the fixture joins and holds as a light
 GB-013   # Stand up the HA-side Zigbee OTA server
