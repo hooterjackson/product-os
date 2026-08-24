@@ -557,10 +557,11 @@ def backlog(root, model, entries, stamp, repos_spec, manual, machine, volatile):
             if slug not in seen:
                 groups.append((slug, []))
         out.append('<div style="display:grid;gap:0;margin-top:var(--sp-5)">')
+        threads = kickoff_mod.all_threads(root, manual, volatile=False)
         for slug, nodes in groups:
             out.append(project_group(slug, nodes, model, entries, stamp,
                                      repos_spec, root, manual, machine,
-                                     volatile))
+                                     volatile, threads))
         out.append("</div>")
     out.append(add_controls(model))
     out.append("</section>")
@@ -568,7 +569,9 @@ def backlog(root, model, entries, stamp, repos_spec, manual, machine, volatile):
 
 
 def project_group(slug, nodes, model, entries, stamp, repos_spec, root, manual,
-                  machine, volatile):
+                  machine, volatile, threads=()):
+    """Closed, a project is its name and how long since it moved. Open, it is
+    what it is, where it is, its last session, ITS CHATS, and its tasks."""
     project = model.projects.get(slug)
     name = slug
     open_n = len(nodes)
@@ -612,6 +615,19 @@ def project_group(slug, nodes, model, entries, stamp, repos_spec, root, manual,
         if not closed and not parked:
             said += " Not idle by accident — there is simply nothing here."
         inner.append(field("Nothing open", said, BODY_INK))
+
+    # AFTER the tasks, not before them. A chat is context for the work, and
+    # putting the context first pushed the work itself below a fold that four
+    # of six projects reached.
+    chats_here = [r for r in threads if r.get("project") == slug]
+    if chats_here:
+        inner.append('<div style="display:grid;gap:0;margin-top:var(--sp-5)">'
+                     '<span style="%s;padding-bottom:var(--sp-2)">%d chat%s'
+                     '</span>%s</div>'
+                     % (MICRO, len(chats_here),
+                        "" if len(chats_here) == 1 else "s",
+                        "".join(chat_row(r, model, root, attribute_control(r))
+                                for r in chats_here)))
     return (
         '<details style="border-top:1px solid var(--el-line)"><summary '
         'style="display:flex;gap:var(--sp-3);align-items:baseline;'
@@ -757,7 +773,27 @@ def closures(model):
            "".join(closure_row(n) for n in rows)))
 
 
-def chat_row(row):
+def item_label(item_id, model, root):
+    """`GB-001` means nothing to the person who wrote it, let alone months on.
+
+    An id is a handle for the indexer, not a description, and a row reading
+    "touches GB-001, GB-004, Q-002" asks the reader to hold six prefixes and
+    forty numbers in their head. The title is already loaded; it was simply
+    never looked up. Archived tasks resolve too -- `state/archive/` is inside
+    the model's walk -- and one that does not is shown as the bare id rather
+    than dropped, because a chat citing something that no longer exists is a
+    fact about the chat.
+    """
+    node = model.items.get(item_id) if model else None
+    if node:
+        return "%s — %s" % (item_id, node.title)
+    filed = _context.archived_titles(root).get(item_id)
+    if filed:
+        return "%s — %s (archived)" % (item_id, filed)
+    return item_id
+
+
+def chat_row(row, model, root, attribute_link=None):
     """One chat. The title leads, the ids are a handle, and the way back is
     never a null.
 
@@ -773,13 +809,24 @@ def chat_row(row):
     # of the two; no red, no green.
     tone = "var(--el-ink)" if verdict == "RESUME" else "var(--el-ink-3)"
 
-    items = row.get("items") or []
+    # Tasks before decision records. A chat citing fifty ids showed
+    # `DEC-003, DEC-012, DEC-013, +46 more` -- three rulings and not one task,
+    # because the sort was alphabetical and `DEC` sorts early. The tasks are
+    # what the reader can act on.
+    items = sorted(row.get("items") or [],
+                   key=lambda i: (0 if _fm.project_for((_fm.parse_id(i)
+                                                        or ("",))[0]) else 1,
+                                  _fm.sort_key(i)))
     if items:
-        shown = ", ".join(sorted(items, key=_fm.sort_key)[:3])
-        touches = "touches %s%s" % (
-            shown, ", +%d more" % (len(items) - 3) if len(items) > 3 else "")
+        touches = "".join(
+            '<span style="display:block">%s</span>'
+            % esc(item_label(i, model, root))
+            for i in items[:4])
+        if len(items) > 4:
+            touches += ('<span style="display:block;color:var(--el-ink-3)">'
+                        '+%d more</span>' % (len(items) - 4))
     else:
-        touches = "cites no task — it will not appear on any of them"
+        touches = esc("Cites no task — it will not appear on any of them.")
 
     if row.get("command"):
         way = ('<code style="font:400 var(--fs-meta)/1.6 var(--font-mono);'
@@ -821,36 +868,90 @@ def chat_row(row):
            " · last active %s" % esc(short_date(row["last_active"]))
            if row.get("last_active") else "",
            tone, esc(verdict or "?"),
-           field("What it touched", esc(touches), BODY_INK),
+           field("What it was",
+              esc(row.get("summary") or "")
+              + (esc(" · also touches %s"
+                     % ", ".join(p for p in (row.get("projects") or [])
+                                 if p != row.get("project")))
+                 if len(row.get("projects") or []) > 1 else ""), BODY_INK)
+        + field("What it touched", touches, BODY_INK)
+        + (field("Which project", (
+            'Nothing can derive this — it cites no task. Say once, and it '
+            'survives re-indexing.'
+            if not row.get("project") else
+            'Placed by the tasks it cites, not by you. Say so and your word '
+            'wins.') + '<span style="display:block;margin-top:var(--sp-3)">'
+            '</span>' + attribute_link, BODY)
+           if attribute_link else ""),
            field("The way back", way, BODY),
            field("Why this verdict", esc(row.get("reason") or "not recorded"),
                  META)))
 
 
-def chats(root, manual):
-    """One row per CHAT, newest first -- not one per (task, chat) pair.
+def chats(root, model, manual):
+    """Only the chats that belong to no project.
 
-    Item-major rendering turned 15 chats into 52 rows, because a thread citing
-    fifty tasks rendered fifty times, and made the row's primary label an item
-    id rather than the chat's own name.
+    The rest moved INTO the project cards. Fifteen chats in one flat list, ten
+    of them citing nothing and several not this portfolio at all -- a playlist
+    tool, an entitlements parser -- is a section you scroll past. A chat is
+    context for a project, so it belongs where that project is.
+
+    What is left here is the residue, and it is actionable rather than noise:
+    each row can be attributed in one tap, and "not one of my projects" hides
+    it for good.
     """
+    attributed = _context.attributions(root)
     rows = kickoff_mod.all_threads(root, manual, volatile=False)
+    loose, dismissed, placed = [], 0, 0
+    for row in rows:
+        if _context.is_dismissed(row, attributed):
+            dismissed += 1
+        elif row.get("project"):
+            placed += 1
+        else:
+            loose.append(row)
+
     out = ['<section style="%s"><div style="display:flex;align-items:baseline;'
-           'gap:var(--sp-2);margin:0 0 var(--sp-4)"><span style="%s">Chats · %d'
-           '</span></div>' % (SECTION, CHROME, len(rows))]
-    if not rows:
-        out.append('<p style="%s;margin:0;max-width:46ch">None indexed. '
-                   'Starting fresh is correct — nothing has been bound to a '
-                   'chat yet, which is a cold start and not a fault.</p>' % BODY)
+           'gap:var(--sp-2);margin:0 0 var(--sp-4)"><span style="%s">'
+           'Chats with no project · %d</span></div>' % (SECTION, CHROME,
+                                                        len(loose))]
+    tail = []
+    if placed:
+        tail.append("%d chat%s sit%s with %s project%s above"
+                    % (placed, "" if placed == 1 else "s",
+                       "s" if placed == 1 else "", "its" if placed == 1
+                       else "their", "" if placed == 1 else "s"))
+    if dismissed:
+        tail.append("%d hidden as not this portfolio" % dismissed)
+    if tail:
+        out.append('<p style="%s;margin:0 0 var(--sp-4);max-width:46ch">%s.</p>'
+                   % (BODY, "; ".join(tail).capitalize()))
+    if not loose:
+        out.append('<p style="%s;margin:0;max-width:46ch">Every indexed chat '
+                   'belongs to a project or has been set aside. Nothing here '
+                   'needs a decision.</p>' % BODY)
     else:
-        resume = sum(1 for r in rows if (r.get("verdict") or "") == "resume")
-        out.append('<p style="%s;margin:0 0 var(--sp-4);max-width:46ch">%d '
-                   'worth returning to, %d better restarted. Every chat here '
-                   'was indexed from a transcript on the machine that ran '
-                   'it.</p>' % (BODY, resume, len(rows) - resume))
-        out += [chat_row(r) for r in rows]
+        out.append('<p style="%s;margin:0 0 var(--sp-4);max-width:46ch">These '
+                   'cite no task, so nothing can place them. One tap each, and '
+                   'they stop being a list you scroll past.</p>' % BODY)
+        for row in loose:
+            out.append(chat_row(row, model, root, attribute_control(row)))
     out.append("</section>")
     return "".join(out)
+
+
+def attribute_control(row):
+    return (
+        '<a href="%s" style="display:flex;align-items:center;'
+        'justify-content:space-between;min-height:48px;border:1px solid '
+        'var(--el-line-2);padding:0 var(--sp-4);font:400 var(--fs-chrome)/1 '
+        'var(--font-mono);letter-spacing:0.12em;text-transform:uppercase;'
+        'color:var(--el-ink-2)"><span>Say which project</span>'
+        '<span style="color:var(--el-ink-3);text-transform:none">&#8594;</span>'
+        '</a>'
+        % esc(issue_url("attribute.yml", "attribute",
+                        "attribute %s" % (row.get("key") or "chat"),
+                        chat=row.get("title"), key=row.get("key"))))
 
 
 # -------------------------------------------------------------------- render
@@ -939,7 +1040,7 @@ def render(root, model, volatile=False):
         backlog(root, model, entries, stamp, repos_spec, manual, machine,
                 volatile),
         closures(model),
-        chats(root, manual),
+        chats(root, model, manual),
         '<p style="%s;margin:var(--sp-8) 0 0">This page reads. It never writes '
         '— every action leaves through a chat or a GitHub issue under your own '
         'sign-in, and it holds no token.</p>' % META,

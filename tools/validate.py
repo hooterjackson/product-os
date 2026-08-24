@@ -817,11 +817,75 @@ class Validator(object):
         for line in failures or ["see `python3 tests/test_regressions.py`"]:
             self.error("E-REGRESSION", "tests/test_regressions.py", line.strip())
 
+    def check_issue_form_projects(self, model):
+        """An issue form's project dropdown must be the projects that exist.
+
+        The forms are the phone's whole write path, and their options are
+        hand-written YAML. Add a project and the dropdown does not know; a
+        chat or a task filed against it picks a wrong project from a list that
+        looks authoritative. Nothing else notices, because the form still
+        validates and the issue still opens -- the same shape as the `inbox`
+        and `task` labels GitHub silently dropped for a week.
+
+        `new project` and `not one of my projects` are the two legal extras:
+        each is an answer about the SET of projects rather than a member of it.
+        """
+        known = set(model.projects) | {"new project", "not one of my projects"}
+        directory = os.path.join(self.root, ".github", "ISSUE_TEMPLATE")
+        if not os.path.isdir(directory):
+            # NOT a silent return. The forms are the only write path from a
+            # phone; a missing directory is the loudest possible finding, and
+            # returning quietly would report it as a clean tree.
+            self.error("E-FORM-PROJECT", ".github/ISSUE_TEMPLATE",
+                       "the issue forms are missing entirely — there is no "
+                       "way to file anything from a phone")
+            return
+        checked = 0
+        for name in sorted(os.listdir(directory)):
+            if not name.endswith(".yml"):
+                continue
+            path = os.path.join(directory, name)
+            with open(path, "r", encoding="utf-8") as fh:
+                lines = fh.read().splitlines()
+            # Anchored to the `options:` block that FOLLOWS `id: project`.
+            # A looser "any list item after id: project" scan reads the next
+            # field's `- type: textarea` as a project named "type: textarea".
+            inside, options, listed, start = False, False, set(), 0
+            for number, line in enumerate(lines, 1):
+                if re.match(r"^\s*id:\s*project\s*$", line):
+                    inside, start = True, number
+                elif not inside:
+                    continue
+                elif re.match(r"^\s*options:\s*$", line):
+                    options = True
+                elif options and re.match(r"^\s+- \S", line):
+                    listed.add(line.strip()[2:].strip())
+                elif options:
+                    break
+            if not inside:
+                continue
+            checked += 1
+            for extra in sorted(listed - known):
+                self.error("E-FORM-PROJECT", path,
+                           "offers project %r, which does not exist in "
+                           "state/projects/" % extra, start)
+            for missing in sorted(set(model.projects) - listed):
+                self.error("E-FORM-PROJECT", path,
+                           "does not offer project %r, so it cannot be "
+                           "chosen from a phone" % missing, start)
+        # R-075. Two forms carry this dropdown; a walk finding none has found
+        # a renamed directory, not a clean tree.
+        if checked < 2:
+            self.error("E-FORM-PROJECT", directory,
+                       "expected at least 2 forms with a project dropdown, "
+                       "scanned %d — the check did not run" % checked)
+
     def run(self, base_ref=None, with_tests=True):
         self.check_format()
         self.check_contract_docs()
         model = _model.Model.load(self.root)
         self.check_model(model)
+        self.check_issue_form_projects(model)
         self.check_register_ids()
         self.check_proposal_refs()
         self.check_secrets()

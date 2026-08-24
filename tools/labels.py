@@ -44,6 +44,8 @@ REQUIRED = {
     "dismiss": ("7D765F", "Dismiss a recommendation. It must not come back."),
     "confirm": ("D6E5F4", "Confirm a closure a machine made without him."),
     "close": ("9C937F", "Close an open task — shipped, or decided against."),
+    "attribute": ("7D765F", "Say which project a chat belongs to, or that it "
+                            "is not this portfolio at all."),
 }
 
 TEMPLATE_DIR = os.path.join(".github", "ISSUE_TEMPLATE")

@@ -1,0 +1,41 @@
+name: Attribute a chat
+description: Say which project a chat belongs to, or that it is not yours at all.
+labels:
+  - attribute
+body:
+  - type: markdown
+    attributes:
+      value: >
+        The chat is filled in from the row you tapped. Most chats cite no task,
+        so nothing can derive this — it is yours to say, once, and it survives
+        re-indexing.
+  - type: input
+    id: chat
+    attributes:
+      label: Chat
+    validations:
+      required: true
+  - type: input
+    id: key
+    attributes:
+      label: Its handle
+      description: A hash of the session, not the session id. Leave it alone.
+    validations:
+      required: true
+  - type: dropdown
+    id: project
+    attributes:
+      label: Which project
+      description: >
+        "Not one of my projects" hides it for good — use it for work that has
+        nothing to do with this portfolio.
+      options:
+        - engineering-site
+        - gimbal-bench
+        - home-ai-infra
+        - home-app
+        - product-os
+        - robotic-spotlight
+        - not one of my projects
+    validations:
+      required: true

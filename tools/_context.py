@@ -457,3 +457,200 @@ def machines(root):
         if spec.get("id"):
             out[spec["id"]] = spec
     return out
+
+
+# --- which project a chat belongs to ----------------------------------------
+
+ATTRIBUTION = "state/threads/attribution.yaml"
+NOT_MINE = "none"
+
+
+def attributions(root):
+    """thread key -> project slug, or NOT_MINE. Hand-written, tracked.
+
+    A chat's project cannot be derived for most chats: 10 of 15 here cite no
+    task at all, and several are not this portfolio in any sense -- a playlist
+    tool, an entitlements parser. So attribution is HIS, written once per chat
+    and surviving re-indexing, which regenerates the shard wholesale.
+
+    Tracked, and safe to track: a project slug and a thread key, where the key
+    is a 12-character hash that cannot resume anything. No url, no session id,
+    no path -- the split `R-076` established.
+    """
+    out = {}
+    path = os.path.join(root, ATTRIBUTION)
+    if not os.path.exists(path):
+        return out
+    with open(path, "r", encoding="utf-8") as fh:
+        for line in fh:
+            line = line.split("#", 1)[0].strip()
+            if not line or ":" not in line:
+                continue
+            key, _, value = line.partition(":")
+            value = value.strip()
+            if value:
+                out[key.strip()] = value
+    return out
+
+
+def chat_projects(thread, attributed):
+    """Every project this chat touches. Explicit attribution wins.
+
+    Derived from the ID PREFIX, not from a live lookup. Resolving against
+    loaded items meant archiving the product-os build history silently orphaned
+    four chats that were entirely about product-os -- the tasks left the model
+    and took the chats' identity with them. A prefix outlives the task.
+    """
+    said = attributed.get(thread.get("key"))
+    if said == NOT_MINE:
+        return set()
+    if said:
+        return {said}
+    if not _fm.prefixes():
+        # Loud, not empty. Without the prefix set every chat resolves to no
+        # project and the page renders them all as unattributed -- a wrong
+        # answer that looks exactly like a correct one, which is R-075.
+        raise RuntimeError(
+            "prefix set not loaded -- call _model.Model.load() first. "
+            "Without it every chat attributes to nothing, and a section of "
+            "unattributed chats is indistinguishable from the truth.")
+    out = set()
+    for item in thread.get("items") or []:
+        parsed = _fm.parse_id(item)
+        if parsed:
+            slug = _fm.project_for(parsed[0])
+            if slug:
+                out.add(slug)
+    return out
+
+
+def primary_project(thread, attributed):
+    """The ONE project a chat renders under.
+
+    `chat_projects` returns everything it touches, and one thread here cites
+    tasks across six projects -- so rendering it in each card reproduced
+    exactly the duplication that moving chats out of the item-major loop was
+    meant to end: 15 chats, 20 rows. A chat appears once, under the project it
+    cites most, and its row names the others.
+
+    Ties break alphabetically so the choice is stable across runs rather than
+    depending on dict order -- otherwise `publish --check` drifts for no
+    reason anyone can see.
+    """
+    said = attributed.get(thread.get("key"))
+    if said and said != NOT_MINE:
+        return said
+    counts = {}
+    for item in thread.get("items") or []:
+        parsed = _fm.parse_id(item)
+        if not parsed:
+            continue
+        slug = _fm.project_for(parsed[0])
+        if slug:
+            counts[slug] = counts.get(slug, 0) + 1
+    if not counts:
+        return None
+    return sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[0][0]
+
+
+def is_dismissed(thread, attributed):
+    return attributed.get(thread.get("key")) == NOT_MINE
+
+
+_ARCHIVED = {}
+
+
+def archived_titles(root):
+    """id -> title, for tasks that have left the model.
+
+    `Model.load` walks `state/projects/*/items/` and archived tasks are not
+    there, so every chat citing the build history rendered a column of bare
+    `POS-001 … +8 more` -- twelve ids and not one word about any of them, on
+    the rows most likely to be worth reading. The titles are on disk the whole
+    time, one directory across.
+
+    Archiving deliberately keeps ids resolvable rather than deleting them
+    (`R-057` is the same lesson about `next_id`), so reading them here is
+    consistent with that, not a special case.
+    """
+    if root in _ARCHIVED:
+        return _ARCHIVED[root]
+    out = {}
+    base = os.path.join(root, "state", "archive")
+    for stem, _dirs, files in os.walk(base):
+        for name in files:
+            if not name.endswith(".md"):
+                continue
+            try:
+                fm, _body = _fm.load(os.path.join(stem, name))
+            except _fm.FrontmatterError:
+                continue        # `state/archive/README.md` is prose, not an item
+            if fm.get("id") and fm.get("title"):
+                out[fm["id"]] = fm["title"]
+    if os.path.isdir(base) and not out:
+        raise RuntimeError(
+            "%s exists and holds no readable id/title pair. An empty result "
+            "here renders as bare ids and looks like a design choice rather "
+            "than a broken read -- R-075." % base)
+    _ARCHIVED[root] = out
+    return out
+
+
+def notes(root):
+    """key -> the authored sentence saying what that chat was about.
+
+    Deliberately NOT in the shard. `index.py`'s FORBIDDEN_KEY rejects any field
+    matching /summary|content|message|text|body/ at any depth, because a shard
+    is machine-derived and must never carry conversation content. That guard is
+    right and stays -- so the sentence is authored here instead, the way
+    `attribution.yaml` is authored, which also makes it editable before it
+    reaches a public page.
+    """
+    out = {}
+    path = os.path.join(root, "state", "threads", "notes.yaml")
+    if not os.path.exists(path):
+        return out
+    with open(path, "r", encoding="utf-8") as fh:
+        for line in fh:
+            line = line.strip()
+            if not line or line.startswith("#") or ":" not in line:
+                continue
+            key, _, value = line.partition(":")
+            value = value.strip().strip('"').strip("'")
+            if value:
+                out[key.strip()] = value
+    return out
+
+
+def chat_summary(thread, note=None):
+    """What this chat was about -- the authored sentence, or the shape of it.
+
+    `note` is the real answer and comes from `notes()`. Without one, the best
+    the index can honestly do is say how MUCH work happened, over what span,
+    against what -- which is what rendered before, on every row, and read as
+    filler because it described none of them. The fallback stays because nine
+    of fifteen chats have no transcript left on this machine to author from,
+    and a metadata line is a truthful thin answer where a guessed sentence
+    would be a confident wrong one.
+    """
+    if note:
+        return note
+    bits = []
+    started = (thread.get("started") or "")[:10]
+    ended = (thread.get("last_active") or "")[:10]
+    if started and ended:
+        bits.append("one sitting on %s" % started if started == ended
+                    else "%s to %s" % (started, ended))
+    prompts = thread.get("prompts") or 0
+    if prompts:
+        bits.append("%d exchange%s" % (prompts, "" if prompts == 1 else "s"))
+    files = thread.get("files") or 0
+    if files > 1:
+        bits.append("%d files touched" % files)
+    if thread.get("branch"):
+        bits.append("on `%s`" % thread["branch"])
+    if not bits:
+        return "The index recorded no detail beyond its name."
+    bits.append("no description written yet")
+    return bits[0][:1].upper() + bits[0][1:] + (
+        " · " + " · ".join(bits[1:]) if len(bits) > 1 else "")

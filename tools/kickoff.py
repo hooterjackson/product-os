@@ -273,6 +273,11 @@ def all_threads(root, manual, volatile=False):
                 out.append({
                     "machine": shard.get("machine"),
                     "tool": thread.get("tool"),
+                    "key": thread.get("key"),
+                    "started": thread.get("started"),
+                    "prompts": thread.get("prompts"),
+                    "files": thread.get("files"),
+                    "branch": thread.get("branch"),
                     "title": thread.get("title") or thread.get("key"),
                     "verdict": thread.get("verdict"),
                     "reason": thread.get("verdict_reason"),
@@ -293,6 +298,12 @@ def all_threads(root, manual, volatile=False):
             })
     out.sort(key=lambda r: (r.get("last_active") or "", r.get("title") or ""),
              reverse=True)
+    attributed = _context.attributions(root)
+    written = _context.notes(root)
+    for row in out:
+        row["projects"] = sorted(_context.chat_projects(row, attributed))
+        row["project"] = _context.primary_project(row, attributed)
+        row["summary"] = _context.chat_summary(row, written.get(row.get("key")))
     return redact(out, volatile, root)
 
 

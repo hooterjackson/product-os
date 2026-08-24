@@ -1557,3 +1557,64 @@ disclosure screen's `home-path` is `/Users/` with slashes and never saw the
 dash form. Three guards, all correct, all pointed one directory away from where
 the data actually lived. **A guard aimed at the generated surface cannot see
 the authored one, and the authored one is where the source of truth is.**
+
+---
+
+## R-079 · A list of every chat, sorted by date, ranked as a section to skip
+
+**Keywords:** chats, threads, dashboard, surface, attribution, summary,
+grouping, noise, index, metadata
+
+Fifteen chats rendered as one flat list newest-first. **Ten cited no task at
+all**, several were not this portfolio in any sense — a playlist tool, an
+entitlements parser, a Parallels comparison — and every row's description was
+the same metadata sentence in different numbers: *"One sitting on 2026-07-24 ·
+5 files touched."* True of all fifteen, descriptive of none. Marcelo's verdict
+was that it was the worst section on the page, and the reason is structural
+rather than cosmetic: **the section's organising principle was the indexer's,
+not the reader's.** The indexer knows chats by recency; a person knows them by
+what they were working on.
+
+Three separate fixes, and only the first is about layout:
+
+**A chat is context for a project, so it lives where the project is.** Each
+chat now renders inside its project's card, once, under the project it cites
+most. Ten with nothing to cite fall to a section at the foot that is
+*actionable* rather than residual — one tap files an attribution issue, and
+*"not one of my projects"* hides it permanently.
+
+**Rendering it in every project it touches is the item-major bug wearing new
+clothes.** One thread here cites tasks across six projects, so the first
+version produced 20 rows for 15 chats. That is the same defect that moving
+chats out of the per-item loop had just fixed, re-entered from the other side:
+the earlier version looped items over threads and produced 52 rows. **Whenever
+a thing has a many-to-many relationship with the thing it renders under, pick
+one and name the others in the row.**
+
+**A metadata line cannot say what a chat was about, and it must not pretend
+to.** `index.py`'s `FORBIDDEN_KEY` rejects any shard field matching
+`/summary|content|message|text|body/`, deliberately — a shard is machine-derived
+and must never carry conversation content. That guard is right and stays. So
+the sentence is *authored*, in `state/threads/notes.yaml`, the way
+`attribution.yaml` is authored. **Six of fifteen had a transcript left on this
+machine to author from; the other nine are absent from the file rather than
+guessed**, and their rows fall back to the metadata line marked *"no
+description written yet"*. Being visibly thin is the honest state; a confident
+invented summary is the failure this portfolio keeps having.
+
+Authoring it also puts it somewhere he can edit before it reaches a
+world-readable page, which a generated field would not have been.
+
+**`GB-001` is a handle, not a description.** Rows listed bare ids, and the
+titles were one lookup away the whole time. `Model.load` walks
+`state/projects/*/items/` only, so the twelve archived `POS-*` tasks resolved to
+nothing — `_context.archived_titles` reads them out of `state/archive/`, which
+is exactly why archiving moves rather than deletes (`R-057`).
+
+**The first version of that lookup shipped broken and silent.** It called a
+function that does not exist, inside a bare `except Exception: continue`, and
+returned `{}` — rendering every id bare, which is indistinguishable from a
+design decision. `R-075` again, in code written the same hour as a test
+asserting `R-075`. It now raises if `state/archive/` exists and yields nothing,
+and catches only `FrontmatterError`, for the one prose file in there.
+

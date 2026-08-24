@@ -1,0 +1,16 @@
+# Which project a chat belongs to. Hand-written, tracked, and yours.
+#
+# Most chats cite no task — 10 of 15 here — so nothing can derive this. The
+# thread index is regenerated wholesale on every run, so an attribution written
+# into the shard would be destroyed; this file survives.
+#
+# Format: <handle>: <project-slug>       one per line, # comments fine
+#         <handle>: none                 not this portfolio at all — hidden
+#
+# The handle is a 12-character hash of the session, printed on the chat's row.
+# It is NOT the session id and cannot resume anything, which is why this file
+# is safe to track — see R-076 and index.py LOCAL_KEYS.
+#
+# A chat citing a task id needs no line here: the project comes from the id's
+# prefix, and a prefix outlives the task, so archiving one does not orphan the
+# chats that were about it.

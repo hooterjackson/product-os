@@ -1,0 +1,24 @@
+# What each chat was actually about -- one sentence, AUTHORED.
+#
+# `index.py`'s FORBIDDEN_KEY rejects any shard field matching /summary|content|
+# message|text|body/, so a machine-derived shard can never carry this: the
+# index is metadata-only by design and a span plus an exchange count says how
+# MUCH happened, never what it was. The dashboard rendered exactly that and it
+# read as filler.
+#
+# So the sentence lives here instead, authored the way `attribution.yaml` is
+# authored -- which also makes it editable. Every line below is published to a
+# world-readable page. Shorten one, or delete it and the row falls back to the
+# metadata line; set the chat to `none` in `attribution.yaml` to drop it from
+# the page entirely.
+#
+# Seeded 2026-08-23 from the opening ask of each transcript still on this
+# machine. Nine of fifteen had none -- codex threads, or transcripts since
+# rotated away -- and those are absent here rather than guessed.
+
+705af7bc2ec0: "Rebuilding product-os around a refined model — deleting the scoring engine and dependency graph, and turning the tool into a read-only dashboard whose product is copyable prompts."
+788b3ce995fb: "The original build, straight from BOOTSTRAP.md — planned first, then written. 134 exchanges, and most of what this repo now is came out of it."
+6b0c0de94a96: "The `product-os` entry in `state/repos.json` contradicted an accepted decision record, and this fixed the entry to match the ruling."
+ff4f3a1d5887: "Ideating the tool that became product-os — how the hardware site, the chats, and the priorities could stop being three separate places."
+21dff8bac4d6: "Building engineering.engineered.lighting: turning the seven-document Engineered Lighting research series into an MkDocs site."
+d0f173b0e831: "Training V-JEPA 2.1 to recognise household context — reading, cooking, working out — with pose detection, on the RTX 6000 box."

@@ -2368,10 +2368,12 @@ class TheChatsSectionNamesChatsNotItems(unittest.TestCase):
     rather than what the CHAT was about."""
 
     def _section(self):
+        """The WHOLE page. Chats live in two places now — inside the project
+        card they belong to, and in a "no project" section at the foot — so a
+        slice from one heading sees only half of them."""
         with open(os.path.join(ROOT, "public", "index.html"),
                   encoding="utf-8") as fh:
-            page = fh.read()
-        return page[page.index(">Chats ·"):]
+            return fh.read()
 
     def test_one_row_per_chat_not_per_task_it_cites(self):
         """A thread citing 50 tasks rendered 50 times, and that is also why the
@@ -2986,6 +2988,221 @@ class TheWayBackIsCopyableNotProse(unittest.TestCase):
         self.assertIsNotNone(bench, "formd-t1 is not registered")
         self.assertIsNone(bench.get("product_os"),
                           "formd-t1 claims a checkout it does not have")
+
+
+class ChatsLiveWithTheirProject(unittest.TestCase):
+    """Fifteen chats in one flat list, ten citing nothing and several not this
+    portfolio at all — a playlist tool, an entitlements parser — is a section
+    you scroll past. A chat is context for a project, so it belongs where that
+    project is."""
+
+    def _page(self):
+        with open(os.path.join(ROOT, "public", "index.html"),
+                  encoding="utf-8") as fh:
+            return fh.read()
+
+    def _threads(self):
+        import _model as model_mod
+        import kickoff as kickoff_mod
+        model_mod.Model.load(ROOT)          # loads the prefix set
+        return kickoff_mod.all_threads(ROOT, kickoff_mod.load_manual(ROOT),
+                                       volatile=False)
+
+    def test_each_chat_renders_exactly_once(self):
+        """One thread cites tasks across SIX projects. Rendering it in each
+        card reproduced the very duplication that moving chats out of the
+        item-major loop was meant to end — 15 chats, 20 rows."""
+        threads = self._threads()
+        self.assertTrue(threads, "no chats to check")                 # R-075
+        badges = re.findall(r">(RESUME|RESTART)<", self._page())
+        self.assertEqual(len(badges), len(threads),
+                         "%d rows for %d chats" % (len(badges), len(threads)))
+
+    def test_a_multi_project_chat_names_the_others(self):
+        spread = [t for t in self._threads() if len(t.get("projects") or []) > 1]
+        if not spread:
+            self.skipTest("no chat spans projects right now")
+        self.assertIn("also touches", self._page(),
+                      "a chat spanning projects hides all but one")
+
+    def test_the_project_comes_from_the_id_PREFIX(self):
+        """Resolving against LOADED items meant archiving the product-os build
+        history silently orphaned four chats that were entirely about
+        product-os — the tasks left the model and took the chats' identity with
+        them. A prefix outlives the task."""
+        import _context as ctx
+        import _model as model_mod
+        model = model_mod.Model.load(ROOT)
+        live = set(model.items)
+        placed = [t for t in self._threads() if t.get("project")]
+        self.assertTrue(placed, "nothing attributes")                 # R-075
+        orphaned = [t for t in placed
+                    if not any(i in live for i in (t.get("items") or []))
+                    and not ctx.attributions(ROOT).get(t.get("key"))]
+        self.assertTrue(orphaned,
+                        "expected at least one chat placed by prefix alone — "
+                        "the archived-task case this exists for")
+
+    def test_an_unloaded_prefix_set_raises_rather_than_orphaning_everything(self):
+        """R-075. Without the prefix set every chat resolves to no project and
+        the page renders them all as unattributed — a wrong answer that looks
+        exactly like a correct one."""
+        import _context as ctx
+        import _fm as fm_mod
+        saved = fm_mod.prefixes()
+        try:
+            fm_mod.set_prefixes({})
+            with self.assertRaises(RuntimeError):
+                ctx.chat_projects({"items": ["GB-001"]}, {})
+        finally:
+            fm_mod.set_prefixes(saved)
+
+    def test_every_chat_can_be_attributed_in_one_tap(self):
+        """Placed ones too. Placement is derived from the ids a chat happens to
+        cite, and one product-os chat lands under gimbal-bench because it cites
+        more GB tasks than POS ones. A derived answer he cannot overrule is
+        worse than no answer."""
+        page = self._page()
+        threads = self._threads()
+        links = set(re.findall(r'issues/new\?[^"]*attribute\.yml[^"]*', page))
+        self.assertEqual(len(links), len(threads),
+                         "%d attribute links for %d chats"
+                         % (len(links), len(threads)))
+        for thread in threads:
+            self.assertTrue(any("key=%s" % thread["key"] in u for u in links),
+                            "%r has no way to be attributed" % thread["title"])
+
+    def test_tasks_outrank_rulings_when_the_citation_list_is_cut(self):
+        """One chat cites fifty ids and rendered `DEC-003, DEC-012, DEC-013,
+        +46 more` — three rulings and not one task, because `DEC` sorts early
+        alphabetically."""
+        page = self._page()
+        crowded = [t for t in self._threads() if len(t.get("items") or []) > 4]
+        self.assertTrue(crowded, "no chat cites enough ids to truncate")
+        for thread in crowded:
+            block = page[page.index("key=%s" % thread["key"]):]
+            block = block[:block.index("The way back")] if "The way back" \
+                in block else block
+            self.assertNotIn(">DEC-", block[:2000],
+                             "%r leads its citations with rulings"
+                             % thread["title"])
+
+    def test_not_mine_is_an_option_and_it_hides(self):
+        """Several of these are not this portfolio in any sense. Without a
+        "not mine" exit they come back every run and the section never empties."""
+        with open(os.path.join(ROOT, ".github", "ISSUE_TEMPLATE",
+                               "attribute.yml"), encoding="utf-8") as fh:
+            self.assertIn("not one of my projects", fh.read())
+        import _context as ctx
+        self.assertEqual(ctx.chat_projects({"items": ["GB-001"], "key": "k"},
+                                           {"k": ctx.NOT_MINE}), set())
+
+    def test_the_summary_says_what_the_index_is_allowed_to_know(self):
+        """The index is metadata-only by design, so a real summary cannot come
+        from here — that is the audit's job. What metadata CAN say honestly is
+        how much work happened, over what span, against what."""
+        for thread in self._threads():
+            summary = thread.get("summary") or ""
+            self.assertTrue(summary, "%r has no summary" % thread["title"])
+            self.assertNotEqual(summary, thread["title"])
+
+
+class DescriptionsAreAuthoredNotDerived(unittest.TestCase):
+    """A span and an exchange count say how MUCH happened, never what it was.
+    Fifteen rows carried the same sentence in different numbers."""
+
+    def test_the_shard_still_refuses_to_carry_content(self):
+        """The reason the note is authored at all. If this guard ever relaxes,
+        the honest fix is a better authored note, not a summary in the shard."""
+        import index as index_mod
+        for word in ("summary", "content", "message", "text", "body"):
+            self.assertTrue(index_mod.FORBIDDEN_KEY.search(word),
+                            "%r would now be publishable from a shard" % word)
+
+    def test_an_authored_note_wins_over_the_metadata_line(self):
+        import _context as ctx
+        thread = {"started": "2026-01-01", "last_active": "2026-01-01",
+                  "prompts": 5}
+        self.assertIn("no description written yet", ctx.chat_summary(thread))
+        self.assertEqual(ctx.chat_summary(thread, "It was about X."),
+                         "It was about X.")
+
+    def test_notes_reach_the_page_verbatim(self):
+        import _context as ctx
+        written = ctx.notes(ROOT)
+        self.assertTrue(written, "state/threads/notes.yaml parsed to nothing")
+        with open(os.path.join(ROOT, "public", "index.html"),
+                  encoding="utf-8") as fh:
+            page = fh.read()
+        for key, note in written.items():
+            head = note.split("—")[0].split(" - ")[0].strip()[:40]
+            self.assertIn(head, page,
+                          "note for %s never reaches the page" % key)
+
+    def test_archived_task_titles_resolve(self):
+        """Twelve POS-* tasks left the model at the cutover and their chats
+        rendered a column of bare ids. `state/archive/` is why archiving moves
+        instead of deleting."""
+        import _context as ctx
+        filed = ctx.archived_titles(ROOT)
+        self.assertGreaterEqual(len(filed), 12,
+                                "archive read %d titles" % len(filed))
+        self.assertEqual(filed.get("POS-001"),
+                         "Build product-os slice 1a-minus")
+
+    def test_an_unreadable_archive_raises_rather_than_returning_empty(self):
+        """R-075. The first version of this shipped as a bare `except
+        Exception` around a function that did not exist, returned {}, and
+        rendered every id bare — a broken read that looked like a choice."""
+        import _context as ctx
+        with tempfile.TemporaryDirectory() as tmp:
+            os.makedirs(os.path.join(tmp, "state", "archive"))
+            with open(os.path.join(tmp, "state", "archive", "notes.md"),
+                      "w", encoding="utf-8") as fh:
+                fh.write("no frontmatter here\n")
+            with self.assertRaises(RuntimeError):
+                ctx.archived_titles(tmp)
+
+
+class TheIssueFormsOfferTheProjectsThatExist(unittest.TestCase):
+    """The forms are the phone's whole write path and their options are
+    hand-written YAML. Add a project and the dropdown does not know."""
+
+    def _validator(self):
+        import validate as validate_mod
+        import _model as model_mod
+        v = validate_mod.Validator(ROOT)
+        v.check_issue_form_projects(model_mod.Model.load(ROOT))
+        return [f for f in v.findings if f.code == "E-FORM-PROJECT"]
+
+    def test_the_forms_are_in_sync_today(self):
+        self.assertEqual(self._validator(), [])
+
+    def test_the_check_counts_the_forms_it_scanned(self):
+        """R-075. Two forms carry the dropdown; a walk finding none has found
+        a renamed directory, not a clean tree."""
+        import validate as validate_mod
+        import _model as model_mod
+        with tempfile.TemporaryDirectory() as tmp:
+            os.makedirs(os.path.join(tmp, ".github", "ISSUE_TEMPLATE"))
+            v = validate_mod.Validator(tmp)
+            v.check_issue_form_projects(model_mod.Model.load(ROOT))
+            self.assertTrue([f for f in v.findings
+                             if "did not run" in f.message])
+
+    def test_a_missing_directory_is_loud(self):
+        import validate as validate_mod
+        import _model as model_mod
+        with tempfile.TemporaryDirectory() as tmp:
+            v = validate_mod.Validator(tmp)
+            v.check_issue_form_projects(model_mod.Model.load(ROOT))
+            self.assertTrue(v.findings, "a missing form directory was silent")
+
+    def test_the_parser_reads_options_not_the_next_field(self):
+        """`- type: textarea` follows the dropdown in task.yml and an
+        unanchored scan read it as a project named "type: textarea"."""
+        findings = self._validator()
+        self.assertFalse([f for f in findings if "type:" in f.message])
 
 
 if __name__ == "__main__":
